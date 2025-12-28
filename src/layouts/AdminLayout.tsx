@@ -2,7 +2,6 @@ import { ReactNode } from 'react'
 import { Sidebar } from '@/components/common/Sidebar'
 import { MobileSidebar } from '@/components/common/MobileSidebar'
 import { Header } from '@/components/common/Header'
-import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import { useUIStore } from '@/store/uiStore'
 import { cn } from '@/lib/utils'
 

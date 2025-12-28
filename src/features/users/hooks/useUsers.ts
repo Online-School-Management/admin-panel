@@ -17,6 +17,7 @@ import type {
   CreateUserInput,
   UpdateUserInput,
   UserResponse,
+  UsersResponse,
   User,
 } from '../types/user.types'
 
@@ -45,12 +46,12 @@ export function useUsers(params?: {
   role?: string
   status?: string
 }) {
-  return useQuery({
+  return useQuery<UsersResponse>({
     queryKey: userKeys.list(params),
     queryFn: () => {
       if (USE_MOCK_DATA) {
         // Simulate API delay
-        return new Promise((resolve) => {
+        return new Promise<UsersResponse>((resolve) => {
           setTimeout(() => {
             resolve(getMockUsers(params))
           }, 300)

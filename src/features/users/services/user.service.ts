@@ -1,6 +1,5 @@
 import apiClient from '@/services/api-client'
 import type {
-  User,
   CreateUserInput,
   UpdateUserInput,
   UsersResponse,

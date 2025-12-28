@@ -157,7 +157,7 @@ export function UsersList() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {data.users.map((user) => (
+                    {data.users.map((user: User) => (
                       <TableRow key={user.id}>
                         <TableCell>
                           <div className="flex items-center gap-3">
@@ -166,7 +166,7 @@ export function UsersList() {
                               <AvatarFallback>
                                 {user.name
                                   .split(' ')
-                                  .map((n) => n[0])
+                                  .map((n: string) => n[0])
                                   .join('')
                                   .toUpperCase()
                                   .slice(0, 2)}

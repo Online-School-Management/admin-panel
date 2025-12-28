@@ -1,19 +1,9 @@
-import { Home, Users, Settings } from 'lucide-react'
+import { X } from 'lucide-react'
 import { NavItem } from './NavItem'
 import { useUIStore } from '@/store/uiStore'
 import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
-import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
-const navigation = [
-  { to: '/dashboard', icon: Home, label: 'Dashboard' },
-  { to: '/users', icon: Users, label: 'Users' },
-]
-
-const settingsNavigation = [
-  { to: '/settings', icon: Settings, label: 'Settings' },
-]
+import { mainNavigation, settingsNavigation } from '@/constants/navigation'
 
 export function Sidebar() {
   const { sidebarOpen, setSidebarOpen } = useUIStore()
@@ -65,7 +55,7 @@ export function Sidebar() {
           sidebarOpen ? 'p-4' : 'p-2'
         )}>
           {/* Main Navigation */}
-          {navigation.map((item) => (
+          {mainNavigation.map((item) => (
             <NavItem
               key={item.to}
               to={item.to}

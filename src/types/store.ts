@@ -46,7 +46,6 @@ export type AuthStore = AuthState & AuthActions
 export interface UIState {
   sidebarOpen: boolean
   mobileMenuOpen: boolean
-  theme: 'light' | 'dark'
 }
 
 /**
@@ -57,8 +56,6 @@ export interface UIActions {
   toggleSidebar: () => void
   setMobileMenuOpen: (open: boolean) => void
   toggleMobileMenu: () => void
-  setTheme: (theme: 'light' | 'dark') => void
-  toggleTheme: () => void
 }
 
 /**

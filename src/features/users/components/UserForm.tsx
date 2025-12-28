@@ -301,14 +301,14 @@ export function UserForm({ userId }: UserFormProps) {
           <div className="flex justify-end gap-4 pt-4 border-t">
             <Button
               type="button"
-              variant="outline"
+              variant="default"
               onClick={() => navigate('/users')}
               disabled={isSubmitting}
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" variant="default" disabled={isSubmitting}>
               <UserPlus className="h-4 w-4 mr-2" />
               {isSubmitting
                 ? 'Creating...'

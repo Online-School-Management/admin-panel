@@ -1,4 +1,3 @@
-import { Home, Users, Settings } from 'lucide-react'
 import {
   Sheet,
   SheetContent,
@@ -7,12 +6,9 @@ import {
 } from '@/components/ui/sheet'
 import { NavItem } from './NavItem'
 import { useUIStore } from '@/store/uiStore'
+import { mainNavigation, settingsNavigation } from '@/constants/navigation'
 
-const navigation = [
-  { to: '/dashboard', icon: Home, label: 'Dashboard' },
-  { to: '/users', icon: Users, label: 'Users' },
-  { to: '/settings', icon: Settings, label: 'Settings' },
-]
+const navigation = [...mainNavigation, ...settingsNavigation]
 
 export function MobileSidebar() {
   const { mobileMenuOpen, setMobileMenuOpen } = useUIStore()
@@ -36,7 +32,7 @@ export function MobileSidebar() {
         </nav>
         <div className="border-t p-4">
           <p className="text-xs text-muted-foreground">
-            © 2024 Admin Panel
+            © 2026 Admin Panel
           </p>
         </div>
       </SheetContent>

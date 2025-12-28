@@ -1,24 +1,63 @@
 @import "tailwindcss";
 
+@theme {
+  /* Base colors */
+  --color-background: hsl(0 0% 100%);
+  --color-foreground: hsl(222.2 84% 4.9%);
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(222.2 84% 4.9%);
+  --color-popover: hsl(0 0% 100%);
+  --color-popover-foreground: hsl(222.2 84% 4.9%);
+  
+  /* Education theme - Teal primary - #3b8880 */
+  --color-primary: hsl(174 39% 38%);
+  --color-primary-foreground: hsl(0 0% 100%);
+  --color-primary-active: hsl(174 30% 92%);
+  
+  /* Secondary colors */
+  --color-secondary: hsl(210 40% 96.1%);
+  --color-secondary-foreground: hsl(222.2 47.4% 11.2%);
+  
+  /* Muted colors */
+  --color-muted: hsl(210 40% 96.1%);
+  --color-muted-foreground: hsl(215.4 16.3% 46.9%);
+  
+  /* Education theme - Light teal accent */
+  --color-accent: hsl(174 30% 95%);
+  --color-accent-foreground: hsl(174 39% 38%);
+  
+  /* Destructive colors */
+  --color-destructive: hsl(0 84.2% 60.2%);
+  --color-destructive-foreground: hsl(210 40% 98%);
+  
+  /* Border and input */
+  --color-border: hsl(214.3 31.8% 91.4%);
+  --color-input: hsl(214.3 31.8% 91.4%);
+  --color-ring: hsl(174 39% 38%);
+  
+  /* Border radius */
+  --radius: 0.5rem;
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
 @layer base {
   :root {
+    /* CSS variables for components that use hsl(var(--variable)) syntax */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    /* Education theme - Teal primary - #3b8880 */
     --primary: 174 39% 38%;
     --primary-foreground: 0 0% 100%;
-    /* Primary active states for menu items - visible light teal background */
-    --primary-active-bg: 174 30% 92%;
-    --primary-active-text: 174 39% 38%;
+    --primary-active: 174 30% 92%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    /* Education theme - Light teal accent */
     --accent: 174 30% 95%;
     --accent-foreground: 174 39% 38%;
     --destructive: 0 84.2% 60.2%;
@@ -27,33 +66,6 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 174 39% 38%;
     --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    /* Education theme - Brighter teal for dark mode */
-    --primary: 174 39% 50%;
-    --primary-foreground: 0 0% 100%;
-    /* Primary active states for menu items (dark mode) */
-    --primary-active-bg: 174 25% 25%;
-    --primary-active-text: 174 39% 60%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    /* Education theme - Darker teal accent for dark mode */
-    --accent: 174 25% 25%;
-    --accent-foreground: 174 39% 60%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 174 39% 50%;
   }
 }
 

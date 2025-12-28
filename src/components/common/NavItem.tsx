@@ -18,27 +18,21 @@ export function NavItem({ to, icon: Icon, label, collapsed = false, onClick }: N
     <Link
       to={to}
       onClick={onClick}
-      style={isActive ? {
-        backgroundColor: 'hsl(var(--primary-active-bg))',
-        color: 'hsl(var(--primary))',
-      } : undefined}
       className={cn(
         'flex items-center rounded-lg transition-all duration-200 relative group w-full',
         collapsed 
           ? 'justify-center px-2 py-2.5 min-w-0' 
           : 'gap-3 px-3 py-2.5',
         isActive
-          ? 'shadow-sm font-semibold'
+          ? 'bg-primary-active text-primary shadow-sm font-semibold'
           : 'text-muted-foreground hover:bg-accent hover:text-primary'
       )}
       title={collapsed ? label : undefined}
     >
       <Icon 
-        style={isActive ? { color: 'hsl(var(--primary))' } : undefined}
         className={cn(
-          'flex-shrink-0',
-          collapsed ? 'h-5 w-5' : 'h-5 w-5',
-          !isActive && 'text-muted-foreground'
+          'flex-shrink-0 h-5 w-5',
+          isActive ? 'text-primary' : 'text-muted-foreground'
         )} 
       />
       {!collapsed && (

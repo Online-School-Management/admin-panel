@@ -13,15 +13,16 @@ import { Breadcrumbs } from './Breadcrumbs'
 import { useUIStore } from '@/store/uiStore'
 import { useAuthStore } from '@/store/authStore'
 import { useNavigate } from 'react-router-dom'
+import { useLogout } from '@/features/auth/hooks/useLogout'
 
 export function Header() {
   const { toggleSidebar, toggleMobileMenu } = useUIStore()
-  const { user, logout } = useAuthStore()
+  const { user } = useAuthStore()
   const navigate = useNavigate()
+  const logoutMutation = useLogout()
 
   const handleLogout = () => {
-    logout()
-    navigate('/login')
+    logoutMutation.mutate()
   }
 
   const userInitials = user?.name

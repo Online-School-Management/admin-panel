@@ -6,7 +6,7 @@ import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosError } from 'ax
  */
 
 // Base URL - can be moved to environment variables
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1/backend'
 
 /**
  * Create axios instance with default configuration
@@ -69,6 +69,13 @@ apiClient.interceptors.response.use(
           useAuthStore.getState().logout()
         })
         window.location.href = '/login'
+        return Promise.reject(error)
+      }
+      
+      // Handle 403 Forbidden - permission denied
+      if (status === 403) {
+        // Error will be handled by the component showing toast/alert
+        // Don't redirect, just reject with error for component handling
         return Promise.reject(error)
       }
     }

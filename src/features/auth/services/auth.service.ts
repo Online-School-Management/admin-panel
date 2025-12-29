@@ -1,52 +1,98 @@
-import type { LoginCredentials, LoginResponse } from '../types/auth.types'
+import apiClient from '@/services/api-client'
+import type {
+  LoginCredentials,
+  LoginResponse,
+  ApiResponse,
+  LoginResponseData,
+  ApiUser,
+} from '../types/auth.types'
 
 /**
  * Authentication service
- * Currently uses static authentication (will be replaced with API calls later)
+ * Handles all authentication-related API calls
  */
 
-// Static admin credentials
-const ADMIN_EMAIL = 'admin@gmail.com'
-const ADMIN_PASSWORD = 'admin' // Default password
-
 /**
- * Login function - Static implementation
- * TODO: Replace with actual API call when backend is ready
+ * Login function - Calls real API
  */
 export async function login(
   credentials: LoginCredentials
 ): Promise<LoginResponse> {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 500))
+  try {
+    const response = await apiClient.post<ApiResponse<LoginResponseData>>(
+      '/auth/login',
+      credentials
+    )
 
-  // Static authentication check
-  if (
-    credentials.email === ADMIN_EMAIL &&
-    credentials.password === ADMIN_PASSWORD
-  ) {
+    if (!response.data.success || !response.data.data) {
+      throw new Error(response.data.message || 'Login failed')
+    }
+
+    const { user, token } = response.data.data
+
+    // Transform API user to frontend user format
     return {
       user: {
-        id: '1',
-        email: ADMIN_EMAIL,
-        name: 'Admin User',
-        role: 'admin',
+        id: user.id.toString(),
+        email: user.email,
+        name: user.name,
+        user_type: user.user_type,
+        role: user.admin?.roles?.[0]?.name,
+        avatar: user.profile_image,
+        // Include full user data for access to other fields
+        ...user,
       },
-      token: 'static-auth-token-' + Date.now(), // Generate a simple token
+      token,
     }
+  } catch (error: any) {
+    // Handle API errors
+    if (error.response?.data) {
+      const apiError = error.response.data
+      if (apiError.errors) {
+        // Validation errors
+        const firstError = Object.values(apiError.errors)[0]
+        throw new Error(
+          Array.isArray(firstError) ? firstError[0] : firstError || 'Login failed'
+        )
+      }
+      throw new Error(apiError.message || 'Login failed')
+    }
+    throw new Error(error.message || 'Login failed')
   }
-
-  // Throw error for invalid credentials
-  throw new Error('Invalid email or password')
 }
 
 /**
- * Logout function
- * TODO: Replace with actual API call when backend is ready
+ * Get current authenticated user
+ */
+export async function getCurrentUser(): Promise<ApiUser> {
+  try {
+    const response = await apiClient.get<ApiResponse<ApiUser>>('/auth/me')
+
+    if (!response.data.success || !response.data.data) {
+      throw new Error(response.data.message || 'Failed to get user')
+    }
+
+    return response.data.data
+  } catch (error: any) {
+    if (error.response?.data) {
+      const apiError = error.response.data
+      throw new Error(apiError.message || 'Failed to get user')
+    }
+    throw new Error(error.message || 'Failed to get user')
+  }
+}
+
+/**
+ * Logout function - Calls API to revoke token
  */
 export async function logout(): Promise<void> {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 200))
-  // In real implementation, this would call the API to invalidate the token
+  try {
+    await apiClient.post<ApiResponse<null>>('/auth/logout')
+  } catch (error: any) {
+    // Even if logout fails on server, we should still clear local state
+    // Log error but don't throw
+    console.error('Logout error:', error)
+  }
 }
 
 

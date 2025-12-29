@@ -6,9 +6,9 @@ import {
 } from '@/components/ui/sheet'
 import { NavItem } from './NavItem'
 import { useUIStore } from '@/store/uiStore'
-import { mainNavigation, settingsNavigation } from '@/constants/navigation'
+import { mainNavigation, adminNavigation, settingsNavigation } from '@/constants/navigation'
 
-const navigation = [...mainNavigation, ...settingsNavigation]
+const navigation = [...mainNavigation, ...adminNavigation, ...settingsNavigation]
 
 export function MobileSidebar() {
   const { mobileMenuOpen, setMobileMenuOpen } = useUIStore()

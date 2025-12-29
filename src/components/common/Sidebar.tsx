@@ -3,7 +3,7 @@ import { NavItem } from './NavItem'
 import { useUIStore } from '@/store/uiStore'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { mainNavigation, settingsNavigation } from '@/constants/navigation'
+import { mainNavigation, adminNavigation, settingsNavigation } from '@/constants/navigation'
 
 export function Sidebar() {
   const { sidebarOpen, setSidebarOpen } = useUIStore()
@@ -56,6 +56,28 @@ export function Sidebar() {
         )}>
           {/* Main Navigation */}
           {mainNavigation.map((item) => (
+            <NavItem
+              key={item.to}
+              to={item.to}
+              icon={item.icon}
+              label={item.label}
+              collapsed={!sidebarOpen}
+              onClick={() => {
+                // Close sidebar on mobile when item is clicked
+                if (window.innerWidth < 1024) {
+                  setSidebarOpen(false)
+                }
+              }}
+            />
+          ))}
+
+          {/* Separator */}
+          <div className={cn('my-2', !sidebarOpen && 'px-2')}>
+            <hr className="border-0 h-px bg-border" />
+          </div>
+
+          {/* Admin Navigation */}
+          {adminNavigation.map((item) => (
             <NavItem
               key={item.to}
               to={item.to}

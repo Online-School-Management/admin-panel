@@ -1,0 +1,199 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
+import {
+  getAdmins,
+  getAdminById,
+  createAdmin,
+  updateAdmin,
+  deleteAdmin,
+  assignRole,
+  revokeRole,
+  getAdminPermissions,
+} from '../services/admin.service'
+import type {
+  CreateAdminInput,
+  UpdateAdminInput,
+  AssignRoleInput,
+} from '../types/admin.types'
+
+/**
+ * Query keys for admin-related queries
+ */
+export const adminKeys = {
+  all: ['admins'] as const,
+  lists: () => [...adminKeys.all, 'list'] as const,
+  list: (params?: Record<string, unknown>) =>
+    [...adminKeys.lists(), params] as const,
+  details: () => [...adminKeys.all, 'detail'] as const,
+  detail: (id: number) => [...adminKeys.details(), id] as const,
+  permissions: (id: number) => [...adminKeys.detail(id), 'permissions'] as const,
+}
+
+/**
+ * Hook to fetch all admins with filters and pagination
+ */
+export function useAdmins(params?: {
+  page?: number
+  per_page?: number
+  status?: string
+  department?: string
+  search?: string
+  sort_by?: string
+  sort_order?: string
+}) {
+  return useQuery({
+    queryKey: adminKeys.list(params),
+    queryFn: () => getAdmins(params),
+    staleTime: 1000 * 60 * 2, // 2 minutes
+  })
+}
+
+/**
+ * Hook to fetch a single admin by ID
+ */
+export function useAdmin(id: number) {
+  return useQuery({
+    queryKey: adminKeys.detail(id),
+    queryFn: () => getAdminById(id),
+    enabled: !!id,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  })
+}
+
+/**
+ * Hook to create a new admin
+ */
+export function useCreateAdmin() {
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+
+  return useMutation({
+    mutationFn: (data: CreateAdminInput) => createAdmin(data),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.lists() })
+      toast.success('Admin created successfully', {
+        description: `${response.data.user.name} has been added.`,
+      })
+      navigate('/admins')
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to create admin', {
+        description: error.message || 'Something went wrong',
+      })
+    },
+  })
+}
+
+/**
+ * Hook to update an existing admin
+ */
+export function useUpdateAdmin() {
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: UpdateAdminInput }) =>
+      updateAdmin(id, data),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: adminKeys.detail(variables.id) })
+      toast.success('Admin updated successfully', {
+        description: `${response.data.user.name} has been updated.`,
+      })
+      navigate('/admins')
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to update admin', {
+        description: error.message || 'Something went wrong',
+      })
+    },
+  })
+}
+
+/**
+ * Hook to delete an admin
+ */
+export function useDeleteAdmin() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: number) => deleteAdmin(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.lists() })
+      toast.success('Admin deleted successfully')
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to delete admin', {
+        description: error.message || 'Something went wrong',
+      })
+    },
+  })
+}
+
+/**
+ * Hook to assign a role to an admin
+ */
+export function useAssignRole() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      adminId,
+      data,
+    }: {
+      adminId: number
+      data: AssignRoleInput
+    }) => assignRole(adminId, data),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.detail(variables.adminId) })
+      queryClient.invalidateQueries({ queryKey: adminKeys.lists() })
+      toast.success('Role assigned successfully')
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to assign role', {
+        description: error.message || 'Something went wrong',
+      })
+    },
+  })
+}
+
+/**
+ * Hook to revoke a role from an admin
+ */
+export function useRevokeRole() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      adminId,
+      roleId,
+    }: {
+      adminId: number
+      roleId: number
+    }) => revokeRole(adminId, roleId),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.detail(variables.adminId) })
+      queryClient.invalidateQueries({ queryKey: adminKeys.lists() })
+      toast.success('Role revoked successfully')
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to revoke role', {
+        description: error.message || 'Something went wrong',
+      })
+    },
+  })
+}
+
+/**
+ * Hook to fetch admin permissions
+ */
+export function useAdminPermissions(id: number) {
+  return useQuery({
+    queryKey: adminKeys.permissions(id),
+    queryFn: () => getAdminPermissions(id),
+    enabled: !!id,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  })
+}
+

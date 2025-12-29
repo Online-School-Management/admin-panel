@@ -8,6 +8,13 @@ const DashboardPage = lazy(() => import('@/pages/DashboardPage'))
 const UsersPage = lazy(() => import('@/pages/UsersPage'))
 const CreateUserPage = lazy(() => import('@/pages/CreateUserPage'))
 const EditUserPage = lazy(() => import('@/pages/EditUserPage'))
+const PermissionsPage = lazy(() => import('@/pages/PermissionsPage'))
+const RolesPage = lazy(() => import('@/pages/RolesPage'))
+const RoleDetailPage = lazy(() => import('@/pages/RoleDetailPage'))
+const AdminsPage = lazy(() => import('@/pages/AdminsPage'))
+const CreateAdminPage = lazy(() => import('@/pages/CreateAdminPage'))
+const EditAdminPage = lazy(() => import('@/pages/EditAdminPage'))
+const AdminDetailPage = lazy(() => import('@/pages/AdminDetailPage'))
 
 /**
  * Route configuration
@@ -47,6 +54,62 @@ export const routes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <EditUserPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/permissions',
+    element: (
+      <ProtectedRoute>
+        <PermissionsPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/roles',
+    element: (
+      <ProtectedRoute>
+        <RolesPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/roles/:id',
+    element: (
+      <ProtectedRoute>
+        <RoleDetailPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/admins',
+    element: (
+      <ProtectedRoute>
+        <AdminsPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/admins/new',
+    element: (
+      <ProtectedRoute>
+        <CreateAdminPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/admins/:id/edit',
+    element: (
+      <ProtectedRoute>
+        <EditAdminPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/admins/:id',
+    element: (
+      <ProtectedRoute>
+        <AdminDetailPage />
       </ProtectedRoute>
     ),
   },

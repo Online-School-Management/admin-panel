@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -9,14 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useLogin } from '../hooks/useLogin'
 import type { LoginCredentials } from '../types/auth.types'
 import { Loader2, Eye, EyeOff } from 'lucide-react'
-
-// Form validation schema
-const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(1, 'Password is required'),
-})
-
-type LoginFormData = z.infer<typeof loginSchema>
+import { loginSchema, type LoginFormData } from '../schemas/auth.schemas'
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)

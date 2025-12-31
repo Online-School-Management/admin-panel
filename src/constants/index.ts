@@ -62,6 +62,16 @@ export const VALIDATION = {
   MIN_NAME_LENGTH: 2,
 } as const
 
+// Validation error messages
+export const VALIDATION_MESSAGES = {
+  REQUIRED: (field: string) => `${field} is required`,
+  MIN_LENGTH: (field: string, min: number) => `${field} must be at least ${min} characters`,
+  MAX_LENGTH: (field: string, max: number) => `${field} must not exceed ${max} characters`,
+  INVALID_EMAIL: 'Please enter a valid email address',
+  PASSWORD_MISMATCH: 'Passwords do not match',
+  PASSWORD_CONFIRMATION_REQUIRED: 'Password confirmation is required',
+} as const
+
 // Badge variants mapping
 export const BADGE_VARIANTS = {
   DEFAULT: 'default',

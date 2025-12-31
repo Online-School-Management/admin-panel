@@ -1,6 +1,5 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useMemo, useRef } from 'react'
 import { ArrowLeft, UserPlus } from 'lucide-react'
@@ -16,23 +15,11 @@ import {
 } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { FormSkeleton } from '@/components/common/skeletons/FormSkeleton'
-import { PAGINATION, DEPARTMENT_OPTIONS, ADMIN_STATUS_OPTIONS, VALIDATION } from '@/constants'
+import { PAGINATION, DEPARTMENT_OPTIONS, ADMIN_STATUS_OPTIONS, ADMIN_STATUS } from '@/constants'
 import { useCreateAdmin, useUpdateAdmin, useAdmin } from '../hooks/useAdmins'
 import { useRoles } from '@/features/roles/hooks/useRoles'
 import type { CreateAdminInput, UpdateAdminInput } from '../types/admin.types'
-
-// Base form validation schema - only required fields
-const baseAdminFormSchema = z.object({
-  name: z.string().min(VALIDATION.MIN_NAME_LENGTH, `Name must be at least ${VALIDATION.MIN_NAME_LENGTH} characters`),
-  status: z.enum(['active', 'inactive', 'suspended']).optional(),
-  department: z.string().optional(),
-  role_id: z.number().optional(),
-})
-
-type AdminFormData = z.infer<typeof baseAdminFormSchema> & {
-  password?: string
-  password_confirmation?: string
-}
+import { createAdminSchema, updateAdminSchema, type CreateAdminFormData, type UpdateAdminFormData } from '../schemas/admin.schemas'
 
 interface AdminFormProps {
   adminId?: string
@@ -59,42 +46,13 @@ export function AdminForm({ adminId }: AdminFormProps) {
   const createAdmin = useCreateAdmin()
   const updateAdmin = useUpdateAdmin()
 
-  // Create schema based on edit mode
+  // Select schema based on edit mode
   const adminFormSchema = useMemo(() => {
-    if (isEditMode) {
-      return baseAdminFormSchema
-        .extend({
-          password: z
-            .string()
-            .min(VALIDATION.MIN_PASSWORD_LENGTH, `Password must be at least ${VALIDATION.MIN_PASSWORD_LENGTH} characters`)
-            .optional()
-            .or(z.literal('')),
-          password_confirmation: z.string().optional(),
-        })
-        .refine(
-          (data) => {
-            // If password is provided, confirmation must match
-            if (data.password && data.password.length > 0) {
-              return data.password === data.password_confirmation
-            }
-            return true
-          },
-          {
-            message: 'Passwords do not match',
-            path: ['password_confirmation'],
-          }
-        )
-    }
-    return baseAdminFormSchema
-      .extend({
-        password: z.string().min(VALIDATION.MIN_PASSWORD_LENGTH, `Password must be at least ${VALIDATION.MIN_PASSWORD_LENGTH} characters`),
-        password_confirmation: z.string().min(1, 'Password confirmation is required'),
-      })
-      .refine((data) => data.password === data.password_confirmation, {
-        message: 'Passwords do not match',
-        path: ['password_confirmation'],
-      })
+    return isEditMode ? updateAdminSchema : createAdminSchema
   }, [isEditMode])
+
+  // Type for form data based on mode
+  type AdminFormData = CreateAdminFormData | UpdateAdminFormData
 
   const {
     register,
@@ -107,7 +65,7 @@ export function AdminForm({ adminId }: AdminFormProps) {
     resolver: zodResolver(adminFormSchema),
     defaultValues: {
       name: '',
-      status: 'active',
+      status: ADMIN_STATUS.ACTIVE,
       department: '',
       role_id: undefined,
       password: '',
@@ -172,7 +130,7 @@ export function AdminForm({ adminId }: AdminFormProps) {
     // Reset form with all values at once using reset() - this is more reliable
     reset({
       name: admin.user.name || '',
-      status: admin.user.status || 'active',
+      status: admin.user.status || ADMIN_STATUS.ACTIVE,
       department: departmentValue,
       role_id: roleId,
       password: '',
@@ -362,7 +320,7 @@ export function AdminForm({ adminId }: AdminFormProps) {
               <div className="space-y-2">
                 <Label htmlFor="status">Status</Label>
                 <Select
-                  value={watch('status') || 'active'}
+                  value={watch('status') || ADMIN_STATUS.ACTIVE}
                   onValueChange={(value) => setValue('status', value as any)}
                   disabled={isSubmitting}
                 >

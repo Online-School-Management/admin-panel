@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Search, Shield } from 'lucide-react'
+import { Search, Shield, RefreshCw } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import {
   Table,
@@ -10,7 +10,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import {
   Select,
   SelectContent,
@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
 import { usePermissions, usePermissionsByModule, useModules } from '../hooks/usePermissions'
 import { format } from 'date-fns'
 
@@ -75,6 +76,11 @@ export function PermissionsList() {
     return variants[module] || 'secondary'
   }
 
+  const handleReset = () => {
+    setSearch('')
+    setSelectedModule('all')
+  }
+
   if (error) {
     return (
       <Card>
@@ -88,39 +94,45 @@ export function PermissionsList() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Permissions</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {/* Search and Filter */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Search permissions..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Select value={selectedModule} onValueChange={setSelectedModule}>
-              <SelectTrigger className="w-full sm:w-[200px]">
-                <SelectValue placeholder="Filter by module" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Modules</SelectItem>
-                {modules.map((module) => (
-                  <SelectItem key={module} value={module}>
-                    {module.charAt(0).toUpperCase() + module.slice(1)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+    <div className="space-y-4">
+      {/* Search and Filter */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Input
+            placeholder="Search permissions..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <Select value={selectedModule} onValueChange={setSelectedModule}>
+          <SelectTrigger className="w-full sm:w-[200px]">
+            <SelectValue placeholder="Filter by module" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Modules</SelectItem>
+            {modules.map((module) => (
+              <SelectItem key={module} value={module}>
+                {module.charAt(0).toUpperCase() + module.slice(1)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Button
+          variant="outline"
+          onClick={handleReset}
+          className="w-full sm:w-auto"
+        >
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Clear
+        </Button>
+      </div>
 
-          {/* Permissions Table */}
+      {/* Permissions Table */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="space-y-4">
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
               <div className="text-muted-foreground">Loading permissions...</div>
@@ -135,19 +147,19 @@ export function PermissionsList() {
               </p>
             </div>
           ) : (
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Slug</TableHead>
-                    <TableHead>Module</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Created At</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ID</TableHead>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Slug</TableHead>
+                      <TableHead>Module</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead>Created At</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
                   {filteredPermissions.map((permission) => (
                     <TableRow key={permission.id}>
                       <TableCell className="font-medium">
@@ -187,9 +199,10 @@ export function PermissionsList() {
               {selectedModule !== 'all' && ` in ${selectedModule} module`}
             </div>
           )}
-        </div>
-      </CardContent>
-    </Card>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   )
 }
 

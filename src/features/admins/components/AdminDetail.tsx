@@ -1,6 +1,4 @@
-import { Link } from 'react-router-dom'
-import { ArrowLeft, Edit, Mail, Phone, Calendar, MapPin, Building2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Mail, Phone, Calendar, MapPin } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
@@ -69,27 +67,6 @@ export function AdminDetail({ adminId }: AdminDetailProps) {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
-            <Link to="/admins">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">{admin.user.name}</h1>
-            <p className="text-muted-foreground">{admin.user.email}</p>
-          </div>
-        </div>
-        <Button asChild>
-          <Link to={`/admins/${adminId}/edit`}>
-            <Edit className="h-4 w-4 mr-2" />
-            Edit Admin
-          </Link>
-        </Button>
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Information */}
         <div className="lg:col-span-2 space-y-6">

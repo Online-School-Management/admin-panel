@@ -14,7 +14,8 @@ function EditAdminPage() {
       <div className="space-y-6">
         <PageHeader
           title="Edit Admin"
-          description="Update administrator information."
+          description="Update administrator information"
+          backTo={id ? `/admins/${id}` : '/admins'}
         />
         <AdminForm adminId={id} />
       </div>

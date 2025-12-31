@@ -11,7 +11,8 @@ function CreateAdminPage() {
       <div className="space-y-6">
         <PageHeader
           title="Create Admin"
-          description="Add a new administrator to the system."
+          description="Add a new administrator to the system"
+          backTo="/admins"
         />
         <AdminForm />
       </div>

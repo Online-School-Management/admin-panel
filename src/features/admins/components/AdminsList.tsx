@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, Search, Edit, Trash2, Eye, MoreVertical } from 'lucide-react'
+import { Search, Edit, Trash2, Eye, MoreVertical, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import {
   Select,
   SelectContent,
@@ -69,6 +69,13 @@ export function AdminsList() {
     }
   }
 
+  const handleReset = () => {
+    setSearch('')
+    setStatusFilter('all')
+    setDepartmentFilter('all')
+    setPage(1)
+  }
+
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case 'active':
@@ -105,75 +112,71 @@ export function AdminsList() {
   return (
     <>
       <div className="space-y-4">
-        {/* Header with search, filters, and create button */}
-        <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center justify-between">
-          <div className="flex flex-col sm:flex-row gap-4 flex-1">
-            <div className="relative flex-1 sm:max-w-sm">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input
-                placeholder="Search admins..."
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value)
-                  setPage(1)
-                }}
-                className="pl-10 h-11 text-base"
-              />
-            </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full sm:w-[150px] h-11">
-                <SelectValue placeholder="Status" />
+        {/* Search and filters */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Search admins..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value)
+                setPage(1)
+              }}
+              className="pl-10"
+            />
+          </div>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full sm:w-[200px]">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="inactive">Inactive</SelectItem>
+              <SelectItem value="suspended">Suspended</SelectItem>
+            </SelectContent>
+          </Select>
+          {departments.length > 0 && (
+            <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+              <SelectTrigger className="w-full sm:w-[200px]">
+                <SelectValue placeholder="Filter by department" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
-                <SelectItem value="suspended">Suspended</SelectItem>
+                <SelectItem value="all">All Departments</SelectItem>
+                {departments.map((dept) => (
+                  <SelectItem key={dept} value={dept}>
+                    {dept}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
-            {departments.length > 0 && (
-              <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-                <SelectTrigger className="w-full sm:w-[180px] h-11">
-                  <SelectValue placeholder="Department" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Departments</SelectItem>
-                  {departments.map((dept) => (
-                    <SelectItem key={dept} value={dept}>
-                      {dept}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          </div>
-          <Button asChild variant="default" className="h-11 w-full sm:w-auto sm:min-w-[140px]">
-            <Link to="/admins/new">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Admin
-            </Link>
+          )}
+          <Button
+            variant="outline"
+            onClick={handleReset}
+            className="w-full sm:w-auto"
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Clear
           </Button>
         </div>
 
         {/* Admins Table */}
         <Card>
-          <CardHeader className="pb-4">
-            <CardTitle className="text-xl sm:text-2xl">Admins</CardTitle>
-          </CardHeader>
-          <CardContent className="px-4 sm:px-6">
+          <CardContent className="pt-6">
+            <div className="space-y-4">
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
-                <p className="text-muted-foreground">Loading admins...</p>
+                <div className="text-muted-foreground">Loading admins...</div>
               </div>
             ) : admins.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-8">
-                <p className="text-muted-foreground mb-4">No admins found</p>
-                <Button asChild>
-                  <Link to="/admins/new">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create First Admin
-                  </Link>
-                </Button>
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <p className="text-muted-foreground">
+                  {search || statusFilter !== 'all' || departmentFilter !== 'all'
+                    ? 'No admins found matching your criteria.'
+                    : 'No admins available.'}
+                </p>
               </div>
             ) : (
               <>
@@ -304,6 +307,7 @@ export function AdminsList() {
                 )}
               </>
             )}
+            </div>
           </CardContent>
         </Card>
       </div>

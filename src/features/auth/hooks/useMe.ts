@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useAuthStore } from '@/store/authStore'
 import { getCurrentUser } from '../services/auth.service'
-import type { ApiUser } from '../types/auth.types'
 
 /**
  * Hook to get current authenticated user
@@ -23,8 +22,6 @@ export function useMe() {
         user_type: user.user_type,
         role: user.admin?.roles?.[0]?.name,
         avatar: user.profile_image,
-        // Include full user data
-        ...user,
       }
       
       // Update auth store with fresh user data
@@ -39,4 +36,5 @@ export function useMe() {
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
   })
 }
+
 

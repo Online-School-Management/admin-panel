@@ -57,7 +57,9 @@ export function useAdmin(id: number) {
     queryKey: adminKeys.detail(id),
     queryFn: () => getAdminById(id),
     enabled: !!id,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 0, // Always fetch fresh data
+    refetchOnMount: 'always', // Always refetch when component mounts
+    refetchOnWindowFocus: false, // Don't refetch on window focus
   })
 }
 
@@ -145,7 +147,7 @@ export function useAssignRole() {
       adminId: number
       data: AssignRoleInput
     }) => assignRole(adminId, data),
-    onSuccess: (response, variables) => {
+    onSuccess: (_response, variables) => {
       queryClient.invalidateQueries({ queryKey: adminKeys.detail(variables.adminId) })
       queryClient.invalidateQueries({ queryKey: adminKeys.lists() })
       toast.success('Role assigned successfully')
@@ -172,7 +174,7 @@ export function useRevokeRole() {
       adminId: number
       roleId: number
     }) => revokeRole(adminId, roleId),
-    onSuccess: (response, variables) => {
+    onSuccess: (_response, variables) => {
       queryClient.invalidateQueries({ queryKey: adminKeys.detail(variables.adminId) })
       queryClient.invalidateQueries({ queryKey: adminKeys.lists() })
       toast.success('Role revoked successfully')
@@ -196,4 +198,5 @@ export function useAdminPermissions(id: number) {
     staleTime: 1000 * 60 * 5, // 5 minutes
   })
 }
+
 

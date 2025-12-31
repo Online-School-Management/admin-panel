@@ -39,8 +39,6 @@ export async function login(
         user_type: user.user_type,
         role: user.admin?.roles?.[0]?.name,
         avatar: user.profile_image,
-        // Include full user data for access to other fields
-        ...user,
       },
       token,
     }

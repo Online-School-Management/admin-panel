@@ -14,7 +14,10 @@ function AdminDetailPage() {
       <div className="space-y-6">
         <PageHeader
           title="Admin Details"
-          description="View detailed information about the administrator."
+          description="View detailed information about the administrator"
+          backTo="/admins"
+          editTo={id ? `/admins/${id}/edit` : undefined}
+          editLabel="Edit Admin"
         />
         {id && <AdminDetail adminId={id} />}
       </div>

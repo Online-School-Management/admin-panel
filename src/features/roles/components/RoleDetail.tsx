@@ -7,13 +7,10 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
-  TableHeader,
   TableRow,
 } from '@/components/ui/table'
 import { Separator } from '@/components/ui/separator'
 import { useRole } from '../hooks/useRoles'
-import { format } from 'date-fns'
 
 /**
  * RoleDetail component - displays detailed role information (read-only)
@@ -29,16 +26,6 @@ export function RoleDetail() {
 
   const getStatusBadgeVariant = (status: string) => {
     return status === 'active' ? 'default' : 'secondary'
-  }
-
-  const getModuleBadgeVariant = (module: string) => {
-    const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-      users: 'default',
-      admins: 'destructive',
-      roles: 'secondary',
-      permissions: 'outline',
-    }
-    return variants[module] || 'secondary'
   }
 
   if (isLoading) {
@@ -165,14 +152,6 @@ export function RoleDetail() {
                   </div>
                   <div className="rounded-md border">
                     <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>ID</TableHead>
-                          <TableHead>Name</TableHead>
-                          <TableHead>Slug</TableHead>
-                          <TableHead>Description</TableHead>
-                        </TableRow>
-                      </TableHeader>
                       <TableBody>
                         {modulePermissions.map((permission) => (
                           <TableRow key={permission.id}>

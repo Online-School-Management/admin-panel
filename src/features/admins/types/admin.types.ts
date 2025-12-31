@@ -59,7 +59,7 @@ export interface AdminCollectionItem {
 
 export interface CreateAdminInput {
   name: string
-  email: string
+  email?: string // Optional - backend auto-generates if not provided
   password: string
   password_confirmation: string
   phone?: string
@@ -90,6 +90,7 @@ export interface UpdateAdminInput {
   hire_date?: string
   department?: string
   notes?: string
+  role_id?: number | null // Allow null to explicitly remove role
 }
 
 export interface AssignRoleInput {

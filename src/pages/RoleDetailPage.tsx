@@ -1,20 +1,23 @@
+import { useParams } from 'react-router-dom'
 import { AdminLayout } from '@/layouts/AdminLayout'
 import { RoleDetail } from '@/features/roles/components/RoleDetail'
+import { PageHeader } from '@/components/common/PageHeader'
 
 /**
  * Role Detail Page - Read-only detail view
  */
 function RoleDetailPage() {
+  const { id } = useParams<{ id: string }>()
+
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex flex-col space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Role Details</h1>
-          <p className="text-muted-foreground">
-            View detailed information about a role and its permissions
-          </p>
-        </div>
-        <RoleDetail />
+        <PageHeader
+          title="Role Details"
+          description="View detailed information about a role and its permissions"
+          backTo="/roles"
+        />
+        {id && <RoleDetail />}
       </div>
     </AdminLayout>
   )

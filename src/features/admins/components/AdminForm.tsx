@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useNavigate } from 'react-router-dom'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { ArrowLeft, UserPlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -43,10 +43,15 @@ export function AdminForm({ adminId }: AdminFormProps) {
   const navigate = useNavigate()
   const isEditMode = !!adminId
 
-  const { data: adminData, isLoading: isLoadingAdmin } = useAdmin(
+  const { 
+    data: adminData, 
+    isLoading: isLoadingAdmin,
+    isFetching: isFetchingAdmin,
+    dataUpdatedAt: adminDataUpdatedAt,
+  } = useAdmin(
     adminId ? parseInt(adminId) : 0
   )
-  const { data: rolesData } = useRoles({ per_page: 100 })
+  const { data: rolesData, isLoading: isLoadingRoles } = useRoles({ per_page: 100 })
   const roles = rolesData?.data || []
 
   const createAdmin = useCreateAdmin()
@@ -94,6 +99,7 @@ export function AdminForm({ adminId }: AdminFormProps) {
     handleSubmit,
     setValue,
     watch,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<AdminFormData>({
     resolver: zodResolver(adminFormSchema),
@@ -107,27 +113,94 @@ export function AdminForm({ adminId }: AdminFormProps) {
     },
   })
 
-  // Set form values when admin data loads (edit mode)
+  // Track the last dataUpdatedAt timestamp and adminId we used to populate the form
+  const lastPopulatedRef = useRef<{ adminId: string; timestamp: number } | null>(null)
+  
+  // Populate form values when admin data loads (edit mode)
+  // This effect runs whenever adminId, adminData, or rolesData changes
   useEffect(() => {
-    if (isEditMode && adminData?.data && !isLoadingAdmin) {
-      const admin = adminData.data
-      setValue('name', admin.user.name)
-      setValue('status', admin.user.status)
-      setValue('department', admin.department || '')
-      // Set role_id if admin has roles
-      if (admin.roles && admin.roles.length > 0) {
-        setValue('role_id', admin.roles[0].id)
+    // Only proceed if we're in edit mode
+    if (!isEditMode || !adminId) {
+      lastPopulatedRef.current = null
+      return
+    }
+    
+    // Wait for admin data to be loaded (not loading/fetching and data exists)
+    if (isLoadingAdmin || isFetchingAdmin || !adminData?.data) return
+    
+    // Wait for roles to be loaded (not loading and roles array exists)
+    if (isLoadingRoles || !rolesData?.data) return
+    
+    // Check if we need to populate:
+    // 1. Never populated before
+    // 2. Different adminId (switched to different admin)
+    // 3. Same adminId but data is newer (refetch happened)
+    const shouldPopulate = 
+      lastPopulatedRef.current === null ||
+      lastPopulatedRef.current.adminId !== adminId ||
+      adminDataUpdatedAt > lastPopulatedRef.current.timestamp
+    
+    if (!shouldPopulate) return
+    
+    const admin = adminData.data
+    const roles = rolesData.data
+    
+    // Determine role_id
+    let roleId: number | undefined = undefined
+    if (admin.roles && Array.isArray(admin.roles) && admin.roles.length > 0) {
+      const firstRole = admin.roles[0]
+      const extractedRoleId = typeof firstRole === 'object' && firstRole !== null && 'id' in firstRole
+        ? firstRole.id
+        : null
+      
+      // Verify the role exists in the roles list before setting
+      if (extractedRoleId !== null && typeof extractedRoleId === 'number') {
+        const roleExists = roles.some(role => role.id === extractedRoleId)
+        if (roleExists) {
+          roleId = extractedRoleId
+        }
       }
     }
-  }, [isEditMode, adminData, isLoadingAdmin, setValue])
+    
+    // Determine department value
+    const departmentValue = admin.department && typeof admin.department === 'string' 
+      ? admin.department 
+      : ''
+    
+    // Reset form with all values at once using reset() - this is more reliable
+    reset({
+      name: admin.user.name || '',
+      status: admin.user.status || 'active',
+      department: departmentValue,
+      role_id: roleId,
+      password: '',
+      password_confirmation: '',
+    }, {
+      keepDefaultValues: false,
+    })
+    
+    // Update the last populated tracking
+    lastPopulatedRef.current = {
+      adminId,
+      timestamp: adminDataUpdatedAt,
+    }
+  }, [isEditMode, adminId, adminData, isLoadingAdmin, isFetchingAdmin, adminDataUpdatedAt, rolesData, isLoadingRoles, reset])
 
   const onSubmit = async (data: AdminFormData) => {
     if (isEditMode && adminId) {
       const updateData: UpdateAdminInput = {
         name: data.name,
         status: data.status,
-        department: data.department,
+        department: data.department || undefined,
       }
+      
+      // Include role_id only if it's a valid number (role is selected)
+      // If undefined, don't include it (backend won't change roles)
+      // If null, include it (backend will remove all roles)
+      if (data.role_id !== undefined) {
+        updateData.role_id = typeof data.role_id === 'number' ? data.role_id : (null as number | null)
+      }
+      
       // Only include password if provided
       if (data.password && data.password.length > 0) {
         updateData.password = data.password
@@ -163,7 +236,11 @@ export function AdminForm({ adminId }: AdminFormProps) {
         <CardTitle>{isEditMode ? 'Edit Admin' : 'Create Admin'}</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form 
+          key={isEditMode ? `admin-form-${adminId}` : 'admin-form-create'}
+          onSubmit={handleSubmit(onSubmit)} 
+          className="space-y-6"
+        >
           {/* Form fields - only required fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Left Column */}
@@ -229,12 +306,23 @@ export function AdminForm({ adminId }: AdminFormProps) {
               {/* Department */}
               <div className="space-y-2">
                 <Label htmlFor="department">Department</Label>
-                <Input
-                  id="department"
-                  {...register('department')}
-                  placeholder="Enter department"
+                <Select
+                  value={watch('department') || undefined}
+                  onValueChange={(value) =>
+                    setValue('department', value)
+                  }
                   disabled={isSubmitting}
-                />
+                >
+                  <SelectTrigger id="department">
+                    <SelectValue placeholder="Select department (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Teacher Management">Teacher Management</SelectItem>
+                    <SelectItem value="Administration">Administration</SelectItem>
+                    <SelectItem value="Student Management">Student Management</SelectItem>
+                    <SelectItem value="Employee Management">Employee Management</SelectItem>
+                  </SelectContent>
+                </Select>
                 {errors.department && (
                   <p className="text-sm text-destructive">{errors.department.message}</p>
                 )}
@@ -244,7 +332,14 @@ export function AdminForm({ adminId }: AdminFormProps) {
               <div className="space-y-2">
                 <Label htmlFor="role_id">Role</Label>
                 <Select
-                  value={watch('role_id')?.toString() || undefined}
+                  value={
+                    (() => {
+                      const roleId = watch('role_id')
+                      return roleId !== undefined && roleId !== null
+                        ? roleId.toString()
+                        : undefined
+                    })()
+                  }
                   onValueChange={(value) =>
                     setValue('role_id', parseInt(value))
                   }

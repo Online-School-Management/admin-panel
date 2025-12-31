@@ -7,8 +7,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
-  TableHeader,
   TableRow,
 } from '@/components/ui/table'
 import {
@@ -236,15 +234,6 @@ export function UsersList() {
                 {/* Tablet/Desktop Table View - visible on tablet and up */}
                 <div className="hidden md:block overflow-x-auto">
                   <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>User</TableHead>
-                        <TableHead>Role</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="hidden lg:table-cell">Created</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
                     <TableBody>
                       {data.users.map((user: User) => (
                         <TableRow key={user.id}>

@@ -11,7 +11,9 @@ function AdminsPage() {
       <div className="space-y-6">
         <PageHeader
           title="Admins Management"
-          description="View and manage system administrators."
+          description="View and manage system administrators"
+          addTo="/admins/new"
+          addLabel="Add Admin"
         />
         <AdminsList />
       </div>

@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { toast } from 'sonner'
 import {
   getAdmins,
   getAdminById,
@@ -11,6 +10,16 @@ import {
   revokeRole,
   getAdminPermissions,
 } from '../services/admin.service'
+import {
+  showCreateSuccessToast,
+  showUpdateSuccessToast,
+  showDeleteSuccessToast,
+  showCreateErrorToast,
+  showUpdateErrorToast,
+  showDeleteErrorToast,
+  showSuccessToast,
+  showErrorToast,
+} from '@/utils/toast'
 import type {
   CreateAdminInput,
   UpdateAdminInput,
@@ -74,15 +83,11 @@ export function useCreateAdmin() {
     mutationFn: (data: CreateAdminInput) => createAdmin(data),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: adminKeys.lists() })
-      toast.success('Admin created successfully', {
-        description: `${response.data.user.name} has been added.`,
-      })
+      showCreateSuccessToast('admin', `${response.data.user.name} has been added`)
       navigate('/admins')
     },
     onError: (error: Error) => {
-      toast.error('Failed to create admin', {
-        description: error.message || 'Something went wrong',
-      })
+      showCreateErrorToast('admin', error)
     },
   })
 }
@@ -100,15 +105,11 @@ export function useUpdateAdmin() {
     onSuccess: (response, variables) => {
       queryClient.invalidateQueries({ queryKey: adminKeys.lists() })
       queryClient.invalidateQueries({ queryKey: adminKeys.detail(variables.id) })
-      toast.success('Admin updated successfully', {
-        description: `${response.data.user.name} has been updated.`,
-      })
+      showUpdateSuccessToast('admin', `${response.data.user.name} has been updated`)
       navigate('/admins')
     },
     onError: (error: Error) => {
-      toast.error('Failed to update admin', {
-        description: error.message || 'Something went wrong',
-      })
+      showUpdateErrorToast('admin', error)
     },
   })
 }
@@ -123,12 +124,10 @@ export function useDeleteAdmin() {
     mutationFn: (id: number) => deleteAdmin(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminKeys.lists() })
-      toast.success('Admin deleted successfully')
+      showDeleteSuccessToast('admin')
     },
     onError: (error: Error) => {
-      toast.error('Failed to delete admin', {
-        description: error.message || 'Something went wrong',
-      })
+      showDeleteErrorToast('admin', error)
     },
   })
 }
@@ -150,12 +149,10 @@ export function useAssignRole() {
     onSuccess: (_response, variables) => {
       queryClient.invalidateQueries({ queryKey: adminKeys.detail(variables.adminId) })
       queryClient.invalidateQueries({ queryKey: adminKeys.lists() })
-      toast.success('Role assigned successfully')
+      showSuccessToast('Role assigned successfully', { title: 'Success' })
     },
     onError: (error: Error) => {
-      toast.error('Failed to assign role', {
-        description: error.message || 'Something went wrong',
-      })
+      showErrorToast(error.message || 'Failed to assign role', { title: 'Error' })
     },
   })
 }
@@ -177,12 +174,10 @@ export function useRevokeRole() {
     onSuccess: (_response, variables) => {
       queryClient.invalidateQueries({ queryKey: adminKeys.detail(variables.adminId) })
       queryClient.invalidateQueries({ queryKey: adminKeys.lists() })
-      toast.success('Role revoked successfully')
+      showSuccessToast('Role revoked successfully', { title: 'Success' })
     },
     onError: (error: Error) => {
-      toast.error('Failed to revoke role', {
-        description: error.message || 'Something went wrong',
-      })
+      showErrorToast(error.message || 'Failed to revoke role', { title: 'Error' })
     },
   })
 }

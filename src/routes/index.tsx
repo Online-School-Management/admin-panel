@@ -1,5 +1,5 @@
 import { lazy } from 'react'
-import { RouteObject } from 'react-router-dom'
+import { createBrowserRouter } from 'react-router-dom'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 
 // Lazy load pages for code splitting
@@ -17,105 +17,66 @@ const EditAdminPage = lazy(() => import('@/pages/EditAdminPage'))
 const AdminDetailPage = lazy(() => import('@/pages/AdminDetailPage'))
 
 /**
- * Route configuration
- * All routes are defined here for better organization
+ * Route configuration using createBrowserRouter (data router API)
+ * Each route is individually wrapped with ProtectedRoute (which includes AdminLayout)
+ * This pattern matches the example folder implementation
+ * The data router API handles component instances more efficiently
  */
-export const routes: RouteObject[] = [
+export const router = createBrowserRouter([
+  // Public routes
   {
     path: '/login',
     element: <LoginPage />,
   },
+  
+  // Protected routes - each wrapped individually with ProtectedRoute
+  {
+    path: '/',
+    element: <ProtectedRoute><DashboardPage /></ProtectedRoute>,
+  },
   {
     path: '/dashboard',
-    element: (
-      <ProtectedRoute>
-        <DashboardPage />
-      </ProtectedRoute>
-    ),
+    element: <ProtectedRoute><DashboardPage /></ProtectedRoute>,
   },
   {
     path: '/users',
-    element: (
-      <ProtectedRoute>
-        <UsersPage />
-      </ProtectedRoute>
-    ),
+    element: <ProtectedRoute><UsersPage /></ProtectedRoute>,
   },
   {
     path: '/users/new',
-    element: (
-      <ProtectedRoute>
-        <CreateUserPage />
-      </ProtectedRoute>
-    ),
+    element: <ProtectedRoute><CreateUserPage /></ProtectedRoute>,
   },
   {
     path: '/users/:id/edit',
-    element: (
-      <ProtectedRoute>
-        <EditUserPage />
-      </ProtectedRoute>
-    ),
+    element: <ProtectedRoute><EditUserPage /></ProtectedRoute>,
   },
   {
     path: '/permissions',
-    element: (
-      <ProtectedRoute>
-        <PermissionsPage />
-      </ProtectedRoute>
-    ),
+    element: <ProtectedRoute><PermissionsPage /></ProtectedRoute>,
   },
   {
     path: '/roles',
-    element: (
-      <ProtectedRoute>
-        <RolesPage />
-      </ProtectedRoute>
-    ),
+    element: <ProtectedRoute><RolesPage /></ProtectedRoute>,
   },
   {
     path: '/roles/:id',
-    element: (
-      <ProtectedRoute>
-        <RoleDetailPage />
-      </ProtectedRoute>
-    ),
+    element: <ProtectedRoute><RoleDetailPage /></ProtectedRoute>,
   },
   {
     path: '/admins',
-    element: (
-      <ProtectedRoute>
-        <AdminsPage />
-      </ProtectedRoute>
-    ),
+    element: <ProtectedRoute><AdminsPage /></ProtectedRoute>,
   },
   {
     path: '/admins/new',
-    element: (
-      <ProtectedRoute>
-        <CreateAdminPage />
-      </ProtectedRoute>
-    ),
+    element: <ProtectedRoute><CreateAdminPage /></ProtectedRoute>,
   },
   {
     path: '/admins/:id/edit',
-    element: (
-      <ProtectedRoute>
-        <EditAdminPage />
-      </ProtectedRoute>
-    ),
+    element: <ProtectedRoute><EditAdminPage /></ProtectedRoute>,
   },
   {
     path: '/admins/:id',
-    element: (
-      <ProtectedRoute>
-        <AdminDetailPage />
-      </ProtectedRoute>
-    ),
+    element: <ProtectedRoute><AdminDetailPage /></ProtectedRoute>,
   },
-  {
-    path: '/',
-    element: <DashboardPage />, // Will redirect in App.tsx
-  },
-]
+])
 

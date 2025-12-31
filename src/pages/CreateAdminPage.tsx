@@ -1,4 +1,3 @@
-import { AdminLayout } from '@/layouts/AdminLayout'
 import { AdminForm } from '@/features/admins/components/AdminForm'
 import { PageHeader } from '@/components/common/PageHeader'
 
@@ -7,16 +6,14 @@ import { PageHeader } from '@/components/common/PageHeader'
  */
 function CreateAdminPage() {
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        <PageHeader
-          title="Create Admin"
-          description="Add a new administrator to the system"
-          backTo="/admins"
-        />
-        <AdminForm />
-      </div>
-    </AdminLayout>
+    <div className="space-y-6">
+      <PageHeader
+        title="Create Admin"
+        description="Add a new administrator to the system"
+        backTo="/admins"
+      />
+      <AdminForm />
+    </div>
   )
 }
 

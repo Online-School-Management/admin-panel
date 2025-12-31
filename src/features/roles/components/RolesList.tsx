@@ -123,22 +123,66 @@ export function RolesList() {
       <Card>
         <CardContent className="pt-6">
           <div className="space-y-4">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="text-muted-foreground">Loading roles...</div>
-            </div>
-          ) : filteredRoles.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <UserCog className="h-12 w-12 text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">
-                {search || statusFilter !== 'all'
-                  ? 'No roles found matching your criteria.'
-                  : 'No roles available.'}
-              </p>
-            </div>
-          ) : (
-            <>
-              <div className="rounded-md border">
+          <div className="rounded-md border relative min-h-[400px]">
+            {isLoading && (
+              <div className="absolute inset-0 z-10 bg-background/80 backdrop-blur-sm">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ID</TableHead>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Slug</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Permissions</TableHead>
+                      <TableHead>Created At</TableHead>
+                      <TableHead className="w-[100px]">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {[...Array(5)].map((_, i) => (
+                      <TableRow key={i}>
+                        <TableCell>
+                          <div className="h-4 w-12 bg-muted animate-pulse rounded" />
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-4 w-32 bg-muted animate-pulse rounded" />
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-4 w-40 bg-muted animate-pulse rounded" />
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-5 w-16 bg-muted animate-pulse rounded" />
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-5 w-20 bg-muted animate-pulse rounded" />
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-8 w-8 bg-muted animate-pulse rounded" />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+            {!isLoading && filteredRoles.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <UserCog className="h-12 w-12 text-muted-foreground mb-4" />
+                <p className="text-muted-foreground">
+                  {search || statusFilter !== 'all'
+                    ? 'No roles found matching your criteria.'
+                    : 'No roles available.'}
+                </p>
+              </div>
+            ) : (
+              <div className={isLoading ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}>
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -201,45 +245,44 @@ export function RolesList() {
                   </TableBody>
                 </Table>
               </div>
+            )}
+          </div>
+          {/* Pagination */}
+          {!isLoading && pagination && pagination.last_page > 1 && (
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-muted-foreground">
+                Showing {pagination.from || 0} to {pagination.to || 0} of{' '}
+                {pagination.total} roles
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                >
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    setPage((p) => Math.min(pagination.last_page, p + 1))
+                  }
+                  disabled={page === pagination.last_page}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
 
-              {/* Pagination */}
-              {pagination && pagination.last_page > 1 && (
-                <div className="flex items-center justify-between">
-                  <div className="text-sm text-muted-foreground">
-                    Showing {pagination.from || 0} to {pagination.to || 0} of{' '}
-                    {pagination.total} roles
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setPage((p) => Math.max(1, p - 1))}
-                      disabled={page === 1}
-                    >
-                      Previous
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() =>
-                        setPage((p) => Math.min(pagination.last_page, p + 1))
-                      }
-                      disabled={page === pagination.last_page}
-                    >
-                      Next
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {/* Results count */}
-              {!isLoading && filteredRoles.length > 0 && (
-                <div className="text-sm text-muted-foreground">
-                  Showing {filteredRoles.length} role
-                  {filteredRoles.length !== 1 ? 's' : ''}
-                </div>
-              )}
-            </>
+          {/* Results count */}
+          {!isLoading && filteredRoles.length > 0 && (
+            <div className="text-sm text-muted-foreground">
+              Showing {filteredRoles.length} role
+              {filteredRoles.length !== 1 ? 's' : ''}
+            </div>
           )}
           </div>
         </CardContent>

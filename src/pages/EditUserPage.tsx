@@ -1,5 +1,4 @@
 import { useParams } from 'react-router-dom'
-import { AdminLayout } from '@/layouts/AdminLayout'
 import { PageHeader } from '@/components/common/PageHeader'
 import { UserForm } from '@/features/users/components/UserForm'
 
@@ -10,17 +9,15 @@ function EditUserPage() {
   const { id } = useParams<{ id: string }>()
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        <PageHeader
-          title="Edit User"
-          description="Update user information"
-          backTo="/users"
-          backLabel="Back to Users"
-        />
-        {id ? <UserForm userId={id} /> : <p>User ID not found</p>}
-      </div>
-    </AdminLayout>
+    <div className="space-y-6">
+      <PageHeader
+        title="Edit User"
+        description="Update user information"
+        backTo="/users"
+        backLabel="Back to Users"
+      />
+      {id ? <UserForm userId={id} /> : <p>User ID not found</p>}
+    </div>
   )
 }
 

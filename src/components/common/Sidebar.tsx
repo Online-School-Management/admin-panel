@@ -1,17 +1,22 @@
 import { X } from 'lucide-react'
+import { memo } from 'react'
 import { NavItem } from './NavItem'
 import { useUIStore } from '@/store/uiStore'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { mainNavigation, adminNavigation, settingsNavigation } from '@/constants/navigation'
 
-export function Sidebar() {
-  const { sidebarOpen, setSidebarOpen } = useUIStore()
+export const Sidebar = memo(function Sidebar() {
+  const sidebarOpen = useUIStore((state) => state.sidebarOpen)
+  const setSidebarOpen = useUIStore((state) => state.setSidebarOpen)
 
   return (
     <aside
       className={cn(
-        'fixed left-0 top-0 z-40 h-screen border-r bg-background shadow-sm transition-all duration-300 ease-in-out overflow-hidden',
+        'fixed left-0 top-0 z-40 h-screen border-r bg-background shadow-sm overflow-hidden',
+        // Only transition transform and width, not all properties
+        // Use will-change to hint browser for better performance
+        'transition-[transform,width] duration-300 ease-in-out will-change-[transform,width]',
         // Mobile: hide completely when closed
         sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-0',
         // Desktop: collapse to icon-only when closed
@@ -21,7 +26,9 @@ export function Sidebar() {
       <div className="flex h-full flex-col overflow-hidden">
         {/* Sidebar Header */}
         <div className={cn(
-          'flex h-16 items-center border-b bg-muted/30 transition-all duration-300 flex-shrink-0',
+          'flex h-16 items-center border-b bg-muted/30 flex-shrink-0',
+          // Only transition padding, not all properties
+          'transition-[padding] duration-300',
           sidebarOpen ? 'justify-between px-6' : 'justify-center px-0'
         )}>
           {sidebarOpen ? (
@@ -127,5 +134,5 @@ export function Sidebar() {
       </div>
     </aside>
   )
-}
+})
 

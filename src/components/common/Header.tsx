@@ -1,4 +1,5 @@
 import { Menu, Bell } from 'lucide-react'
+import { memo } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -15,9 +16,10 @@ import { useAuthStore } from '@/store/authStore'
 import { useNavigate } from 'react-router-dom'
 import { useLogout } from '@/features/auth/hooks/useLogout'
 
-export function Header() {
-  const { toggleSidebar, toggleMobileMenu } = useUIStore()
-  const { user } = useAuthStore()
+export const Header = memo(function Header() {
+  const toggleSidebar = useUIStore((state) => state.toggleSidebar)
+  const toggleMobileMenu = useUIStore((state) => state.toggleMobileMenu)
+  const user = useAuthStore((state) => state.user)
   const navigate = useNavigate()
   const logoutMutation = useLogout()
 
@@ -108,5 +110,5 @@ export function Header() {
       </div>
     </header>
   )
-}
+})
 

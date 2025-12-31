@@ -1,4 +1,3 @@
-import { AdminLayout } from '@/layouts/AdminLayout'
 import { RolesList } from '@/features/roles/components/RolesList'
 import { PageHeader } from '@/components/common/PageHeader'
 
@@ -7,15 +6,13 @@ import { PageHeader } from '@/components/common/PageHeader'
  */
 function RolesPage() {
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        <PageHeader
-          title="Roles"
-          description="View all roles and their assigned permissions"
-        />
-        <RolesList />
-      </div>
-    </AdminLayout>
+    <div className="space-y-6">
+      <PageHeader
+        title="Roles"
+        description="View all roles and their assigned permissions"
+      />
+      <RolesList />
+    </div>
   )
 }
 

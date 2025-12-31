@@ -166,21 +166,68 @@ export function AdminsList() {
         <Card>
           <CardContent className="pt-6">
             <div className="space-y-4">
-            {isLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="text-muted-foreground">Loading admins...</div>
-              </div>
-            ) : admins.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-8 text-center">
-                <p className="text-muted-foreground">
-                  {search || statusFilter !== 'all' || departmentFilter !== 'all'
-                    ? 'No admins found matching your criteria.'
-                    : 'No admins available.'}
-                </p>
-              </div>
-            ) : (
-              <>
-                <div className="rounded-md border">
+            <div className="rounded-md border relative min-h-[400px]">
+              {isLoading && (
+                <div className="absolute inset-0 z-10 bg-background/80 backdrop-blur-sm">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Admin ID</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Department</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Roles</TableHead>
+                        <TableHead className="hidden lg:table-cell">Created</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {[...Array(5)].map((_, i) => (
+                        <TableRow key={i}>
+                          <TableCell>
+                            <div className="h-5 w-20 bg-muted animate-pulse rounded" />
+                          </TableCell>
+                          <TableCell>
+                            <div className="space-y-1">
+                              <div className="h-4 w-32 bg-muted animate-pulse rounded" />
+                              <div className="h-3 w-24 bg-muted animate-pulse rounded" />
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="h-4 w-40 bg-muted animate-pulse rounded" />
+                          </TableCell>
+                          <TableCell>
+                            <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+                          </TableCell>
+                          <TableCell>
+                            <div className="h-5 w-16 bg-muted animate-pulse rounded" />
+                          </TableCell>
+                          <TableCell>
+                            <div className="h-5 w-20 bg-muted animate-pulse rounded" />
+                          </TableCell>
+                          <TableCell className="hidden lg:table-cell">
+                            <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="h-8 w-8 bg-muted animate-pulse rounded ml-auto" />
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+              {!isLoading && admins.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <p className="text-muted-foreground">
+                    {search || statusFilter !== 'all' || departmentFilter !== 'all'
+                      ? 'No admins found matching your criteria.'
+                      : 'No admins available.'}
+                  </p>
+                </div>
+              ) : (
+                <div className={isLoading ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}>
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -275,37 +322,36 @@ export function AdminsList() {
                     </TableBody>
                   </Table>
                 </div>
-
-                {/* Pagination */}
-                {pagination && pagination.last_page > 1 && (
-                  <div className="flex items-center justify-between mt-4">
-                    <div className="text-sm text-muted-foreground">
-                      Showing {pagination.from || 0} to {pagination.to || 0} of{' '}
-                      {pagination.total} admins
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage((p) => Math.max(1, p - 1))}
-                        disabled={page === 1}
-                      >
-                        Previous
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          setPage((p) => Math.min(pagination.last_page, p + 1))
-                        }
-                        disabled={page === pagination.last_page}
-                      >
-                        Next
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </>
+              )}
+            </div>
+            {/* Pagination */}
+            {!isLoading && pagination && pagination.last_page > 1 && (
+              <div className="flex items-center justify-between mt-4">
+                <div className="text-sm text-muted-foreground">
+                  Showing {pagination.from || 0} to {pagination.to || 0} of{' '}
+                  {pagination.total} admins
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      setPage((p) => Math.min(pagination.last_page, p + 1))
+                    }
+                    disabled={page === pagination.last_page}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
             )}
             </div>
           </CardContent>

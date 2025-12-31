@@ -1,4 +1,3 @@
-import { AdminLayout } from '@/layouts/AdminLayout'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Users, Activity, DollarSign, TrendingUp } from 'lucide-react'
 
@@ -8,8 +7,7 @@ import { Users, Activity, DollarSign, TrendingUp } from 'lucide-react'
  */
 function DashboardPage() {
   return (
-    <AdminLayout>
-      <div className="space-y-6">
+    <div className="space-y-6">
         {/* Page Header */}
         <div className="flex flex-col space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
@@ -114,7 +112,6 @@ function DashboardPage() {
           </CardContent>
         </Card>
       </div>
-    </AdminLayout>
   )
 }
 

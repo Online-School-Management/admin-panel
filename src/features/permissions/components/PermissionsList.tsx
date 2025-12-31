@@ -133,21 +133,58 @@ export function PermissionsList() {
       <Card>
         <CardContent className="pt-6">
           <div className="space-y-4">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="text-muted-foreground">Loading permissions...</div>
-            </div>
-          ) : filteredPermissions.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <Shield className="h-12 w-12 text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">
-                {search || selectedModule !== 'all'
-                  ? 'No permissions found matching your criteria.'
-                  : 'No permissions available.'}
-              </p>
-            </div>
-          ) : (
-              <div className="rounded-md border">
+          <div className="rounded-md border relative min-h-[400px]">
+            {isLoading && (
+              <div className="absolute inset-0 z-10 bg-background/80 backdrop-blur-sm">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ID</TableHead>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Slug</TableHead>
+                      <TableHead>Module</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead>Created At</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {[...Array(5)].map((_, i) => (
+                      <TableRow key={i}>
+                        <TableCell>
+                          <div className="h-4 w-12 bg-muted animate-pulse rounded" />
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-4 w-32 bg-muted animate-pulse rounded" />
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-5 w-16 bg-muted animate-pulse rounded" />
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-4 w-40 bg-muted animate-pulse rounded" />
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+            {!isLoading && filteredPermissions.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <Shield className="h-12 w-12 text-muted-foreground mb-4" />
+                <p className="text-muted-foreground">
+                  {search || selectedModule !== 'all'
+                    ? 'No permissions found matching your criteria.'
+                    : 'No permissions available.'}
+                </p>
+              </div>
+            ) : (
+              <div className={isLoading ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}>
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -188,8 +225,9 @@ export function PermissionsList() {
                   ))}
                 </TableBody>
               </Table>
-            </div>
-          )}
+              </div>
+            )}
+          </div>
 
           {/* Results count */}
           {!isLoading && filteredPermissions.length > 0 && (

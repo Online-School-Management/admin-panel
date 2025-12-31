@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -17,7 +18,7 @@ const routeLabels: Record<string, string> = {
   login: 'Login',
 }
 
-export function Breadcrumbs() {
+export const Breadcrumbs = memo(function Breadcrumbs() {
   const location = useLocation()
   const pathnames = location.pathname.split('/').filter((x) => x)
 
@@ -85,4 +86,4 @@ export function Breadcrumbs() {
       })}
     </nav>
   )
-}
+})

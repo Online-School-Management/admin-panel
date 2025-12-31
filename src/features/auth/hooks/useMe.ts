@@ -7,7 +7,9 @@ import { getCurrentUser } from '../services/auth.service'
  * Automatically refetches user data when token is available
  */
 export function useMe() {
-  const { token, login: setAuth } = useAuthStore()
+  const token = useAuthStore((state) => state.token)
+  const currentUser = useAuthStore((state) => state.user)
+  const setAuth = useAuthStore((state) => state.login)
 
   return useQuery({
     queryKey: ['auth', 'me'],
@@ -24,9 +26,20 @@ export function useMe() {
         avatar: user.profile_image,
       }
       
-      // Update auth store with fresh user data
+      // Only update auth store if user data actually changed to prevent unnecessary re-renders
       if (token) {
-        setAuth(transformedUser, token)
+        const hasChanged = 
+          !currentUser ||
+          currentUser.id !== transformedUser.id ||
+          currentUser.email !== transformedUser.email ||
+          currentUser.name !== transformedUser.name ||
+          currentUser.user_type !== transformedUser.user_type ||
+          currentUser.role !== transformedUser.role ||
+          currentUser.avatar !== transformedUser.avatar
+        
+        if (hasChanged) {
+          setAuth(transformedUser, token)
+        }
       }
       
       return user
@@ -34,6 +47,9 @@ export function useMe() {
     enabled: !!token, // Only fetch if token exists
     retry: false, // Don't retry on 401/403
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+    refetchOnMount: false, // Don't refetch on component mount if data is fresh
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnReconnect: true, // Only refetch on reconnect
   })
 }
 

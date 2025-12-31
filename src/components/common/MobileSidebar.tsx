@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import {
   Sheet,
   SheetContent,
@@ -10,8 +11,9 @@ import { mainNavigation, adminNavigation, settingsNavigation } from '@/constants
 
 const navigation = [...mainNavigation, ...adminNavigation, ...settingsNavigation]
 
-export function MobileSidebar() {
-  const { mobileMenuOpen, setMobileMenuOpen } = useUIStore()
+export const MobileSidebar = memo(function MobileSidebar() {
+  const mobileMenuOpen = useUIStore((state) => state.mobileMenuOpen)
+  const setMobileMenuOpen = useUIStore((state) => state.setMobileMenuOpen)
 
   return (
     <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -38,6 +40,6 @@ export function MobileSidebar() {
       </SheetContent>
     </Sheet>
   )
-}
+})
 
 

@@ -13,14 +13,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Breadcrumbs } from './Breadcrumbs'
 import { useUIStore } from '@/store/uiStore'
 import { useAuthStore } from '@/store/authStore'
-import { useNavigate } from 'react-router-dom'
 import { useLogout } from '@/features/auth/hooks/useLogout'
 
 export const Header = memo(function Header() {
   const toggleSidebar = useUIStore((state) => state.toggleSidebar)
   const toggleMobileMenu = useUIStore((state) => state.toggleMobileMenu)
   const user = useAuthStore((state) => state.user)
-  const navigate = useNavigate()
   const logoutMutation = useLogout()
 
   const handleLogout = () => {
@@ -96,9 +94,6 @@ export const Header = memo(function Header() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate('/settings')}>
-              Settings
-            </DropdownMenuItem>
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout} className="text-destructive">

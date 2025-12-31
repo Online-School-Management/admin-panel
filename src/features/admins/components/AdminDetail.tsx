@@ -2,6 +2,7 @@ import { Mail, Phone, Calendar, MapPin } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import { CardSkeleton } from '@/components/common/skeletons/CardSkeleton'
 import { useAdmin, useAdminPermissions } from '../hooks/useAdmins'
 import { format } from 'date-fns'
 import type { Admin } from '../types/admin.types'
@@ -19,11 +20,22 @@ export function AdminDetail({ adminId }: AdminDetailProps) {
 
   if (isLoading) {
     return (
-      <Card>
-        <CardContent className="pt-6">
-          <p className="text-muted-foreground">Loading admin...</p>
-        </CardContent>
-      </Card>
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Information Skeleton */}
+          <div className="lg:col-span-2 space-y-6">
+            <CardSkeleton titleWidth="w-32" fieldsCount={4} fieldsPerRow={2} />
+            <CardSkeleton titleWidth="w-32" fieldsCount={4} fieldsPerRow={2} />
+            <CardSkeleton titleWidth="w-20" showBadges={true} badgesCount={3} />
+          </div>
+
+          {/* Sidebar Skeleton */}
+          <div className="space-y-6">
+            <CardSkeleton titleWidth="w-28" fieldsCount={3} fieldsPerRow={1} />
+            <CardSkeleton titleWidth="w-24" fieldsCount={2} fieldsPerRow={1} />
+          </div>
+        </div>
+      </div>
     )
   }
 

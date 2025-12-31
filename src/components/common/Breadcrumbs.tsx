@@ -10,11 +10,11 @@ interface BreadcrumbItem {
 
 const routeLabels: Record<string, string> = {
   dashboard: 'Dashboard',
-  users: 'User Management',
-  'user-management': 'User Management',
-  new: 'Create User',
-  edit: 'Edit User',
-  settings: 'Settings',
+  admins: 'Admins',
+  roles: 'Roles',
+  permissions: 'Permissions',
+  new: 'Create',
+  edit: 'Edit',
   login: 'Login',
 }
 
@@ -34,14 +34,19 @@ export const Breadcrumbs = memo(function Breadcrumbs() {
     
     // Skip ID segments (UUIDs or long alphanumeric strings)
     if (pathname.length > 10 && /^[a-zA-Z0-9-]+$/.test(pathname)) {
-      // Check if it's between 'users' and 'edit'
-      if (i > 0 && pathnames[i - 1] === 'users' && pathnames[i + 1] === 'edit') {
-        // Add "Edit User" instead of the ID
+      // Check if it's between 'admins' and 'edit'
+      if (i > 0 && pathnames[i - 1] === 'admins' && pathnames[i + 1] === 'edit') {
+        // Add "Edit Admin" instead of the ID
         breadcrumbs.push({
-          label: 'Edit User',
+          label: 'Edit Admin',
           to: undefined,
         })
         i++ // Skip the 'edit' part as we've already handled it
+        continue
+      }
+      // Check if it's a detail page (admins/:id or roles/:id)
+      if (i > 0 && (pathnames[i - 1] === 'admins' || pathnames[i - 1] === 'roles')) {
+        // Skip the ID, the parent route label is enough
         continue
       }
       // Otherwise, skip this ID segment

@@ -4,7 +4,7 @@ import { NavItem } from './NavItem'
 import { useUIStore } from '@/store/uiStore'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { mainNavigation, adminNavigation, settingsNavigation } from '@/constants/navigation'
+import { mainNavigation, adminNavigation } from '@/constants/navigation'
 
 export const Sidebar = memo(function Sidebar() {
   const sidebarOpen = useUIStore((state) => state.sidebarOpen)
@@ -100,27 +100,6 @@ export const Sidebar = memo(function Sidebar() {
             />
           ))}
 
-          {/* Separator */}
-          <div className={cn('my-2', !sidebarOpen && 'px-2')}>
-            <hr className="border-0 h-px bg-border" />
-          </div>
-
-          {/* Settings Navigation */}
-          {settingsNavigation.map((item) => (
-            <NavItem
-              key={item.to}
-              to={item.to}
-              icon={item.icon}
-              label={item.label}
-              collapsed={!sidebarOpen}
-              onClick={() => {
-                // Close sidebar on mobile when item is clicked
-                if (window.innerWidth < 1024) {
-                  setSidebarOpen(false)
-                }
-              }}
-            />
-          ))}
         </nav>
 
         {/* Sidebar Footer */}

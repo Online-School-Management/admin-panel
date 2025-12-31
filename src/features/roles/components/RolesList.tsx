@@ -20,6 +20,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
+import { Pagination } from '@/components/common/Pagination'
+import { TableSkeleton } from '@/components/common/skeletons/TableSkeleton'
 import { useRoles } from '../hooks/useRoles'
 import { format } from 'date-fns'
 import type { Role } from '../types/role.types'
@@ -120,57 +122,22 @@ export function RolesList() {
       </div>
 
       {/* Roles Table */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="space-y-4">
-          <div className="rounded-md border relative min-h-[400px]">
+      <div className="space-y-4">
+        <div className="rounded-md border relative min-h-[400px]">
             {isLoading && (
-              <div className="absolute inset-0 z-10 bg-background/80 backdrop-blur-sm">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Slug</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Permissions</TableHead>
-                      <TableHead>Created At</TableHead>
-                      <TableHead className="w-[100px]">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {[...Array(5)].map((_, i) => (
-                      <TableRow key={i}>
-                        <TableCell>
-                          <div className="h-4 w-12 bg-muted animate-pulse rounded" />
-                        </TableCell>
-                        <TableCell>
-                          <div className="h-4 w-32 bg-muted animate-pulse rounded" />
-                        </TableCell>
-                        <TableCell>
-                          <div className="h-4 w-24 bg-muted animate-pulse rounded" />
-                        </TableCell>
-                        <TableCell>
-                          <div className="h-4 w-40 bg-muted animate-pulse rounded" />
-                        </TableCell>
-                        <TableCell>
-                          <div className="h-5 w-16 bg-muted animate-pulse rounded" />
-                        </TableCell>
-                        <TableCell>
-                          <div className="h-5 w-20 bg-muted animate-pulse rounded" />
-                        </TableCell>
-                        <TableCell>
-                          <div className="h-4 w-24 bg-muted animate-pulse rounded" />
-                        </TableCell>
-                        <TableCell>
-                          <div className="h-8 w-8 bg-muted animate-pulse rounded" />
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+              <TableSkeleton
+                columns={[
+                  { width: 'w-12' },
+                  { width: 'w-32' },
+                  { width: 'w-24' },
+                  { width: 'w-40' },
+                  { width: 'w-16' },
+                  { width: 'w-20' },
+                  { width: 'w-24' },
+                  { width: 'w-8', className: 'w-[100px]' },
+                ]}
+                rows={5}
+              />
             )}
             {!isLoading && filteredRoles.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-center">
@@ -248,33 +215,12 @@ export function RolesList() {
             )}
           </div>
           {/* Pagination */}
-          {!isLoading && pagination && pagination.last_page > 1 && (
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-muted-foreground">
-                Showing {pagination.from || 0} to {pagination.to || 0} of{' '}
-                {pagination.total} roles
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                >
-                  Previous
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    setPage((p) => Math.min(pagination.last_page, p + 1))
-                  }
-                  disabled={page === pagination.last_page}
-                >
-                  Next
-                </Button>
-              </div>
-            </div>
+          {!isLoading && pagination && (
+            <Pagination
+              pagination={pagination}
+              onPageChange={setPage}
+              itemName="roles"
+            />
           )}
 
           {/* Results count */}
@@ -284,10 +230,8 @@ export function RolesList() {
               {filteredRoles.length !== 1 ? 's' : ''}
             </div>
           )}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </div>
   )
 }
 

@@ -5,9 +5,6 @@ import { ProtectedRoute } from '@/components/ProtectedRoute'
 // Lazy load pages for code splitting
 const LoginPage = lazy(() => import('@/pages/LoginPage'))
 const DashboardPage = lazy(() => import('@/pages/DashboardPage'))
-const UsersPage = lazy(() => import('@/pages/UsersPage'))
-const CreateUserPage = lazy(() => import('@/pages/CreateUserPage'))
-const EditUserPage = lazy(() => import('@/pages/EditUserPage'))
 const PermissionsPage = lazy(() => import('@/pages/PermissionsPage'))
 const RolesPage = lazy(() => import('@/pages/RolesPage'))
 const RoleDetailPage = lazy(() => import('@/pages/RoleDetailPage'))
@@ -37,18 +34,6 @@ export const router = createBrowserRouter([
   {
     path: '/dashboard',
     element: <ProtectedRoute><DashboardPage /></ProtectedRoute>,
-  },
-  {
-    path: '/users',
-    element: <ProtectedRoute><UsersPage /></ProtectedRoute>,
-  },
-  {
-    path: '/users/new',
-    element: <ProtectedRoute><CreateUserPage /></ProtectedRoute>,
-  },
-  {
-    path: '/users/:id/edit',
-    element: <ProtectedRoute><EditUserPage /></ProtectedRoute>,
   },
   {
     path: '/permissions',

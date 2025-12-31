@@ -10,6 +10,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Separator } from '@/components/ui/separator'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useRole } from '../hooks/useRoles'
 
 /**
@@ -30,13 +31,71 @@ export function RoleDetail() {
 
   if (isLoading) {
     return (
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-center py-8">
-            <div className="text-muted-foreground">Loading role details...</div>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="space-y-6">
+        {/* Back Button Skeleton */}
+        <Skeleton className="h-10 w-32" />
+
+        {/* Role Information Skeleton */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-start justify-between">
+              <div className="space-y-2 flex-1">
+                <Skeleton className="h-8 w-48" />
+                <Skeleton className="h-4 w-64" />
+              </div>
+              <Skeleton className="h-6 w-20" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-5 w-32" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-6 w-24" />
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Permissions Skeleton */}
+        <Card>
+          <CardHeader>
+            <div className="space-y-2">
+              <Skeleton className="h-6 w-32" />
+              <Skeleton className="h-4 w-64" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
+              {[...Array(2)].map((_, i) => (
+                <div key={i}>
+                  <div className="mb-3 space-y-2">
+                    <Skeleton className="h-5 w-32" />
+                    <div className="h-px w-full bg-muted" />
+                  </div>
+                  <div className="rounded-md border">
+                    <div className="p-4 space-y-3">
+                      {[...Array(3)].map((_, j) => (
+                        <div key={j} className="flex gap-4">
+                          <Skeleton className="h-4 w-12" />
+                          <Skeleton className="h-4 w-40 flex-1" />
+                          <Skeleton className="h-4 w-32" />
+                          <Skeleton className="h-4 w-48 flex-1" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     )
   }
 

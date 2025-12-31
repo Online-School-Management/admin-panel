@@ -28,6 +28,9 @@ import {
 } from '@/components/ui/select'
 import { useAdmins, useDeleteAdmin } from '../hooks/useAdmins'
 import { DeleteAdminDialog } from './DeleteAdminDialog'
+import { Pagination } from '@/components/common/Pagination'
+import { TableSkeleton } from '@/components/common/skeletons/TableSkeleton'
+import { Skeleton } from '@/components/ui/skeleton'
 import { format } from 'date-fns'
 import type { AdminCollectionItem } from '../types/admin.types'
 
@@ -88,6 +91,7 @@ export function AdminsList() {
         return 'secondary'
     }
   }
+
 
   const admins = data?.data || []
   const pagination = data?.meta?.pagination
@@ -163,60 +167,31 @@ export function AdminsList() {
         </div>
 
         {/* Admins Table */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="space-y-4">
-            <div className="rounded-md border relative min-h-[400px]">
+        <div className="space-y-4">
+          <div className="rounded-md border relative min-h-[400px]">
               {isLoading && (
-                <div className="absolute inset-0 z-10 bg-background/80 backdrop-blur-sm">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Admin ID</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Department</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Roles</TableHead>
-                        <TableHead className="hidden lg:table-cell">Created</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {[...Array(5)].map((_, i) => (
-                        <TableRow key={i}>
-                          <TableCell>
-                            <div className="h-5 w-20 bg-muted animate-pulse rounded" />
-                          </TableCell>
-                          <TableCell>
-                            <div className="space-y-1">
-                              <div className="h-4 w-32 bg-muted animate-pulse rounded" />
-                              <div className="h-3 w-24 bg-muted animate-pulse rounded" />
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="h-4 w-40 bg-muted animate-pulse rounded" />
-                          </TableCell>
-                          <TableCell>
-                            <div className="h-4 w-24 bg-muted animate-pulse rounded" />
-                          </TableCell>
-                          <TableCell>
-                            <div className="h-5 w-16 bg-muted animate-pulse rounded" />
-                          </TableCell>
-                          <TableCell>
-                            <div className="h-5 w-20 bg-muted animate-pulse rounded" />
-                          </TableCell>
-                          <TableCell className="hidden lg:table-cell">
-                            <div className="h-4 w-24 bg-muted animate-pulse rounded" />
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="h-8 w-8 bg-muted animate-pulse rounded ml-auto" />
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                <TableSkeleton
+                  columns={[
+                    { width: 'w-8', className: 'w-16' },
+                    { width: 'w-20' },
+                    { 
+                      width: 'w-32',
+                      customCell: () => (
+                        <div className="space-y-1">
+                          <Skeleton className="h-4 w-32" />
+                          <Skeleton className="h-3 w-24" />
+                        </div>
+                      )
+                    },
+                    { width: 'w-40' },
+                    { width: 'w-24' },
+                    { width: 'w-16' },
+                    { width: 'w-20' },
+                    { width: 'w-24', className: 'hidden lg:table-cell' },
+                    { width: 'w-8', className: 'text-right' },
+                  ]}
+                  rows={5}
+                />
               )}
               {!isLoading && admins.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 text-center">
@@ -231,6 +206,7 @@ export function AdminsList() {
                   <Table>
                     <TableHeader>
                       <TableRow>
+                        <TableHead className="w-16">No</TableHead>
                         <TableHead>Admin ID</TableHead>
                         <TableHead>Name</TableHead>
                         <TableHead>Email</TableHead>
@@ -242,120 +218,107 @@ export function AdminsList() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {admins.map((admin) => (
-                        <TableRow key={admin.id}>
-                          <TableCell className="font-medium">
-                            {admin.admin_id}
-                          </TableCell>
-                          <TableCell>
-                            <div>
-                              <div className="font-medium">{admin.user.name}</div>
-                              {admin.user.phone && (
-                                <div className="text-sm text-muted-foreground">
-                                  {admin.user.phone}
-                                </div>
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell>{admin.user.email}</TableCell>
-                          <TableCell>{admin.department || '-'}</TableCell>
-                          <TableCell>
-                            <Badge variant={getStatusBadgeVariant(admin.status)}>
-                              {admin.status}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            {admin.roles && admin.roles.length > 0 ? (
-                              <div className="flex flex-wrap gap-1">
-                                {admin.roles.slice(0, 2).map((role) => (
-                                  <Badge key={role.id} variant="outline" className="text-xs">
-                                    {role.name}
-                                  </Badge>
-                                ))}
-                                {admin.roles.length > 2 && (
-                                  <Badge variant="outline" className="text-xs">
-                                    +{admin.roles.length - 2}
-                                  </Badge>
+                      {admins.map((admin, index) => {
+                        // Calculate row number based on pagination
+                        const rowNumber = pagination
+                          ? (pagination.current_page - 1) * pagination.per_page + index + 1
+                          : index + 1
+                        
+                        return (
+                          <TableRow key={admin.id}>
+                            <TableCell className="text-muted-foreground text-center">
+                              {rowNumber}
+                            </TableCell>
+                            <TableCell className="font-medium">
+                              {admin.admin_id}
+                            </TableCell>
+                            <TableCell>
+                              <div>
+                                <div className="font-medium">{admin.user.name}</div>
+                                {admin.user.phone && (
+                                  <div className="text-sm text-muted-foreground">
+                                    {admin.user.phone}
+                                  </div>
                                 )}
                               </div>
-                            ) : (
-                              <span className="text-muted-foreground text-sm">No roles</span>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-sm text-muted-foreground hidden lg:table-cell">
-                            {admin.created_at
-                              ? format(new Date(admin.created_at), 'MMM dd, yyyy')
-                              : '-'}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-10 w-10">
-                                  <MoreVertical className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem asChild>
-                                  <Link to={`/admins/${admin.id}`}>
-                                    <Eye className="h-4 w-4 mr-2" />
-                                    View
-                                  </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem asChild>
-                                  <Link to={`/admins/${admin.id}/edit`}>
-                                    <Edit className="h-4 w-4 mr-2" />
-                                    Edit
-                                  </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => handleDeleteClick(admin)}
-                                  className="text-destructive"
-                                >
-                                  <Trash2 className="h-4 w-4 mr-2" />
-                                  Delete
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                            </TableCell>
+                            <TableCell>{admin.user.email}</TableCell>
+                            <TableCell>{admin.department || '-'}</TableCell>
+                            <TableCell>
+                              <Badge variant={getStatusBadgeVariant(admin.status)}>
+                                {admin.status}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              {admin.roles && admin.roles.length > 0 ? (
+                                <div className="flex flex-wrap gap-1">
+                                  {admin.roles.slice(0, 2).map((role) => (
+                                    <Badge key={role.id} variant="outline" className="text-xs">
+                                      {role.name}
+                                    </Badge>
+                                  ))}
+                                  {admin.roles.length > 2 && (
+                                    <Badge variant="outline" className="text-xs">
+                                      +{admin.roles.length - 2}
+                                    </Badge>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-muted-foreground text-sm">No roles</span>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-sm text-muted-foreground hidden lg:table-cell">
+                              {admin.created_at
+                                ? format(new Date(admin.created_at), 'MMM dd, yyyy')
+                                : '-'}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-10 w-10">
+                                    <MoreVertical className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem asChild>
+                                    <Link to={`/admins/${admin.id}`}>
+                                      <Eye className="h-4 w-4 mr-2" />
+                                      View
+                                    </Link>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem asChild>
+                                    <Link to={`/admins/${admin.id}/edit`}>
+                                      <Edit className="h-4 w-4 mr-2" />
+                                      Edit
+                                    </Link>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleDeleteClick(admin)}
+                                    className="text-destructive"
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Delete
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </TableCell>
+                          </TableRow>
+                        )
+                      })}
                     </TableBody>
                   </Table>
                 </div>
               )}
-            </div>
-            {/* Pagination */}
-            {!isLoading && pagination && pagination.last_page > 1 && (
-              <div className="flex items-center justify-between mt-4">
-                <div className="text-sm text-muted-foreground">
-                  Showing {pagination.from || 0} to {pagination.to || 0} of{' '}
-                  {pagination.total} admins
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                  >
-                    Previous
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      setPage((p) => Math.min(pagination.last_page, p + 1))
-                    }
-                    disabled={page === pagination.last_page}
-                  >
-                    Next
-                  </Button>
-                </div>
-              </div>
-            )}
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+          {/* Pagination */}
+          {!isLoading && pagination && (
+            <Pagination
+              pagination={pagination}
+              onPageChange={setPage}
+              itemName="admins"
+            />
+          )}
+        </div>
       </div>
 
       {/* Delete Dialog */}

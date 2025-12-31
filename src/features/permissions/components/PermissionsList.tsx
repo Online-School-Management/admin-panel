@@ -11,15 +11,9 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
-import { usePermissions, usePermissionsByModule, useModules } from '../hooks/usePermissions'
+import { TableSkeleton } from '@/components/common/skeletons/TableSkeleton'
+import { usePermissions } from '../hooks/usePermissions'
 import { format } from 'date-fns'
 
 /**
@@ -27,30 +21,13 @@ import { format } from 'date-fns'
  */
 export function PermissionsList() {
   const [search, setSearch] = useState('')
-  const [selectedModule, setSelectedModule] = useState<string>('all')
 
-  // Fetch all modules for filter dropdown
-  const { data: modulesData } = useModules()
-  const modules = modulesData?.data || []
-
-  // Fetch permissions based on module filter
+  // Fetch all permissions
   const {
-    data: allPermissionsData,
-    isLoading: isLoadingAll,
-    error: errorAll,
+    data: permissionsData,
+    isLoading,
+    error,
   } = usePermissions()
-
-  const {
-    data: modulePermissionsData,
-    isLoading: isLoadingModule,
-    error: errorModule,
-  } = usePermissionsByModule(selectedModule)
-
-  // Determine which data to use
-  const permissionsData =
-    selectedModule === 'all' ? allPermissionsData : modulePermissionsData
-  const isLoading = selectedModule === 'all' ? isLoadingAll : isLoadingModule
-  const error = selectedModule === 'all' ? errorAll : errorModule
 
   // Filter permissions by search term
   const permissions = permissionsData?.data || []
@@ -78,7 +55,6 @@ export function PermissionsList() {
 
   const handleReset = () => {
     setSearch('')
-    setSelectedModule('all')
   }
 
   if (error) {
@@ -95,7 +71,7 @@ export function PermissionsList() {
 
   return (
     <div className="space-y-4">
-      {/* Search and Filter */}
+      {/* Search */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -106,19 +82,6 @@ export function PermissionsList() {
             className="pl-10"
           />
         </div>
-        <Select value={selectedModule} onValueChange={setSelectedModule}>
-          <SelectTrigger className="w-full sm:w-[200px]">
-            <SelectValue placeholder="Filter by module" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Modules</SelectItem>
-            {modules.map((module) => (
-              <SelectItem key={module} value={module}>
-                {module.charAt(0).toUpperCase() + module.slice(1)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
         <Button
           variant="outline"
           onClick={handleReset}
@@ -130,55 +93,26 @@ export function PermissionsList() {
       </div>
 
       {/* Permissions Table */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="space-y-4">
-          <div className="rounded-md border relative min-h-[400px]">
+      <div className="space-y-4">
+        <div className="rounded-md border relative min-h-[400px]">
             {isLoading && (
-              <div className="absolute inset-0 z-10 bg-background/80 backdrop-blur-sm">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Slug</TableHead>
-                      <TableHead>Module</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead>Created At</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {[...Array(5)].map((_, i) => (
-                      <TableRow key={i}>
-                        <TableCell>
-                          <div className="h-4 w-12 bg-muted animate-pulse rounded" />
-                        </TableCell>
-                        <TableCell>
-                          <div className="h-4 w-32 bg-muted animate-pulse rounded" />
-                        </TableCell>
-                        <TableCell>
-                          <div className="h-4 w-24 bg-muted animate-pulse rounded" />
-                        </TableCell>
-                        <TableCell>
-                          <div className="h-5 w-16 bg-muted animate-pulse rounded" />
-                        </TableCell>
-                        <TableCell>
-                          <div className="h-4 w-40 bg-muted animate-pulse rounded" />
-                        </TableCell>
-                        <TableCell>
-                          <div className="h-4 w-24 bg-muted animate-pulse rounded" />
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+              <TableSkeleton
+                columns={[
+                  { width: 'w-12' },
+                  { width: 'w-32' },
+                  { width: 'w-24' },
+                  { width: 'w-16' },
+                  { width: 'w-40' },
+                  { width: 'w-24' },
+                ]}
+                rows={5}
+              />
             )}
             {!isLoading && filteredPermissions.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-center">
                 <Shield className="h-12 w-12 text-muted-foreground mb-4" />
                 <p className="text-muted-foreground">
-                  {search || selectedModule !== 'all'
+                  {search
                     ? 'No permissions found matching your criteria.'
                     : 'No permissions available.'}
                 </p>
@@ -234,13 +168,10 @@ export function PermissionsList() {
             <div className="text-sm text-muted-foreground">
               Showing {filteredPermissions.length} permission
               {filteredPermissions.length !== 1 ? 's' : ''}
-              {selectedModule !== 'all' && ` in ${selectedModule} module`}
             </div>
           )}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </div>
   )
 }
 

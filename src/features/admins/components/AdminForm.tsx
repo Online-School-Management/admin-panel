@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { FormSkeleton } from '@/components/common/skeletons/FormSkeleton'
 import { useCreateAdmin, useUpdateAdmin, useAdmin } from '../hooks/useAdmins'
 import { useRoles } from '@/features/roles/hooks/useRoles'
 import type { CreateAdminInput, UpdateAdminInput } from '../types/admin.types'
@@ -220,14 +221,8 @@ export function AdminForm({ adminId }: AdminFormProps) {
     }
   }
 
-  if (isEditMode && isLoadingAdmin) {
-    return (
-      <Card>
-        <CardContent className="pt-6">
-          <p className="text-muted-foreground">Loading admin...</p>
-        </CardContent>
-      </Card>
-    )
+  if (isEditMode && (isLoadingAdmin || isLoadingRoles)) {
+    return <FormSkeleton fieldsPerColumn={3} showActions={true} titleWidth="w-32" />
   }
 
   return (

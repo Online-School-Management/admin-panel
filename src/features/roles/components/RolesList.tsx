@@ -22,6 +22,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Pagination } from '@/components/common/Pagination'
 import { TableSkeleton } from '@/components/common/skeletons/TableSkeleton'
+import { PAGINATION, ROLE_STATUS_OPTIONS } from '@/constants'
 import { useRoles } from '../hooks/useRoles'
 import { format } from 'date-fns'
 import type { Role } from '../types/role.types'
@@ -32,8 +33,8 @@ import type { Role } from '../types/role.types'
 export function RolesList() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
-  const [page, setPage] = useState(1)
-  const perPage = 15
+  const [page, setPage] = useState<number>(PAGINATION.DEFAULT_PAGE)
+  const perPage = PAGINATION.DEFAULT_PER_PAGE
 
   const { data, isLoading, error } = useRoles({
     page,
@@ -107,8 +108,11 @@ export function RolesList() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="inactive">Inactive</SelectItem>
+            {ROLE_STATUS_OPTIONS.map((status) => (
+              <SelectItem key={status.value} value={status.value}>
+                {status.label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <Button

@@ -1,10 +1,11 @@
 import * as React from "react"
 
 import type { ToastActionElement, ToastProps } from "@/components/ui/toast"
+import { TOAST_DURATION } from "@/constants"
 
 const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 5000 // Default 5 seconds
-const DEFAULT_TOAST_DURATION = 5000 // Default 5 seconds
+const TOAST_REMOVE_DELAY = TOAST_DURATION.DEFAULT
+const DEFAULT_TOAST_DURATION = TOAST_DURATION.DEFAULT
 
 type ToasterToast = ToastProps & {
   id: string

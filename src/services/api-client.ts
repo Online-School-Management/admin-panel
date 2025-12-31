@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosError } from 'axios'
+import { API_CONFIG } from '@/constants'
 
 /**
  * Global API client configuration
@@ -6,14 +7,14 @@ import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosError } from 'ax
  */
 
 // Base URL - can be moved to environment variables
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1/backend'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || API_CONFIG.BASE_URL
 
 /**
  * Create axios instance with default configuration
  */
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000, // 10 seconds
+  timeout: API_CONFIG.TIMEOUT,
   headers: {
     'Content-Type': 'application/json',
   },

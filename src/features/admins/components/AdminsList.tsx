@@ -31,6 +31,7 @@ import { DeleteAdminDialog } from './DeleteAdminDialog'
 import { Pagination } from '@/components/common/Pagination'
 import { TableSkeleton } from '@/components/common/skeletons/TableSkeleton'
 import { Skeleton } from '@/components/ui/skeleton'
+import { PAGINATION, ADMIN_STATUS_OPTIONS } from '@/constants'
 import { format } from 'date-fns'
 import type { AdminCollectionItem } from '../types/admin.types'
 
@@ -41,8 +42,8 @@ export function AdminsList() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [departmentFilter, setDepartmentFilter] = useState<string>('all')
-  const [page, setPage] = useState(1)
-  const perPage = 15
+  const [page, setPage] = useState<number>(PAGINATION.DEFAULT_PAGE)
+  const perPage = PAGINATION.DEFAULT_PER_PAGE
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedAdmin, setSelectedAdmin] = useState<AdminCollectionItem | null>(null)
 
@@ -136,9 +137,11 @@ export function AdminsList() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-              <SelectItem value="suspended">Suspended</SelectItem>
+              {ADMIN_STATUS_OPTIONS.map((status) => (
+                <SelectItem key={status.value} value={status.value}>
+                  {status.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           {departments.length > 0 && (

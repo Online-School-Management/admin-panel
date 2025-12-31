@@ -1,6 +1,7 @@
 import { RouterProvider } from 'react-router-dom'
 import { router } from '@/routes'
 import { Toaster } from '@/components/ui/toaster'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 /**
  * App component
@@ -9,10 +10,10 @@ import { Toaster } from '@/components/ui/toaster'
  */
 function App() {
   return (
-    <>
+    <ErrorBoundary>
       <RouterProvider router={router} />
       <Toaster />
-    </>
+    </ErrorBoundary>
   )
 }
 

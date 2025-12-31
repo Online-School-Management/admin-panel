@@ -16,13 +16,14 @@ import {
 } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { FormSkeleton } from '@/components/common/skeletons/FormSkeleton'
+import { PAGINATION, DEPARTMENT_OPTIONS, ADMIN_STATUS_OPTIONS, VALIDATION } from '@/constants'
 import { useCreateAdmin, useUpdateAdmin, useAdmin } from '../hooks/useAdmins'
 import { useRoles } from '@/features/roles/hooks/useRoles'
 import type { CreateAdminInput, UpdateAdminInput } from '../types/admin.types'
 
 // Base form validation schema - only required fields
 const baseAdminFormSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
+  name: z.string().min(VALIDATION.MIN_NAME_LENGTH, `Name must be at least ${VALIDATION.MIN_NAME_LENGTH} characters`),
   status: z.enum(['active', 'inactive', 'suspended']).optional(),
   department: z.string().optional(),
   role_id: z.number().optional(),
@@ -52,7 +53,7 @@ export function AdminForm({ adminId }: AdminFormProps) {
   } = useAdmin(
     adminId ? parseInt(adminId) : 0
   )
-  const { data: rolesData, isLoading: isLoadingRoles } = useRoles({ per_page: 100 })
+  const { data: rolesData, isLoading: isLoadingRoles } = useRoles({ per_page: PAGINATION.ROLES_PER_PAGE })
   const roles = rolesData?.data || []
 
   const createAdmin = useCreateAdmin()
@@ -65,7 +66,7 @@ export function AdminForm({ adminId }: AdminFormProps) {
         .extend({
           password: z
             .string()
-            .min(8, 'Password must be at least 8 characters')
+            .min(VALIDATION.MIN_PASSWORD_LENGTH, `Password must be at least ${VALIDATION.MIN_PASSWORD_LENGTH} characters`)
             .optional()
             .or(z.literal('')),
           password_confirmation: z.string().optional(),
@@ -86,7 +87,7 @@ export function AdminForm({ adminId }: AdminFormProps) {
     }
     return baseAdminFormSchema
       .extend({
-        password: z.string().min(8, 'Password must be at least 8 characters'),
+        password: z.string().min(VALIDATION.MIN_PASSWORD_LENGTH, `Password must be at least ${VALIDATION.MIN_PASSWORD_LENGTH} characters`),
         password_confirmation: z.string().min(1, 'Password confirmation is required'),
       })
       .refine((data) => data.password === data.password_confirmation, {
@@ -312,10 +313,11 @@ export function AdminForm({ adminId }: AdminFormProps) {
                     <SelectValue placeholder="Select department (optional)" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Teacher Management">Teacher Management</SelectItem>
-                    <SelectItem value="Administration">Administration</SelectItem>
-                    <SelectItem value="Student Management">Student Management</SelectItem>
-                    <SelectItem value="Employee Management">Employee Management</SelectItem>
+                    {DEPARTMENT_OPTIONS.map((dept) => (
+                      <SelectItem key={dept} value={dept}>
+                        {dept}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 {errors.department && (
@@ -368,9 +370,11 @@ export function AdminForm({ adminId }: AdminFormProps) {
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                    <SelectItem value="suspended">Suspended</SelectItem>
+                    {ADMIN_STATUS_OPTIONS.map((status) => (
+                      <SelectItem key={status.value} value={status.value}>
+                        {status.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 {errors.status && (

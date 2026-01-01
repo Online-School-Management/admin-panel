@@ -6,6 +6,7 @@ import { CardSkeleton } from '@/components/common/skeletons/CardSkeleton'
 import { useAdmin, useAdminPermissions } from '../hooks/useAdmins'
 import { format } from 'date-fns'
 import type { Admin } from '../types/admin.types'
+import { useTranslation } from '@/i18n/context'
 
 interface AdminDetailProps {
   adminId: string
@@ -15,6 +16,7 @@ interface AdminDetailProps {
  * AdminDetail component - displays detailed admin information
  */
 export function AdminDetail({ adminId }: AdminDetailProps) {
+  const { t } = useTranslation()
   const { data: adminData, isLoading, error } = useAdmin(parseInt(adminId))
   const { data: permissionsData } = useAdminPermissions(parseInt(adminId))
 
@@ -44,7 +46,7 @@ export function AdminDetail({ adminId }: AdminDetailProps) {
       <Card>
         <CardContent className="pt-6">
           <p className="text-destructive">
-            Error loading admin: {(error as Error).message}
+            {t('admin.detail.errorLoading')}: {(error as Error).message}
           </p>
         </CardContent>
       </Card>
@@ -55,7 +57,7 @@ export function AdminDetail({ adminId }: AdminDetailProps) {
     return (
       <Card>
         <CardContent className="pt-6">
-          <p className="text-muted-foreground">Admin not found</p>
+          <p className="text-muted-foreground">{t('admin.messages.adminNotFound')}</p>
         </CardContent>
       </Card>
     )
@@ -77,6 +79,10 @@ export function AdminDetail({ adminId }: AdminDetailProps) {
     }
   }
 
+  const getStatusLabel = (status: string) => {
+    return t(`common.status.${status}`) || status
+  }
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -85,24 +91,24 @@ export function AdminDetail({ adminId }: AdminDetailProps) {
           {/* Basic Information */}
           <Card>
             <CardHeader>
-              <CardTitle>Basic Information</CardTitle>
+              <CardTitle>{t('admin.detail.basicInformation')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">Admin ID</p>
+                  <p className="text-sm font-medium text-muted-foreground">{t('admin.detail.adminId')}</p>
                   <p className="text-base font-semibold">{admin.admin_id}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">Status</p>
+                  <p className="text-sm font-medium text-muted-foreground">{t('admin.detail.adminStatus')}</p>
                   <Badge variant={getStatusBadgeVariant(admin.status)}>
-                    {admin.status}
+                    {getStatusLabel(admin.status)}
                   </Badge>
                 </div>
                 {admin.department && (
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-muted-foreground">
-                      Department
+                      {t('admin.form.department')}
                     </p>
                     <p className="text-base">{admin.department}</p>
                   </div>
@@ -110,7 +116,7 @@ export function AdminDetail({ adminId }: AdminDetailProps) {
                 {admin.hire_date && (
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-muted-foreground">
-                      Hire Date
+                      {t('admin.detail.hireDate')}
                     </p>
                     <p className="text-base">
                       {format(new Date(admin.hire_date), 'PPP')}
@@ -122,7 +128,7 @@ export function AdminDetail({ adminId }: AdminDetailProps) {
                 <>
                   <Separator />
                   <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">Notes</p>
+                    <p className="text-sm font-medium text-muted-foreground">{t('admin.detail.notes')}</p>
                     <p className="text-base">{admin.notes}</p>
                   </div>
                 </>
@@ -133,14 +139,14 @@ export function AdminDetail({ adminId }: AdminDetailProps) {
           {/* User Information */}
           <Card>
             <CardHeader>
-              <CardTitle>User Information</CardTitle>
+              <CardTitle>{t('admin.detail.userInformation')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                     <Mail className="h-4 w-4" />
-                    Email
+                    {t('common.labels.email')}
                   </p>
                   <p className="text-base">{admin.user.email}</p>
                 </div>
@@ -148,7 +154,7 @@ export function AdminDetail({ adminId }: AdminDetailProps) {
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                       <Phone className="h-4 w-4" />
-                      Phone
+                      {t('admin.detail.phone')}
                     </p>
                     <p className="text-base">{admin.user.phone}</p>
                   </div>
@@ -157,7 +163,7 @@ export function AdminDetail({ adminId }: AdminDetailProps) {
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
-                      Date of Birth
+                      {t('admin.detail.dateOfBirth')}
                     </p>
                     <p className="text-base">
                       {format(new Date(admin.user.date_of_birth), 'PPP')}
@@ -166,7 +172,7 @@ export function AdminDetail({ adminId }: AdminDetailProps) {
                 )}
                 {admin.user.gender && (
                   <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">Gender</p>
+                    <p className="text-sm font-medium text-muted-foreground">{t('admin.detail.gender')}</p>
                     <p className="text-base capitalize">{admin.user.gender}</p>
                   </div>
                 )}
@@ -174,7 +180,7 @@ export function AdminDetail({ adminId }: AdminDetailProps) {
                   <div className="space-y-1 md:col-span-2">
                     <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                       <MapPin className="h-4 w-4" />
-                      Address
+                      {t('admin.detail.address')}
                     </p>
                     <p className="text-base">{admin.user.address}</p>
                   </div>
@@ -182,7 +188,7 @@ export function AdminDetail({ adminId }: AdminDetailProps) {
                 {admin.user.last_login_at && (
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-muted-foreground">
-                      Last Login
+                      {t('admin.detail.lastLogin')}
                     </p>
                     <p className="text-base">
                       {format(new Date(admin.user.last_login_at), 'PPpp')}
@@ -197,7 +203,7 @@ export function AdminDetail({ adminId }: AdminDetailProps) {
           {admin.roles && admin.roles.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>Roles</CardTitle>
+                <CardTitle>{t('admin.detail.roles')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
@@ -215,7 +221,7 @@ export function AdminDetail({ adminId }: AdminDetailProps) {
           {permissions.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>Permissions</CardTitle>
+                <CardTitle>{t('admin.detail.permissions')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -254,27 +260,27 @@ export function AdminDetail({ adminId }: AdminDetailProps) {
           {/* Status Card */}
           <Card>
             <CardHeader>
-              <CardTitle>Account Status</CardTitle>
+              <CardTitle>{t('admin.detail.auditInformation')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-1">
-                <p className="text-sm font-medium text-muted-foreground">User Status</p>
+                <p className="text-sm font-medium text-muted-foreground">{t('admin.detail.userStatus')}</p>
                 <Badge variant={getStatusBadgeVariant(admin.user.status)}>
-                  {admin.user.status}
+                  {getStatusLabel(admin.user.status)}
                 </Badge>
               </div>
               <div className="space-y-1">
                 <p className="text-sm font-medium text-muted-foreground">
-                  Admin Status
+                  {t('admin.detail.adminStatus')}
                 </p>
                 <Badge variant={getStatusBadgeVariant(admin.status)}>
-                  {admin.status}
+                  {getStatusLabel(admin.status)}
                 </Badge>
               </div>
               {admin.user.email_verified_at && (
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-muted-foreground">
-                    Email Verified
+                    {t('admin.detail.emailVerified')}
                   </p>
                   <p className="text-sm">
                     {format(new Date(admin.user.email_verified_at), 'PPP')}
@@ -287,12 +293,12 @@ export function AdminDetail({ adminId }: AdminDetailProps) {
           {/* Timestamps */}
           <Card>
             <CardHeader>
-              <CardTitle>Timestamps</CardTitle>
+              <CardTitle>{t('admin.detail.timestamps')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {admin.created_at && (
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">Created</p>
+                  <p className="text-sm font-medium text-muted-foreground">{t('admin.detail.created')}</p>
                   <p className="text-sm">
                     {format(new Date(admin.created_at), 'PPpp')}
                   </p>
@@ -300,7 +306,7 @@ export function AdminDetail({ adminId }: AdminDetailProps) {
               )}
               {admin.updated_at && (
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">Updated</p>
+                  <p className="text-sm font-medium text-muted-foreground">{t('admin.detail.updated')}</p>
                   <p className="text-sm">
                     {format(new Date(admin.updated_at), 'PPpp')}
                   </p>

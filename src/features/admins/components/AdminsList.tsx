@@ -34,11 +34,13 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { PAGINATION, ADMIN_STATUS_OPTIONS } from '@/constants'
 import { format } from 'date-fns'
 import type { AdminCollectionItem } from '../types/admin.types'
+import { useTranslation } from '@/i18n/context'
 
 /**
  * AdminsList component - displays admins in a table with CRUD actions
  */
 export function AdminsList() {
+  const { t } = useTranslation()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [departmentFilter, setDepartmentFilter] = useState<string>('all')
@@ -93,6 +95,10 @@ export function AdminsList() {
     }
   }
 
+  const getStatusLabel = (status: string) => {
+    return t(`common.status.${status}`) || status
+  }
+
 
   const admins = data?.data || []
   const pagination = data?.meta?.pagination
@@ -107,7 +113,7 @@ export function AdminsList() {
       <Card>
         <CardContent className="pt-6">
           <p className="text-destructive">
-            Error loading admins: {(error as Error).message}
+            {t('common.messages.somethingWentWrong')}: {(error as Error).message}
           </p>
         </CardContent>
       </Card>
@@ -122,7 +128,7 @@ export function AdminsList() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
-              placeholder="Search admins..."
+              placeholder={t('admin.filters.searchAdmins')}
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value)
@@ -133,13 +139,13 @@ export function AdminsList() {
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-full sm:w-[200px]">
-              <SelectValue placeholder="Filter by status" />
+              <SelectValue placeholder={t('admin.filters.filterByStatus')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="all">{t('admin.filters.allStatus')}</SelectItem>
               {ADMIN_STATUS_OPTIONS.map((status) => (
                 <SelectItem key={status.value} value={status.value}>
-                  {status.label}
+                  {getStatusLabel(status.value)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -147,10 +153,10 @@ export function AdminsList() {
           {departments.length > 0 && (
             <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
               <SelectTrigger className="w-full sm:w-[200px]">
-                <SelectValue placeholder="Filter by department" />
+                <SelectValue placeholder={t('admin.filters.filterByDepartment')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Departments</SelectItem>
+                <SelectItem value="all">{t('admin.filters.allDepartments')}</SelectItem>
                 {departments.map((dept) => (
                   <SelectItem key={dept} value={dept}>
                     {dept}
@@ -165,7 +171,7 @@ export function AdminsList() {
             className="w-full sm:w-auto"
           >
             <RefreshCw className="h-4 w-4 mr-2" />
-            Clear
+            {t('admin.actions.clear')}
           </Button>
         </div>
 
@@ -200,8 +206,8 @@ export function AdminsList() {
                 <div className="flex flex-col items-center justify-center py-8 text-center">
                   <p className="text-muted-foreground">
                     {search || statusFilter !== 'all' || departmentFilter !== 'all'
-                      ? 'No admins found matching your criteria.'
-                      : 'No admins available.'}
+                      ? t('admin.messages.noAdminsFound')
+                      : t('admin.messages.noAdmins')}
                   </p>
                 </div>
               ) : (
@@ -209,15 +215,15 @@ export function AdminsList() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-16">No</TableHead>
-                        <TableHead>Admin ID</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Department</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Roles</TableHead>
-                        <TableHead className="hidden lg:table-cell">Created</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                        <TableHead className="w-16">{t('admin.table.no')}</TableHead>
+                        <TableHead>{t('admin.table.adminId')}</TableHead>
+                        <TableHead>{t('admin.table.name')}</TableHead>
+                        <TableHead>{t('admin.table.email')}</TableHead>
+                        <TableHead>{t('admin.table.department')}</TableHead>
+                        <TableHead>{t('admin.table.status')}</TableHead>
+                        <TableHead>{t('admin.table.roles')}</TableHead>
+                        <TableHead className="hidden lg:table-cell">{t('admin.table.created')}</TableHead>
+                        <TableHead className="text-right">{t('admin.table.actions')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -249,7 +255,7 @@ export function AdminsList() {
                             <TableCell>{admin.department || '-'}</TableCell>
                             <TableCell>
                               <Badge variant={getStatusBadgeVariant(admin.status)}>
-                                {admin.status}
+                                {getStatusLabel(admin.status)}
                               </Badge>
                             </TableCell>
                             <TableCell>
@@ -267,7 +273,7 @@ export function AdminsList() {
                                   )}
                                 </div>
                               ) : (
-                                <span className="text-muted-foreground text-sm">No roles</span>
+                                <span className="text-muted-foreground text-sm">{t('admin.messages.noRoles')}</span>
                               )}
                             </TableCell>
                             <TableCell className="text-sm text-muted-foreground hidden lg:table-cell">
@@ -286,13 +292,13 @@ export function AdminsList() {
                                   <DropdownMenuItem asChild>
                                     <Link to={`/admins/${admin.id}`}>
                                       <Eye className="h-4 w-4 mr-2" />
-                                      View
+                                      {t('admin.actions.view')}
                                     </Link>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem asChild>
                                     <Link to={`/admins/${admin.id}/edit`}>
                                       <Edit className="h-4 w-4 mr-2" />
-                                      Edit
+                                      {t('admin.actions.edit')}
                                     </Link>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
@@ -300,7 +306,7 @@ export function AdminsList() {
                                     className="text-destructive"
                                   >
                                     <Trash2 className="h-4 w-4 mr-2" />
-                                    Delete
+                                    {t('admin.actions.delete')}
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
@@ -318,7 +324,7 @@ export function AdminsList() {
             <Pagination
               pagination={pagination}
               onPageChange={setPage}
-              itemName="admins"
+              itemName={t('admin.pages.list').toLowerCase()}
             />
           )}
         </div>

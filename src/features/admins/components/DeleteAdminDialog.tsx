@@ -8,6 +8,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { useTranslation } from '@/i18n/context'
 
 interface DeleteAdminDialogProps {
   open: boolean
@@ -27,29 +28,32 @@ export function DeleteAdminDialog({
   adminName,
   isLoading = false,
 }: DeleteAdminDialogProps) {
+  const { t } = useTranslation()
+  
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+          <AlertDialogTitle>{t('admin.delete.title')}</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the admin{' '}
-            <strong>{adminName}</strong> and all associated data.
+            {t('admin.delete.description')}{' '}
+            <strong>{adminName}</strong> {t('admin.delete.andAllData')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isLoading}>{t('admin.delete.cancel')}</AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
             disabled={isLoading}
             variant="destructive"
           >
-            {isLoading ? 'Deleting...' : 'Delete'}
+            {isLoading ? t('admin.delete.deleting') : t('admin.delete.delete')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   )
 }
+
 
 

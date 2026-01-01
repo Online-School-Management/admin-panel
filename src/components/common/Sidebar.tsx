@@ -5,10 +5,23 @@ import { useUIStore } from '@/store/uiStore'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { mainNavigation, adminNavigation } from '@/constants/navigation'
+import { useTranslation } from '@/i18n/context'
 
 export const Sidebar = memo(function Sidebar() {
   const sidebarOpen = useUIStore((state) => state.sidebarOpen)
   const setSidebarOpen = useUIStore((state) => state.setSidebarOpen)
+  const { t } = useTranslation()
+  
+  // Map navigation items with translations
+  const translatedMainNav = mainNavigation.map(item => ({
+    ...item,
+    label: t(`navigation.${item.to.replace('/', '')}`) || item.label
+  }))
+  
+  const translatedAdminNav = adminNavigation.map(item => ({
+    ...item,
+    label: t(`navigation.${item.to.replace('/', '')}`) || item.label
+  }))
 
   return (
     <aside
@@ -34,7 +47,7 @@ export const Sidebar = memo(function Sidebar() {
           {sidebarOpen ? (
             <>
               <h2 className="text-lg font-semibold flex-1 whitespace-nowrap overflow-hidden text-ellipsis">
-                Admin Panel
+                {t('navigation.adminPanel')}
               </h2>
               {/* Close button - visible on mobile/tablet */}
               <Button
@@ -44,7 +57,7 @@ export const Sidebar = memo(function Sidebar() {
                 onClick={() => setSidebarOpen(false)}
               >
                 <X className="h-5 w-5" />
-                <span className="sr-only">Close sidebar</span>
+                <span className="sr-only">{t('navigation.closeSidebar')}</span>
               </Button>
             </>
           ) : (
@@ -62,7 +75,7 @@ export const Sidebar = memo(function Sidebar() {
           sidebarOpen ? 'p-4' : 'p-2'
         )}>
           {/* Main Navigation */}
-          {mainNavigation.map((item) => (
+          {translatedMainNav.map((item) => (
             <NavItem
               key={item.to}
               to={item.to}
@@ -84,7 +97,7 @@ export const Sidebar = memo(function Sidebar() {
           </div>
 
           {/* Admin Navigation */}
-          {adminNavigation.map((item) => (
+          {translatedAdminNav.map((item) => (
             <NavItem
               key={item.to}
               to={item.to}

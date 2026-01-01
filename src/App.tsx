@@ -2,6 +2,7 @@ import { RouterProvider } from 'react-router-dom'
 import { router } from '@/routes'
 import { Toaster } from '@/components/ui/toaster'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { I18nProvider } from '@/i18n/context'
 
 /**
  * App component
@@ -11,8 +12,10 @@ import { ErrorBoundary } from '@/components/ErrorBoundary'
 function App() {
   return (
     <ErrorBoundary>
-      <RouterProvider router={router} />
-      <Toaster />
+      <I18nProvider>
+        <RouterProvider router={router} />
+        <Toaster />
+      </I18nProvider>
     </ErrorBoundary>
   )
 }

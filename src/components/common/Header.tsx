@@ -11,15 +11,18 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Breadcrumbs } from './Breadcrumbs'
+import { LanguageSwitcher } from './LanguageSwitcher'
 import { useUIStore } from '@/store/uiStore'
 import { useAuthStore } from '@/store/authStore'
 import { useLogout } from '@/features/auth/hooks/useLogout'
+import { useTranslation } from '@/i18n/context'
 
 export const Header = memo(function Header() {
   const toggleSidebar = useUIStore((state) => state.toggleSidebar)
   const toggleMobileMenu = useUIStore((state) => state.toggleMobileMenu)
   const user = useAuthStore((state) => state.user)
   const logoutMutation = useLogout()
+  const { t } = useTranslation()
 
   const handleLogout = () => {
     logoutMutation.mutate()
@@ -66,6 +69,9 @@ export const Header = memo(function Header() {
 
         {/* Right side actions */}
         <div className="ml-auto flex items-center gap-4">
+        {/* Language Switcher */}
+        <LanguageSwitcher />
+        
         {/* Notifications - Hidden on mobile */}
         <Button variant="ghost" size="icon" className="hidden md:flex">
           <Bell className="h-5 w-5" />
@@ -94,10 +100,10 @@ export const Header = memo(function Header() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
+            <DropdownMenuItem>{t('common.buttons.view')} Profile</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout} className="text-destructive">
-              Log out
+              {t('common.buttons.logout')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

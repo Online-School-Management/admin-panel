@@ -9,10 +9,12 @@ import { useLogin } from '../hooks/useLogin'
 import type { LoginCredentials } from '../types/auth.types'
 import { Loader2, Eye, EyeOff } from 'lucide-react'
 import { loginSchema, type LoginFormData } from '../schemas/auth.schemas'
+import { useTranslation } from '@/i18n/context'
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const loginMutation = useLogin()
+  const { t } = useTranslation()
 
   const {
     register,
@@ -37,16 +39,16 @@ export function LoginForm() {
   return (
     <Card className="w-full">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
+        <CardTitle className="text-2xl font-bold">{t('auth.messages.welcomeBack')}</CardTitle>
         <CardDescription>
-          Enter your credentials to access the admin panel
+          {t('auth.messages.loginDescription')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Email Field */}
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('auth.form.email')}</Label>
             <Input
               id="email"
               type="email"
@@ -62,12 +64,12 @@ export function LoginForm() {
 
           {/* Password Field */}
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t('auth.form.password')}</Label>
             <div className="relative">
               <Input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
-                placeholder="Enter your password"
+                placeholder={t('auth.form.enterPassword')}
                 {...register('password')}
                 disabled={loginMutation.isPending}
                 className={errors.password ? 'border-destructive' : ''}
@@ -86,7 +88,7 @@ export function LoginForm() {
                   <Eye className="h-4 w-4" />
                 )}
                 <span className="sr-only">
-                  {showPassword ? 'Hide password' : 'Show password'}
+                  {showPassword ? t('auth.form.hidePassword') : t('auth.form.showPassword')}
                 </span>
               </Button>
             </div>
@@ -106,21 +108,21 @@ export function LoginForm() {
             {loginMutation.isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Logging in...
+                {t('auth.messages.loggingIn')}
               </>
             ) : (
-              'Login'
+              t('common.buttons.login')
             )}
           </Button>
 
           {/* Demo Credentials Hint */}
           <div className="mt-4 rounded-md bg-muted p-3 text-sm">
-            <p className="font-medium">Demo Credentials:</p>
+            <p className="font-medium">{t('auth.messages.demoCredentials')}:</p>
             <p className="text-muted-foreground">
-              Email: <span className="font-mono">admin@gmail.com</span>
+              {t('auth.form.email')}: <span className="font-mono">admin@gmail.com</span>
             </p>
             <p className="text-muted-foreground">
-              Password: <span className="font-mono">admin</span>
+              {t('auth.form.password')}: <span className="font-mono">admin</span>
             </p>
           </div>
         </form>

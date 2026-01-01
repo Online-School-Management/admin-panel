@@ -20,6 +20,7 @@ import { useCreateAdmin, useUpdateAdmin, useAdmin } from '../hooks/useAdmins'
 import { useRoles } from '@/features/roles/hooks/useRoles'
 import type { CreateAdminInput, UpdateAdminInput } from '../types/admin.types'
 import { createAdminSchema, updateAdminSchema, type CreateAdminFormData, type UpdateAdminFormData } from '../schemas/admin.schemas'
+import { useTranslation } from '@/i18n/context'
 
 interface AdminFormProps {
   adminId?: string
@@ -29,8 +30,13 @@ interface AdminFormProps {
  * AdminForm component - handles both create and edit
  */
 export function AdminForm({ adminId }: AdminFormProps) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const isEditMode = !!adminId
+
+  const getStatusLabel = (status: string) => {
+    return t(`common.status.${status}`) || status
+  }
 
   const { 
     data: adminData, 
@@ -187,7 +193,7 @@ export function AdminForm({ adminId }: AdminFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{isEditMode ? 'Edit Admin' : 'Create Admin'}</CardTitle>
+        <CardTitle>{isEditMode ? t('admin.pages.edit') : t('admin.pages.create')}</CardTitle>
       </CardHeader>
       <CardContent>
         <form 
@@ -202,12 +208,12 @@ export function AdminForm({ adminId }: AdminFormProps) {
               {/* Full Name */}
               <div className="space-y-2">
                 <Label htmlFor="name">
-                  Full Name <span className="text-destructive">*</span>
+                  {t('admin.form.fullName')} <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="name"
                   {...register('name')}
-                  placeholder="Enter full name"
+                  placeholder={t('admin.form.enterFullName')}
                   disabled={isSubmitting}
                 />
                 {errors.name && (
@@ -218,13 +224,13 @@ export function AdminForm({ adminId }: AdminFormProps) {
               {/* Password */}
               <div className="space-y-2">
                 <Label htmlFor="password">
-                  Password {!isEditMode && <span className="text-destructive">*</span>}
+                  {t('admin.form.password')} {!isEditMode && <span className="text-destructive">*</span>}
                 </Label>
                 <Input
                   id="password"
                   type="password"
                   {...register('password')}
-                  placeholder={isEditMode ? 'Leave blank to keep current' : 'Enter password'}
+                  placeholder={isEditMode ? t('admin.form.leavePasswordBlank') : t('admin.form.enterPassword')}
                   disabled={isSubmitting}
                 />
                 {errors.password && (
@@ -236,14 +242,14 @@ export function AdminForm({ adminId }: AdminFormProps) {
               {(!isEditMode || watch('password')) && (
                 <div className="space-y-2">
                   <Label htmlFor="password_confirmation">
-                    Confirm Password{' '}
+                    {t('admin.form.confirmPassword')}{' '}
                     {!isEditMode && <span className="text-destructive">*</span>}
                   </Label>
                   <Input
                     id="password_confirmation"
                     type="password"
                     {...register('password_confirmation')}
-                    placeholder="Confirm password"
+                    placeholder={t('admin.form.confirmPasswordPlaceholder')}
                     disabled={isSubmitting}
                   />
                   {errors.password_confirmation && (
@@ -259,7 +265,7 @@ export function AdminForm({ adminId }: AdminFormProps) {
             <div className="space-y-4">
               {/* Department */}
               <div className="space-y-2">
-                <Label htmlFor="department">Department</Label>
+                <Label htmlFor="department">{t('admin.form.department')}</Label>
                 <Select
                   value={watch('department') || undefined}
                   onValueChange={(value) =>
@@ -268,7 +274,7 @@ export function AdminForm({ adminId }: AdminFormProps) {
                   disabled={isSubmitting}
                 >
                   <SelectTrigger id="department">
-                    <SelectValue placeholder="Select department (optional)" />
+                    <SelectValue placeholder={t('admin.form.selectDepartment')} />
                   </SelectTrigger>
                   <SelectContent>
                     {DEPARTMENT_OPTIONS.map((dept) => (
@@ -285,7 +291,7 @@ export function AdminForm({ adminId }: AdminFormProps) {
 
               {/* Role */}
               <div className="space-y-2">
-                <Label htmlFor="role_id">Role</Label>
+                <Label htmlFor="role_id">{t('admin.form.role')}</Label>
                 <Select
                   value={
                     (() => {
@@ -301,7 +307,7 @@ export function AdminForm({ adminId }: AdminFormProps) {
                   disabled={isSubmitting}
                 >
                   <SelectTrigger id="role_id">
-                    <SelectValue placeholder="Select role (optional)" />
+                    <SelectValue placeholder={t('admin.form.selectRole')} />
                   </SelectTrigger>
                   <SelectContent>
                     {roles.map((role) => (
@@ -318,19 +324,19 @@ export function AdminForm({ adminId }: AdminFormProps) {
 
               {/* Status */}
               <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
+                <Label htmlFor="status">{t('admin.form.status')}</Label>
                 <Select
                   value={watch('status') || ADMIN_STATUS.ACTIVE}
                   onValueChange={(value) => setValue('status', value as any)}
                   disabled={isSubmitting}
                 >
                   <SelectTrigger id="status">
-                    <SelectValue placeholder="Select status" />
+                    <SelectValue placeholder={t('admin.form.selectStatus')} />
                   </SelectTrigger>
                   <SelectContent>
                     {ADMIN_STATUS_OPTIONS.map((status) => (
                       <SelectItem key={status.value} value={status.value}>
-                        {status.label}
+                        {getStatusLabel(status.value)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -351,17 +357,17 @@ export function AdminForm({ adminId }: AdminFormProps) {
               disabled={isSubmitting}
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Cancel
+              {t('admin.actions.cancel')}
             </Button>
             <Button type="submit" variant="default" disabled={isSubmitting}>
               <UserPlus className="h-4 w-4 mr-2" />
               {isSubmitting
                 ? isEditMode
-                  ? 'Updating...'
-                  : 'Creating...'
+                  ? t('admin.messages.updating')
+                  : t('admin.messages.creating')
                 : isEditMode
-                  ? 'Update Admin'
-                  : 'Create Admin'}
+                  ? t('admin.actions.update')
+                  : t('admin.actions.create')}
             </Button>
           </div>
         </form>

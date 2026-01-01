@@ -62,3 +62,4 @@ export const updateAdminSchema = adminFormBaseSchema.extend({
 export type CreateAdminFormData = z.infer<typeof createAdminSchema>
 export type UpdateAdminFormData = z.infer<typeof updateAdminSchema>
 
+

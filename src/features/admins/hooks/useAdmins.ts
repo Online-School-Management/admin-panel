@@ -82,7 +82,10 @@ export function useCreateAdmin() {
   return useMutation({
     mutationFn: (data: CreateAdminInput) => createAdmin(data),
     onSuccess: (response) => {
+      // Invalidate all admin list queries to ensure fresh data
       queryClient.invalidateQueries({ queryKey: adminKeys.lists() })
+      // Also refetch to ensure the list is updated immediately
+      queryClient.refetchQueries({ queryKey: adminKeys.lists() })
       showCreateSuccessToast('admin', `${response.data.user.name} has been added`)
       navigate('/admins')
     },
@@ -123,7 +126,9 @@ export function useDeleteAdmin() {
   return useMutation({
     mutationFn: (id: number) => deleteAdmin(id),
     onSuccess: () => {
+      // Invalidate and refetch list queries to ensure the deleted admin is removed
       queryClient.invalidateQueries({ queryKey: adminKeys.lists() })
+      queryClient.refetchQueries({ queryKey: adminKeys.lists() })
       showDeleteSuccessToast('admin')
     },
     onError: (error: unknown) => {

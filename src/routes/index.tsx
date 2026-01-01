@@ -22,6 +22,12 @@ const RoleDetailPage = lazy(() => import('@/pages/roles/detail'))
 // Permission pages
 const PermissionsListPage = lazy(() => import('@/pages/permissions/list'))
 
+// Teacher pages
+const TeachersListPage = lazy(() => import('@/pages/teachers/list'))
+const CreateTeacherPage = lazy(() => import('@/pages/teachers/create'))
+const EditTeacherPage = lazy(() => import('@/pages/teachers/edit'))
+const TeacherDetailPage = lazy(() => import('@/pages/teachers/detail'))
+
 /**
  * Route configuration using createBrowserRouter (data router API)
  * Each route is individually wrapped with ProtectedRoute (which includes AdminLayout)
@@ -71,6 +77,22 @@ export const router = createBrowserRouter([
   {
     path: '/admins/:id',
     element: <ProtectedRoute><AdminDetailPage /></ProtectedRoute>,
+  },
+  {
+    path: '/teachers',
+    element: <ProtectedRoute><TeachersListPage /></ProtectedRoute>,
+  },
+  {
+    path: '/teachers/new',
+    element: <ProtectedRoute><CreateTeacherPage /></ProtectedRoute>,
+  },
+  {
+    path: '/teachers/:id/edit',
+    element: <ProtectedRoute><EditTeacherPage /></ProtectedRoute>,
+  },
+  {
+    path: '/teachers/:id',
+    element: <ProtectedRoute><TeacherDetailPage /></ProtectedRoute>,
   },
 ])
 

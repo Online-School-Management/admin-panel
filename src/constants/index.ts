@@ -42,6 +42,48 @@ export const ROLE_STATUS_OPTIONS = [
   { value: ROLE_STATUS.INACTIVE, label: 'Inactive' },
 ] as const
 
+// Teacher status options
+export const TEACHER_STATUS = {
+  ACTIVE: 'active',
+  INACTIVE: 'inactive',
+  SUSPENDED: 'suspended',
+} as const
+
+export const TEACHER_STATUS_OPTIONS = [
+  { value: TEACHER_STATUS.ACTIVE, label: 'Active' },
+  { value: TEACHER_STATUS.INACTIVE, label: 'Inactive' },
+  { value: TEACHER_STATUS.SUSPENDED, label: 'Suspended' },
+] as const
+
+// Employment type options
+export const EMPLOYMENT_TYPE = {
+  FULL_TIME: 'full-time',
+  PART_TIME: 'part-time',
+  CONTRACT: 'contract',
+} as const
+
+export const EMPLOYMENT_TYPE_OPTIONS = [
+  { value: EMPLOYMENT_TYPE.FULL_TIME, label: 'Full-time' },
+  { value: EMPLOYMENT_TYPE.PART_TIME, label: 'Part-time' },
+  { value: EMPLOYMENT_TYPE.CONTRACT, label: 'Contract' },
+] as const
+
+// Subject options (can be extended later)
+export const SUBJECT_OPTIONS = [
+  'Mathematics',
+  'English',
+  'Science',
+  'History',
+  'Geography',
+  'Physics',
+  'Chemistry',
+  'Biology',
+  'Computer Science',
+  'Art',
+  'Music',
+  'Physical Education',
+] as const
+
 // Department options
 export const DEPARTMENT_OPTIONS = [
   'Teacher Management',
@@ -52,7 +94,7 @@ export const DEPARTMENT_OPTIONS = [
 
 // API configuration
 export const API_CONFIG = {
-  TIMEOUT: 10000, // 10 seconds
+  TIMEOUT: 5000, // 5 seconds - reduced for faster failure detection
   BASE_URL: 'http://localhost:8000/api/v1/backend',
 } as const
 

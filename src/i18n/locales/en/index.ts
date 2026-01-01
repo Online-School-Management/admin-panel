@@ -11,6 +11,7 @@ import { admin } from './admin'
 import { auth } from './auth'
 import { role } from './role'
 import { permission } from './permission'
+import { teacher } from './teacher'
 
 export const en = {
   common,
@@ -21,6 +22,7 @@ export const en = {
   auth,
   role,
   permission,
+  teacher,
 }
 
 

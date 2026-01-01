@@ -11,6 +11,7 @@ const adminFormBaseSchema = z.object({
   name: z
     .string()
     .min(VALIDATION.MIN_NAME_LENGTH, VALIDATION_MESSAGES.MIN_LENGTH('Name', VALIDATION.MIN_NAME_LENGTH)),
+  email: z.string().email(VALIDATION_MESSAGES.INVALID_EMAIL),
   status: z.enum([ADMIN_STATUS.ACTIVE, ADMIN_STATUS.INACTIVE, ADMIN_STATUS.SUSPENDED]).optional(),
   department: z.string().optional(),
   role_id: z.number().optional(),
@@ -36,8 +37,10 @@ export const createAdminSchema = adminFormBaseSchema.extend({
 /**
  * Schema for updating an existing admin
  * Password is optional (only validate if provided)
+ * Email is optional (can be updated)
  */
 export const updateAdminSchema = adminFormBaseSchema.extend({
+  email: z.string().email(VALIDATION_MESSAGES.INVALID_EMAIL).optional().or(z.literal('')),
   password: z
     .string()
     .min(VALIDATION.MIN_PASSWORD_LENGTH, VALIDATION_MESSAGES.MIN_LENGTH('Password', VALIDATION.MIN_PASSWORD_LENGTH))

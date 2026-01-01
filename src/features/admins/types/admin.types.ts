@@ -59,7 +59,7 @@ export interface AdminCollectionItem {
 
 export interface CreateAdminInput {
   name: string
-  email?: string // Optional - backend auto-generates if not provided
+  email: string // Required - must be provided from frontend
   password: string
   password_confirmation: string
   phone?: string

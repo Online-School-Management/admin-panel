@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useMemo, useRef } from 'react'
-import { ArrowLeft, UserPlus } from 'lucide-react'
+import { ArrowLeft, UserPlus, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -71,6 +71,7 @@ export function AdminForm({ adminId }: AdminFormProps) {
     resolver: zodResolver(adminFormSchema),
     defaultValues: {
       name: '',
+      email: '',
       status: ADMIN_STATUS.ACTIVE,
       department: '',
       role_id: undefined,
@@ -136,6 +137,7 @@ export function AdminForm({ adminId }: AdminFormProps) {
     // Reset form with all values at once using reset() - this is more reliable
     reset({
       name: admin.user.name || '',
+      email: admin.user.email || '',
       status: admin.user.status || ADMIN_STATUS.ACTIVE,
       department: departmentValue,
       role_id: roleId,
@@ -160,6 +162,11 @@ export function AdminForm({ adminId }: AdminFormProps) {
         department: data.department || undefined,
       }
       
+      // Include email if provided and not empty
+      if (data.email && data.email.trim().length > 0) {
+        updateData.email = data.email.trim()
+      }
+      
       // Include role_id only if it's a valid number (role is selected)
       // If undefined, don't include it (backend won't change roles)
       // If null, include it (backend will remove all roles)
@@ -176,6 +183,7 @@ export function AdminForm({ adminId }: AdminFormProps) {
     } else {
       const createData: CreateAdminInput = {
         name: data.name,
+        email: data.email || '',
         password: data.password || '',
         password_confirmation: data.password_confirmation || '',
         status: data.status,
@@ -218,6 +226,23 @@ export function AdminForm({ adminId }: AdminFormProps) {
                 />
                 {errors.name && (
                   <p className="text-sm text-destructive">{errors.name.message}</p>
+                )}
+              </div>
+
+              {/* Email */}
+              <div className="space-y-2">
+                <Label htmlFor="email">
+                  {t('common.labels.email')} <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  {...register('email')}
+                  placeholder={t('auth.form.enterEmail')}
+                  disabled={isSubmitting}
+                />
+                {errors.email && (
+                  <p className="text-sm text-destructive">{errors.email.message}</p>
                 )}
               </div>
 
@@ -354,20 +379,31 @@ export function AdminForm({ adminId }: AdminFormProps) {
               type="button"
               variant="outline"
               onClick={() => navigate('/admins')}
-              disabled={isSubmitting}
+              disabled={isSubmitting || createAdmin.isPending || updateAdmin.isPending}
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               {t('admin.actions.cancel')}
             </Button>
-            <Button type="submit" variant="default" disabled={isSubmitting}>
-              <UserPlus className="h-4 w-4 mr-2" />
-              {isSubmitting
-                ? isEditMode
-                  ? t('admin.messages.updating')
-                  : t('admin.messages.creating')
-                : isEditMode
-                  ? t('admin.actions.update')
-                  : t('admin.actions.create')}
+            <Button 
+              type="submit" 
+              variant="default" 
+              disabled={isSubmitting || createAdmin.isPending || updateAdmin.isPending}
+            >
+              {(isSubmitting || createAdmin.isPending || updateAdmin.isPending) ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  {isEditMode
+                    ? t('admin.messages.updating')
+                    : t('admin.messages.creating')}
+                </>
+              ) : (
+                <>
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  {isEditMode
+                    ? t('admin.actions.update')
+                    : t('admin.actions.create')}
+                </>
+              )}
             </Button>
           </div>
         </form>

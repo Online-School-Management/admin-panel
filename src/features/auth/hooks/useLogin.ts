@@ -4,6 +4,7 @@ import { useAuthStore } from '@/store/authStore'
 import { login } from '../services/auth.service'
 import type { LoginCredentials } from '../types/auth.types'
 import { toast } from '@/hooks/use-toast'
+import { showErrorToast } from '@/utils/toast'
 
 /**
  * Login mutation hook
@@ -28,13 +29,9 @@ export function useLogin() {
       // Redirect to dashboard
       navigate('/dashboard')
     },
-    onError: (error: Error) => {
-      // Show error toast
-      toast({
-        title: 'Login failed',
-        description: error.message || 'Invalid email or password',
-        variant: 'destructive',
-      })
+    onError: (error: unknown) => {
+      // Show error toast with API error message
+      showErrorToast(error, { title: 'Login Failed' })
     },
   })
 }

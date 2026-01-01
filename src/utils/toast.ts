@@ -1,4 +1,5 @@
 import { toast } from '@/hooks/use-toast'
+import { getApiErrorMessage } from './api-error'
 
 /**
  * Toast utility functions for consistent success and error messages
@@ -25,11 +26,20 @@ export function showSuccessToast(message: string, options?: ToastOptions) {
 
 /**
  * Show an error toast notification
+ * Can accept Error object and extract API error message
  */
-export function showErrorToast(message: string, options?: ToastOptions) {
+export function showErrorToast(message: string | Error | unknown, options?: ToastOptions) {
+  const errorMessage = typeof message === 'string' 
+    ? message 
+    : message instanceof Error 
+      ? getApiErrorMessage(message)
+      : message 
+        ? getApiErrorMessage(message)
+        : 'Something went wrong'
+  
   toast({
     title: options?.title || 'Error',
-    description: message || options?.description || 'Something went wrong',
+    description: errorMessage || options?.description || 'Something went wrong',
     variant: 'destructive',
     duration: options?.duration,
   })
@@ -76,42 +86,66 @@ export function showDeleteSuccessToast(itemName: string, itemLabel?: string) {
 
 /**
  * Show an error toast for create operations
+ * Extracts error message from API response
  */
-export function showCreateErrorToast(itemName: string, error?: Error | string) {
-  const errorMessage = typeof error === 'string' ? error : error?.message
+export function showCreateErrorToast(itemName: string, error?: Error | string | unknown) {
+  const errorMessage = typeof error === 'string' 
+    ? error 
+    : error instanceof Error 
+      ? getApiErrorMessage(error)
+      : error 
+        ? getApiErrorMessage(error)
+        : `Failed to create ${itemName.toLowerCase()}`
+  
   showErrorToast(
-    errorMessage || `Failed to create ${itemName.toLowerCase()}`,
+    errorMessage,
     {
       title: 'Create Failed',
-      description: errorMessage || `Something went wrong while creating the ${itemName.toLowerCase()}.`,
+      description: errorMessage,
     }
   )
 }
 
 /**
  * Show an error toast for update operations
+ * Extracts error message from API response
  */
-export function showUpdateErrorToast(itemName: string, error?: Error | string) {
-  const errorMessage = typeof error === 'string' ? error : error?.message
+export function showUpdateErrorToast(itemName: string, error?: Error | string | unknown) {
+  const errorMessage = typeof error === 'string' 
+    ? error 
+    : error instanceof Error 
+      ? getApiErrorMessage(error)
+      : error 
+        ? getApiErrorMessage(error)
+        : `Failed to update ${itemName.toLowerCase()}`
+  
   showErrorToast(
-    errorMessage || `Failed to update ${itemName.toLowerCase()}`,
+    errorMessage,
     {
       title: 'Update Failed',
-      description: errorMessage || `Something went wrong while updating the ${itemName.toLowerCase()}.`,
+      description: errorMessage,
     }
   )
 }
 
 /**
  * Show an error toast for delete operations
+ * Extracts error message from API response
  */
-export function showDeleteErrorToast(itemName: string, error?: Error | string) {
-  const errorMessage = typeof error === 'string' ? error : error?.message
+export function showDeleteErrorToast(itemName: string, error?: Error | string | unknown) {
+  const errorMessage = typeof error === 'string' 
+    ? error 
+    : error instanceof Error 
+      ? getApiErrorMessage(error)
+      : error 
+        ? getApiErrorMessage(error)
+        : `Failed to delete ${itemName.toLowerCase()}`
+  
   showErrorToast(
-    errorMessage || `Failed to delete ${itemName.toLowerCase()}`,
+    errorMessage,
     {
       title: 'Delete Failed',
-      description: errorMessage || `Something went wrong while deleting the ${itemName.toLowerCase()}.`,
+      description: errorMessage,
     }
   )
 }

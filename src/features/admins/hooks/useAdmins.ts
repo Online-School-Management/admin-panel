@@ -86,7 +86,7 @@ export function useCreateAdmin() {
       showCreateSuccessToast('admin', `${response.data.user.name} has been added`)
       navigate('/admins')
     },
-    onError: (error: Error) => {
+    onError: (error: unknown) => {
       showCreateErrorToast('admin', error)
     },
   })
@@ -108,7 +108,7 @@ export function useUpdateAdmin() {
       showUpdateSuccessToast('admin', `${response.data.user.name} has been updated`)
       navigate('/admins')
     },
-    onError: (error: Error) => {
+    onError: (error: unknown) => {
       showUpdateErrorToast('admin', error)
     },
   })
@@ -126,7 +126,7 @@ export function useDeleteAdmin() {
       queryClient.invalidateQueries({ queryKey: adminKeys.lists() })
       showDeleteSuccessToast('admin')
     },
-    onError: (error: Error) => {
+    onError: (error: unknown) => {
       showDeleteErrorToast('admin', error)
     },
   })
@@ -151,8 +151,8 @@ export function useAssignRole() {
       queryClient.invalidateQueries({ queryKey: adminKeys.lists() })
       showSuccessToast('Role assigned successfully', { title: 'Success' })
     },
-    onError: (error: Error) => {
-      showErrorToast(error.message || 'Failed to assign role', { title: 'Error' })
+    onError: (error: unknown) => {
+      showErrorToast(error, { title: 'Error' })
     },
   })
 }
@@ -176,8 +176,8 @@ export function useRevokeRole() {
       queryClient.invalidateQueries({ queryKey: adminKeys.lists() })
       showSuccessToast('Role revoked successfully', { title: 'Success' })
     },
-    onError: (error: Error) => {
-      showErrorToast(error.message || 'Failed to revoke role', { title: 'Error' })
+    onError: (error: unknown) => {
+      showErrorToast(error, { title: 'Error' })
     },
   })
 }

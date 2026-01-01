@@ -27,15 +27,14 @@ export function useLogout() {
       // Redirect to login
       navigate('/login')
     },
-    onError: (error: Error) => {
+    onError: () => {
       // Even if API call fails, clear local state
       clearAuth()
       
-      // Show error toast (but still log out locally)
+      // Show info toast since logout still succeeded locally
       toast({
-        title: 'Logout',
-        description: error.message || 'Logged out locally',
-        variant: 'destructive',
+        title: 'Logged out',
+        description: 'You have been logged out locally.',
       })
 
       // Redirect to login

@@ -19,6 +19,7 @@ export interface TeacherUser {
 export interface Teacher {
   id: number
   teacher_id: string
+  slug: string
   user: TeacherUser
   hire_date?: string | null
   department?: string | null
@@ -35,6 +36,7 @@ export interface Teacher {
 export interface TeacherCollectionItem {
   id: number
   teacher_id: string
+  slug: string
   user: {
     id: number
     name: string

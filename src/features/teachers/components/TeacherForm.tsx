@@ -22,16 +22,16 @@ import { createTeacherSchema, updateTeacherSchema, type CreateTeacherFormData, t
 import { useTranslation } from '@/i18n/context'
 
 interface TeacherFormProps {
-  teacherId?: string
+  teacherSlug?: string
 }
 
 /**
  * TeacherForm component - handles both create and edit
  */
-export function TeacherForm({ teacherId }: TeacherFormProps) {
+export function TeacherForm({ teacherSlug }: TeacherFormProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const isEditMode = !!teacherId
+  const isEditMode = !!teacherSlug
 
   const getStatusLabel = (status: string) => {
     return t(`common.status.${status}`) || status
@@ -47,7 +47,7 @@ export function TeacherForm({ teacherId }: TeacherFormProps) {
     isFetching: isFetchingTeacher,
     dataUpdatedAt: teacherDataUpdatedAt,
   } = useTeacher(
-    teacherId ? parseInt(teacherId) : 0
+    teacherSlug || ''
   )
 
   const createTeacher = useCreateTeacher()
@@ -83,13 +83,13 @@ export function TeacherForm({ teacherId }: TeacherFormProps) {
     },
   })
 
-  // Track the last dataUpdatedAt timestamp and teacherId we used to populate the form
-  const lastPopulatedRef = useRef<{ teacherId: string; timestamp: number } | null>(null)
+  // Track the last dataUpdatedAt timestamp and teacherSlug we used to populate the form
+  const lastPopulatedRef = useRef<{ teacherSlug: string; timestamp: number } | null>(null)
   
   // Populate form values when teacher data loads (edit mode)
   useEffect(() => {
     // Only proceed if we're in edit mode
-    if (!isEditMode || !teacherId) {
+    if (!isEditMode || !teacherSlug) {
       lastPopulatedRef.current = null
       return
     }
@@ -100,7 +100,7 @@ export function TeacherForm({ teacherId }: TeacherFormProps) {
     // Check if we need to populate
     const shouldPopulate = 
       lastPopulatedRef.current === null ||
-      lastPopulatedRef.current.teacherId !== teacherId ||
+      lastPopulatedRef.current.teacherSlug !== teacherSlug ||
       teacherDataUpdatedAt > lastPopulatedRef.current.timestamp
     
     if (!shouldPopulate) return
@@ -134,13 +134,13 @@ export function TeacherForm({ teacherId }: TeacherFormProps) {
     
     // Update the last populated tracking
     lastPopulatedRef.current = {
-      teacherId,
+      teacherSlug,
       timestamp: teacherDataUpdatedAt,
     }
-  }, [isEditMode, teacherId, teacherData, isLoadingTeacher, isFetchingTeacher, teacherDataUpdatedAt, reset])
+  }, [isEditMode, teacherSlug, teacherData, isLoadingTeacher, isFetchingTeacher, teacherDataUpdatedAt, reset])
 
   const onSubmit = async (data: TeacherFormData) => {
-    if (isEditMode && teacherId) {
+    if (isEditMode && teacherSlug) {
       const updateData: UpdateTeacherInput = {
         name: data.name,
         status: data.status,
@@ -160,7 +160,7 @@ export function TeacherForm({ teacherId }: TeacherFormProps) {
         updateData.password = data.password
         updateData.password_confirmation = data.password_confirmation
       }
-      updateTeacher.mutate({ id: parseInt(teacherId), data: updateData })
+      updateTeacher.mutate({ slug: teacherSlug, data: updateData })
     } else {
       const createData: CreateTeacherInput = {
         name: data.name,
@@ -188,7 +188,7 @@ export function TeacherForm({ teacherId }: TeacherFormProps) {
       </CardHeader>
       <CardContent>
         <form 
-          key={isEditMode ? `teacher-form-${teacherId}` : 'teacher-form-create'}
+          key={isEditMode ? `teacher-form-${teacherSlug}` : 'teacher-form-create'}
           onSubmit={handleSubmit(onSubmit)} 
           className="space-y-6"
         >

@@ -87,11 +87,11 @@ export const router = createBrowserRouter([
     element: <ProtectedRoute><CreateTeacherPage /></ProtectedRoute>,
   },
   {
-    path: '/teachers/:id/edit',
+    path: '/teachers/:slug/edit',
     element: <ProtectedRoute><EditTeacherPage /></ProtectedRoute>,
   },
   {
-    path: '/teachers/:id',
+    path: '/teachers/:slug',
     element: <ProtectedRoute><TeacherDetailPage /></ProtectedRoute>,
   },
 ])

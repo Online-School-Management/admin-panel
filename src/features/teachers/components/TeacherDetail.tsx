@@ -9,15 +9,15 @@ import type { Teacher } from '../types/teacher.types'
 import { useTranslation } from '@/i18n/context'
 
 interface TeacherDetailProps {
-  teacherId: string
+  teacherSlug: string
 }
 
 /**
  * TeacherDetail component - displays detailed teacher information
  */
-export function TeacherDetail({ teacherId }: TeacherDetailProps) {
+export function TeacherDetail({ teacherSlug }: TeacherDetailProps) {
   const { t } = useTranslation()
-  const { data: teacherData, isLoading, error } = useTeacher(parseInt(teacherId))
+  const { data: teacherData, isLoading, error } = useTeacher(teacherSlug)
 
   if (isLoading) {
     return <DetailSkeleton />

@@ -8,16 +8,16 @@ import { useTranslation } from '@/i18n/context'
  */
 function EditTeacherPage() {
   const { t } = useTranslation()
-  const { id } = useParams<{ id: string }>()
+  const { slug } = useParams<{ slug: string }>()
   
   return (
     <div className="space-y-6">
       <PageHeader
         title={t('teacher.pages.edit')}
         description={t('teacher.descriptions.edit')}
-        backTo={id ? `/teachers/${id}` : '/teachers'}
+        backTo={slug ? `/teachers/${slug}` : '/teachers'}
       />
-      <TeacherForm teacherId={id} />
+      <TeacherForm teacherSlug={slug} />
     </div>
   )
 }

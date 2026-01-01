@@ -8,7 +8,7 @@ import { useTranslation } from '@/i18n/context'
  */
 function TeacherDetailPage() {
   const { t } = useTranslation()
-  const { id } = useParams<{ id: string }>()
+  const { slug } = useParams<{ slug: string }>()
   
   return (
     <div className="space-y-6">
@@ -16,10 +16,10 @@ function TeacherDetailPage() {
         title={t('teacher.pages.detail')}
         description={t('teacher.descriptions.detail')}
         backTo="/teachers"
-        editTo={id ? `/teachers/${id}/edit` : undefined}
+        editTo={slug ? `/teachers/${slug}/edit` : undefined}
         editLabel={t('teacher.actions.edit')}
       />
-      {id && <TeacherDetail teacherId={id} />}
+      {slug && <TeacherDetail teacherSlug={slug} />}
     </div>
   )
 }

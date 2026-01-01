@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import {
   getTeachers,
-  getTeacherById,
+  getTeacherBySlug,
   createTeacher,
   updateTeacher,
   deleteTeacher,
@@ -29,7 +29,7 @@ export const teacherKeys = {
   list: (params?: Record<string, unknown>) =>
     [...teacherKeys.lists(), params] as const,
   details: () => [...teacherKeys.all, 'detail'] as const,
-  detail: (id: number) => [...teacherKeys.details(), id] as const,
+  detail: (slug: string) => [...teacherKeys.details(), slug] as const,
 }
 
 /**
@@ -53,13 +53,13 @@ export function useTeachers(params?: {
 }
 
 /**
- * Hook to fetch a single teacher by ID
+ * Hook to fetch a single teacher by slug
  */
-export function useTeacher(id: number) {
+export function useTeacher(slug: string) {
   return useQuery({
-    queryKey: teacherKeys.detail(id),
-    queryFn: () => getTeacherById(id),
-    enabled: !!id,
+    queryKey: teacherKeys.detail(slug),
+    queryFn: () => getTeacherBySlug(slug),
+    enabled: !!slug,
     staleTime: 0, // Always fetch fresh data
     refetchOnMount: 'always', // Always refetch when component mounts
     refetchOnWindowFocus: false, // Don't refetch on window focus
@@ -97,15 +97,15 @@ export function useUpdateTeacher() {
   const navigate = useNavigate()
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: UpdateTeacherInput }) =>
-      updateTeacher(id, data),
+    mutationFn: ({ slug, data }: { slug: string; data: UpdateTeacherInput }) =>
+      updateTeacher(slug, data),
     onSuccess: (response, variables) => {
       // Invalidate and refetch list queries
       queryClient.invalidateQueries({ queryKey: teacherKeys.lists() })
       queryClient.refetchQueries({ queryKey: teacherKeys.lists() })
       // Invalidate and refetch detail query
-      queryClient.invalidateQueries({ queryKey: teacherKeys.detail(variables.id) })
-      queryClient.refetchQueries({ queryKey: teacherKeys.detail(variables.id) })
+      queryClient.invalidateQueries({ queryKey: teacherKeys.detail(variables.slug) })
+      queryClient.refetchQueries({ queryKey: teacherKeys.detail(variables.slug) })
       showUpdateSuccessToast('teacher', `${response.data.user.name} has been updated`)
       navigate('/teachers')
     },
@@ -122,7 +122,7 @@ export function useDeleteTeacher() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (id: number) => deleteTeacher(id),
+    mutationFn: (slug: string) => deleteTeacher(slug),
     onSuccess: () => {
       // Invalidate and refetch list queries to ensure the deleted teacher is removed
       queryClient.invalidateQueries({ queryKey: teacherKeys.lists() })

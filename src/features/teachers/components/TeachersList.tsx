@@ -68,7 +68,7 @@ export function TeachersList() {
 
   const handleDeleteConfirm = () => {
     if (selectedTeacher) {
-      deleteTeacher.mutate(selectedTeacher.id, {
+      deleteTeacher.mutate(selectedTeacher.slug, {
         onSuccess: () => {
           setDeleteDialogOpen(false)
           setSelectedTeacher(null)
@@ -299,13 +299,13 @@ export function TeachersList() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem asChild>
-                                    <Link to={`/teachers/${teacher.id}`}>
+                                    <Link to={`/teachers/${teacher.slug}`}>
                                       <Eye className="h-4 w-4 mr-2" />
                                       {t('teacher.actions.view')}
                                     </Link>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem asChild>
-                                    <Link to={`/teachers/${teacher.id}/edit`}>
+                                    <Link to={`/teachers/${teacher.slug}/edit`}>
                                       <Edit className="h-4 w-4 mr-2" />
                                       {t('teacher.actions.edit')}
                                     </Link>

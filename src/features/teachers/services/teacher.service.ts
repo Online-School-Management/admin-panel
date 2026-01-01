@@ -28,10 +28,10 @@ export async function getTeachers(params?: {
 }
 
 /**
- * Get a single teacher by ID
+ * Get a single teacher by slug
  */
-export async function getTeacherById(id: number): Promise<TeacherResponse> {
-  const response = await apiClient.get<TeacherResponse>(`/teachers/${id}`)
+export async function getTeacherBySlug(slug: string): Promise<TeacherResponse> {
+  const response = await apiClient.get<TeacherResponse>(`/teachers/${slug}`)
   return response.data
 }
 
@@ -47,17 +47,17 @@ export async function createTeacher(data: CreateTeacherInput): Promise<TeacherRe
  * Update an existing teacher
  */
 export async function updateTeacher(
-  id: number,
+  slug: string,
   data: UpdateTeacherInput
 ): Promise<TeacherResponse> {
-  const response = await apiClient.put<TeacherResponse>(`/teachers/${id}`, data)
+  const response = await apiClient.put<TeacherResponse>(`/teachers/${slug}`, data)
   return response.data
 }
 
 /**
  * Delete a teacher
  */
-export async function deleteTeacher(id: number): Promise<void> {
-  await apiClient.delete(`/teachers/${id}`)
+export async function deleteTeacher(slug: string): Promise<void> {
+  await apiClient.delete(`/teachers/${slug}`)
 }
 

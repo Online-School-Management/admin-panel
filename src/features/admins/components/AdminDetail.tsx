@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { CardSkeleton } from '@/components/common/skeletons/CardSkeleton'
 import { useAdmin, useAdminPermissions } from '../hooks/useAdmins'
-import { format } from 'date-fns'
+import format from 'date-fns/format'
 import type { Admin } from '../types/admin.types'
 import { useTranslation } from '@/i18n/context'
 

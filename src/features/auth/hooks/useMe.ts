@@ -4,7 +4,8 @@ import { getCurrentUser } from '../services/auth.service'
 
 /**
  * Hook to get current authenticated user
- * Automatically refetches user data when token is available
+ * Optimized: Non-blocking, loads in background
+ * Uses cached data as placeholder to prevent blocking
  */
 export function useMe() {
   const token = useAuthStore((state) => state.token)
@@ -49,7 +50,9 @@ export function useMe() {
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
     refetchOnMount: false, // Don't refetch on component mount if data is fresh
     refetchOnWindowFocus: false, // Don't refetch on window focus
-    refetchOnReconnect: true, // Only refetch on reconnect
+    refetchOnReconnect: false, // Don't refetch on reconnect (improves performance)
+    // Use cached data if available while refetching (prevents blocking)
+    placeholderData: (previousData) => previousData,
   })
 }
 

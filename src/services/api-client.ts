@@ -65,11 +65,14 @@ apiClient.interceptors.response.use(
       const status = error.response.status
       
       // Handle 401 Unauthorized - clear auth and redirect to login
+      // Use dynamic import to avoid circular dependency and prevent blocking
       if (status === 401) {
         import('@/store/authStore').then(({ useAuthStore }) => {
           useAuthStore.getState().logout()
+          // Use window.location.replace instead of href to prevent back/forward cache issues
+          // This allows the browser to cache the page properly
+          window.location.replace('/login')
         })
-        window.location.href = '/login'
         return Promise.reject(error)
       }
       

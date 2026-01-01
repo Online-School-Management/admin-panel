@@ -24,7 +24,7 @@ import { Pagination } from '@/components/common/Pagination'
 import { TableSkeleton } from '@/components/common/skeletons/TableSkeleton'
 import { PAGINATION, ROLE_STATUS_OPTIONS } from '@/constants'
 import { useRoles } from '../hooks/useRoles'
-import { format } from 'date-fns'
+import format from 'date-fns/format'
 import type { Role } from '../types/role.types'
 
 /**

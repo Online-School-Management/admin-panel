@@ -32,7 +32,7 @@ import { Pagination } from '@/components/common/Pagination'
 import { TableSkeleton } from '@/components/common/skeletons/TableSkeleton'
 import { Skeleton } from '@/components/ui/skeleton'
 import { PAGINATION, ADMIN_STATUS_OPTIONS } from '@/constants'
-import { format } from 'date-fns'
+import format from 'date-fns/format'
 import type { AdminCollectionItem } from '../types/admin.types'
 import { useTranslation } from '@/i18n/context'
 

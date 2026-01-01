@@ -14,7 +14,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { TableSkeleton } from '@/components/common/skeletons/TableSkeleton'
 import { usePermissions } from '../hooks/usePermissions'
-import { format } from 'date-fns'
+import format from 'date-fns/format'
 
 /**
  * PermissionsList component - displays permissions in a table (read-only)

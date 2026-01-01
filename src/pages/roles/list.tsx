@@ -2,9 +2,9 @@ import { RolesList } from '@/features/roles/components/RolesList'
 import { PageHeader } from '@/components/common/PageHeader'
 
 /**
- * Roles Page - Read-only list view
+ * Roles List Page - Read-only list view
  */
-function RolesPage() {
+function RolesListPage() {
   return (
     <div className="space-y-6">
       <PageHeader
@@ -16,5 +16,5 @@ function RolesPage() {
   )
 }
 
-export default RolesPage
+export default RolesListPage
 

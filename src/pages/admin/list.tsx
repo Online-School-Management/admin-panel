@@ -3,9 +3,9 @@ import { PageHeader } from '@/components/common/PageHeader'
 import { useTranslation } from '@/i18n/context'
 
 /**
- * Admins Page - Displays a list of all admins
+ * Admins List Page - Displays a list of all admins
  */
-function AdminsPage() {
+function AdminsListPage() {
   const { t } = useTranslation()
   
   return (
@@ -21,5 +21,5 @@ function AdminsPage() {
   )
 }
 
-export default AdminsPage
+export default AdminsListPage
 

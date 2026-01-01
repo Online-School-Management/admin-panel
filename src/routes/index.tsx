@@ -3,15 +3,24 @@ import { createBrowserRouter } from 'react-router-dom'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 
 // Lazy load pages for code splitting
-const LoginPage = lazy(() => import('@/pages/LoginPage'))
-const DashboardPage = lazy(() => import('@/pages/DashboardPage'))
-const PermissionsPage = lazy(() => import('@/pages/PermissionsPage'))
-const RolesPage = lazy(() => import('@/pages/RolesPage'))
-const RoleDetailPage = lazy(() => import('@/pages/RoleDetailPage'))
-const AdminsPage = lazy(() => import('@/pages/AdminsPage'))
-const CreateAdminPage = lazy(() => import('@/pages/CreateAdminPage'))
-const EditAdminPage = lazy(() => import('@/pages/EditAdminPage'))
-const AdminDetailPage = lazy(() => import('@/pages/AdminDetailPage'))
+// Auth pages
+const LoginPage = lazy(() => import('@/pages/auth/login'))
+
+// Dashboard
+const DashboardPage = lazy(() => import('@/pages/dashboard'))
+
+// Admin pages
+const AdminsListPage = lazy(() => import('@/pages/admin/list'))
+const CreateAdminPage = lazy(() => import('@/pages/admin/create'))
+const EditAdminPage = lazy(() => import('@/pages/admin/edit'))
+const AdminDetailPage = lazy(() => import('@/pages/admin/detail'))
+
+// Role pages
+const RolesListPage = lazy(() => import('@/pages/roles/list'))
+const RoleDetailPage = lazy(() => import('@/pages/roles/detail'))
+
+// Permission pages
+const PermissionsListPage = lazy(() => import('@/pages/permissions/list'))
 
 /**
  * Route configuration using createBrowserRouter (data router API)
@@ -37,11 +46,11 @@ export const router = createBrowserRouter([
   },
   {
     path: '/permissions',
-    element: <ProtectedRoute><PermissionsPage /></ProtectedRoute>,
+    element: <ProtectedRoute><PermissionsListPage /></ProtectedRoute>,
   },
   {
     path: '/roles',
-    element: <ProtectedRoute><RolesPage /></ProtectedRoute>,
+    element: <ProtectedRoute><RolesListPage /></ProtectedRoute>,
   },
   {
     path: '/roles/:id',
@@ -49,7 +58,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/admins',
-    element: <ProtectedRoute><AdminsPage /></ProtectedRoute>,
+    element: <ProtectedRoute><AdminsListPage /></ProtectedRoute>,
   },
   {
     path: '/admins/new',

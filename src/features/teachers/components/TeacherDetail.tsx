@@ -122,10 +122,10 @@ export function TeacherDetail({ teacherSlug }: TeacherDetailProps) {
                     {getEmploymentTypeLabel(teacher.employment_type)}
                   </Badge>
                 </div>
-                {teacher.salary && (
+                {teacher.commission_rate && (
                   <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">{t('teacher.detail.salary')}</p>
-                    <p className="text-base">${teacher.salary.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                    <p className="text-sm font-medium text-muted-foreground">{t('teacher.detail.commissionRate')}</p>
+                    <p className="text-base">{teacher.commission_rate.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</p>
                   </div>
                 )}
               </div>

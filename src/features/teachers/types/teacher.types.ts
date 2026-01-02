@@ -25,7 +25,7 @@ export interface Teacher {
   department?: string | null
   subject?: string | null
   employment_type: 'full-time' | 'part-time' | 'contract'
-  salary?: number | null
+  commission_rate?: number | null
   status: 'active' | 'inactive' | 'suspended'
   notes?: string | null
   created_at?: string
@@ -68,7 +68,7 @@ export interface CreateTeacherInput {
   department?: string
   subject?: string
   employment_type?: 'full-time' | 'part-time' | 'contract'
-  salary?: number
+  commission_rate?: number
   notes?: string
 }
 
@@ -88,7 +88,7 @@ export interface UpdateTeacherInput {
   department?: string
   subject?: string
   employment_type?: 'full-time' | 'part-time' | 'contract'
-  salary?: number
+  commission_rate?: number
   notes?: string
 }
 

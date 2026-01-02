@@ -77,7 +77,7 @@ export function TeacherForm({ teacherSlug }: TeacherFormProps) {
       department: '',
       subject: '',
       employment_type: EMPLOYMENT_TYPE.FULL_TIME,
-      salary: undefined,
+      commission_rate: undefined,
       password: '',
       password_confirmation: '',
     },
@@ -125,7 +125,7 @@ export function TeacherForm({ teacherSlug }: TeacherFormProps) {
       department: departmentValue,
       subject: subjectValue,
       employment_type: teacher.employment_type || EMPLOYMENT_TYPE.FULL_TIME,
-      salary: teacher.salary || undefined,
+      commission_rate: teacher.commission_rate || undefined,
       password: '',
       password_confirmation: '',
     }, {
@@ -147,7 +147,7 @@ export function TeacherForm({ teacherSlug }: TeacherFormProps) {
         department: data.department || undefined,
         subject: data.subject || undefined,
         employment_type: data.employment_type,
-        salary: data.salary || undefined,
+        commission_rate: data.commission_rate || undefined,
       }
       
       // Include email if provided and not empty
@@ -171,7 +171,7 @@ export function TeacherForm({ teacherSlug }: TeacherFormProps) {
         department: data.department,
         subject: data.subject,
         employment_type: data.employment_type,
-        salary: data.salary ?? undefined,
+        commission_rate: data.commission_rate ?? undefined,
       }
       createTeacher.mutate(createData)
     }
@@ -348,20 +348,21 @@ export function TeacherForm({ teacherSlug }: TeacherFormProps) {
                 )}
               </div>
 
-              {/* Salary */}
+              {/* Commission Rate */}
               <div className="space-y-2">
-                <Label htmlFor="salary">{t('teacher.form.salary')}</Label>
+                <Label htmlFor="commission_rate">{t('teacher.form.commissionRate')}</Label>
                 <Input
-                  id="salary"
+                  id="commission_rate"
                   type="number"
                   step="0.01"
                   min="0"
-                  {...register('salary', { valueAsNumber: true })}
-                  placeholder={t('teacher.form.enterSalary')}
+                  max="999.99"
+                  {...register('commission_rate', { valueAsNumber: true })}
+                  placeholder={t('teacher.form.enterCommissionRate')}
                   disabled={isSubmitting}
                 />
-                {errors.salary && (
-                  <p className="text-sm text-destructive">{errors.salary.message}</p>
+                {errors.commission_rate && (
+                  <p className="text-sm text-destructive">{errors.commission_rate.message}</p>
                 )}
               </div>
 

@@ -1,4 +1,4 @@
-import { Home, Shield, UserCog, Key, GraduationCap, LucideIcon } from 'lucide-react'
+import { Home, Shield, UserCog, Key, GraduationCap, Users, LucideIcon } from 'lucide-react'
 
 export interface NavigationItem {
   to: string
@@ -8,11 +8,12 @@ export interface NavigationItem {
 
 export const mainNavigation: NavigationItem[] = [
   { to: '/dashboard', icon: Home, label: 'Dashboard' },
+  { to: '/teachers', icon: GraduationCap, label: 'Teachers' },
+  { to: '/students', icon: Users, label: 'Students' },
 ]
 
 export const adminNavigation: NavigationItem[] = [
   { to: '/admins', icon: UserCog, label: 'Admins' },
-  { to: '/teachers', icon: GraduationCap, label: 'Teachers' },
   { to: '/roles', icon: Shield, label: 'Roles' },
   { to: '/permissions', icon: Key, label: 'Permissions' },
 ]

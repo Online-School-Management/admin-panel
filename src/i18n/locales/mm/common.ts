@@ -44,6 +44,7 @@ export const common = {
     module: 'မော်ဂျူး',
     permissions: 'ခွင့်ပြုချက်များ',
     createdAt: 'ဖန်တီးထားသောနေ့စွဲ',
+    optional: "မဖြည့်လည်းရသည်။"
   },
 
   // Placeholders
@@ -74,6 +75,12 @@ export const common = {
     results: 'ရလဒ်များ',
     of: '၏',
   },
+
+  gender: {
+    male: "ယောကျ်ားလေး",
+    female: "မိန်းကလေး",
+    other: "အခြား..."
+  }
 }
 
 

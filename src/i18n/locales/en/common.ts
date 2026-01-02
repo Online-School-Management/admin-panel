@@ -44,6 +44,7 @@ export const common = {
     module: 'Module',
     permissions: 'Permissions',
     createdAt: 'Created At',
+    optional: "Optional"
   },
 
   // Placeholders
@@ -74,6 +75,12 @@ export const common = {
     results: 'results',
     of: 'of',
   },
+
+  gender: {
+    male: "Male",
+    female: "Female",
+    other: "Other"
+  }
 }
 
 

@@ -6,6 +6,7 @@ export const navigation = {
   dashboard: 'Dashboard',
   admins: 'Admins',
   teachers: 'Teachers',
+  students: 'Students',
   roles: 'Roles',
   permissions: 'Permissions',
   adminPanel: 'Admin Panel',

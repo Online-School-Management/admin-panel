@@ -10,6 +10,7 @@ export const navigation = {
   permissions: 'ခွင့်ပြုချက်များ',
   adminPanel: 'Admin',
   closeSidebar: 'ဘေးဘားကို ပိတ်ရန်',
+  students: 'ကျောင်းသားများ',
 }
 
 

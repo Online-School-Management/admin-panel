@@ -13,6 +13,7 @@ import { role } from './role'
 import { permission } from './permission'
 import { teacher } from './teacher'
 import { student } from './student'
+import { subject } from './subject'
 
 export const mm = {
   common,
@@ -25,6 +26,7 @@ export const mm = {
   permission,
   teacher,
   student,
+  subject,
 }
 
 

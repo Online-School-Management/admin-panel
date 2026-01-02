@@ -11,6 +11,7 @@ export const navigation = {
   adminPanel: 'Admin',
   closeSidebar: 'ဘေးဘားကို ပိတ်ရန်',
   students: 'ကျောင်းသားများ',
+  subjects: 'ဘာသာရပ်များ',
 }
 
 

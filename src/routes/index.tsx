@@ -34,6 +34,12 @@ const CreateStudentPage = lazy(() => import('@/pages/students/create'))
 const EditStudentPage = lazy(() => import('@/pages/students/edit'))
 const StudentDetailPage = lazy(() => import('@/pages/students/detail'))
 
+// Subject pages
+const SubjectsListPage = lazy(() => import('@/pages/subjects/list'))
+const CreateSubjectPage = lazy(() => import('@/pages/subjects/create'))
+const EditSubjectPage = lazy(() => import('@/pages/subjects/edit'))
+const SubjectDetailPage = lazy(() => import('@/pages/subjects/detail'))
+
 /**
  * Route configuration using createBrowserRouter (data router API)
  * Each route is individually wrapped with ProtectedRoute (which includes AdminLayout)
@@ -115,6 +121,22 @@ export const router = createBrowserRouter([
   {
     path: '/students/:slug',
     element: <ProtectedRoute><StudentDetailPage /></ProtectedRoute>,
+  },
+  {
+    path: '/subjects',
+    element: <ProtectedRoute><SubjectsListPage /></ProtectedRoute>,
+  },
+  {
+    path: '/subjects/new',
+    element: <ProtectedRoute><CreateSubjectPage /></ProtectedRoute>,
+  },
+  {
+    path: '/subjects/:slug/edit',
+    element: <ProtectedRoute><EditSubjectPage /></ProtectedRoute>,
+  },
+  {
+    path: '/subjects/:slug',
+    element: <ProtectedRoute><SubjectDetailPage /></ProtectedRoute>,
   },
 ])
 

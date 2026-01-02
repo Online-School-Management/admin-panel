@@ -12,6 +12,7 @@ export const navigation = {
   closeSidebar: 'ဘေးဘားကို ပိတ်ရန်',
   students: 'ကျောင်းသားများ',
   subjects: 'ဘာသာရပ်များ',
+  courses: 'သင်တန်းများ',
 }
 
 

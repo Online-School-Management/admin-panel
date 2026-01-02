@@ -14,6 +14,7 @@ import { permission } from './permission'
 import { teacher } from './teacher'
 import { student } from './student'
 import { subject } from './subject'
+import { course } from './course'
 
 export const mm = {
   common,
@@ -27,6 +28,7 @@ export const mm = {
   teacher,
   student,
   subject,
+  course,
 }
 
 

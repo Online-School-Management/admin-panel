@@ -62,6 +62,9 @@ export const common = {
     inactive: 'အသုံးမပြုနေသည်',
     suspended: 'ရပ်ဆိုင်းထားသည်',
     all: 'အားလုံး',
+    upcoming: "Upcoming",
+    completed: "Completed",
+    cancelled: "Cancelled",
   },
 
   // Common messages

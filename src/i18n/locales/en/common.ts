@@ -62,6 +62,9 @@ export const common = {
     inactive: 'Inactive',
     suspended: 'Suspended',
     all: 'All',
+    upcoming: "Upcoming",
+    completed: "Completed",
+    cancelled: "Cancelled",
   },
 
   // Common messages

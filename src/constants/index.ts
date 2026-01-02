@@ -92,6 +92,21 @@ export const DEPARTMENT_OPTIONS = [
   'Employee Management',
 ] as const
 
+// Course status options
+export const COURSE_STATUS = {
+  UPCOMING: 'upcoming',
+  ACTIVE: 'active',
+  COMPLETED: 'completed',
+  CANCELLED: 'cancelled',
+} as const
+
+export const COURSE_STATUS_OPTIONS = [
+  { value: COURSE_STATUS.UPCOMING, label: 'Upcoming' },
+  { value: COURSE_STATUS.ACTIVE, label: 'Active' },
+  { value: COURSE_STATUS.COMPLETED, label: 'Completed' },
+  { value: COURSE_STATUS.CANCELLED, label: 'Cancelled' },
+] as const
+
 // API configuration
 export const API_CONFIG = {
   TIMEOUT: 5000, // 5 seconds - reduced for faster failure detection

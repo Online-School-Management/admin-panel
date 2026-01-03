@@ -123,6 +123,7 @@ export const course = {
     delete: 'Delete',
     clear: 'Clear',
     assignTeacher: 'Assign Teacher',
+    manageSchedule: 'Manage Schedule',
   },
 }
 

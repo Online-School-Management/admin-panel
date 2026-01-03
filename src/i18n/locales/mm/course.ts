@@ -123,6 +123,7 @@ export const course = {
     delete: 'ဖျက်ရန်',
     clear: 'ရှင်းလင်းရန်',
     assignTeacher: 'ဆရာ ခန့်အပ်ရန်',
+    manageSchedule: 'သင်တန်းချိန်ဇယား စီမံခန့်ခွဲရန်',
   },
 }
 

@@ -7,6 +7,7 @@ import { Separator } from '@/components/ui/separator'
 import { DetailSkeleton } from '@/components/common/skeletons/DetailSkeleton'
 import { useCourse } from '../hooks/useCourses'
 import { AssignTeacherModal } from '@/features/course-teachers/components/AssignTeacherModal'
+import { ScheduleModal } from '@/features/schedules/components/ScheduleModal'
 import format from 'date-fns/format'
 import type { Course } from '../types/course.types'
 import { useTranslation } from '@/i18n/context'
@@ -21,6 +22,7 @@ interface CourseDetailProps {
 export function CourseDetail({ courseSlug }: CourseDetailProps) {
   const { t } = useTranslation()
   const [assignTeacherModalOpen, setAssignTeacherModalOpen] = useState(false)
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false)
   const { data: courseData, isLoading, error } = useCourse(courseSlug)
 
   if (isLoading) {
@@ -68,14 +70,21 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
 
   return (
     <div className="space-y-6">
-      {/* Assign Teacher Button */}
-      <div className="flex justify-end">
+      {/* Action Buttons */}
+      <div className="flex justify-end gap-2">
         <Button
           onClick={() => setAssignTeacherModalOpen(true)}
           variant="default"
         >
           <UserPlus className="h-4 w-4 mr-2" />
           {t('course.actions.assignTeacher')}
+        </Button>
+        <Button
+          onClick={() => setScheduleModalOpen(true)}
+          variant="default"
+        >
+          <Calendar className="h-4 w-4 mr-2" />
+          {t('course.actions.manageSchedule')}
         </Button>
       </div>
 
@@ -284,12 +293,21 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
 
       {/* Assign Teacher Modal */}
       {courseData?.data && (
-        <AssignTeacherModal
-          open={assignTeacherModalOpen}
-          onOpenChange={setAssignTeacherModalOpen}
-          courseId={courseData.data.id}
-          courseTitle={courseData.data.title}
-        />
+        <>
+          <AssignTeacherModal
+            open={assignTeacherModalOpen}
+            onOpenChange={setAssignTeacherModalOpen}
+            courseId={courseData.data.id}
+            courseTitle={courseData.data.title}
+          />
+          <ScheduleModal
+            open={scheduleModalOpen}
+            onOpenChange={setScheduleModalOpen}
+            courseId={courseData.data.id}
+            courseTitle={courseData.data.title}
+            assignedTeacher={courseData.data.assigned_teacher}
+          />
+        </>
       )}
     </div>
   )

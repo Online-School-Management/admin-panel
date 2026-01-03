@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Edit, Trash2, Eye, MoreVertical, RefreshCw, UserPlus } from 'lucide-react'
+import { Search, Edit, Trash2, Eye, MoreVertical, RefreshCw, UserPlus, Calendar } from 'lucide-react'
 import format from 'date-fns/format'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -31,6 +31,7 @@ import { useCourses, useDeleteCourse } from '../hooks/useCourses'
 import { useSubjects } from '@/features/subjects/hooks/useSubjects'
 import { DeleteCourseDialog } from './DeleteCourseDialog'
 import { AssignTeacherModal } from '@/features/course-teachers/components/AssignTeacherModal'
+import { ScheduleModal } from '@/features/schedules/components/ScheduleModal'
 import { Pagination } from '@/components/common/Pagination'
 import { TableSkeleton } from '@/components/common/skeletons/TableSkeleton'
 import { PAGINATION, COURSE_STATUS_OPTIONS } from '@/constants'
@@ -71,6 +72,8 @@ export function CoursesList() {
   const [selectedCourse, setSelectedCourse] = useState<CourseCollectionItem | null>(null)
   const [assignTeacherModalOpen, setAssignTeacherModalOpen] = useState(false)
   const [selectedCourseForAssignment, setSelectedCourseForAssignment] = useState<CourseCollectionItem | null>(null)
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false)
+  const [selectedCourseForSchedule, setSelectedCourseForSchedule] = useState<CourseCollectionItem | null>(null)
 
   // Fetch subjects for filter dropdown
   const { data: subjectsData } = useSubjects({ per_page: 0 })
@@ -307,6 +310,18 @@ export function CoursesList() {
                                 >
                                   <UserPlus className="h-4 w-4" />
                                 </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  onClick={() => {
+                                    setSelectedCourseForSchedule(course)
+                                    setScheduleModalOpen(true)
+                                  }}
+                                  title={t('course.actions.manageSchedule')}
+                                >
+                                  <Calendar className="h-4 w-4" />
+                                </Button>
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -377,6 +392,22 @@ export function CoursesList() {
           }}
           courseId={selectedCourseForAssignment.id}
           courseTitle={selectedCourseForAssignment.title}
+        />
+      )}
+
+      {/* Schedule Modal */}
+      {selectedCourseForSchedule && (
+        <ScheduleModal
+          open={scheduleModalOpen}
+          onOpenChange={(open) => {
+            setScheduleModalOpen(open)
+            if (!open) {
+              setSelectedCourseForSchedule(null)
+            }
+          }}
+          courseId={selectedCourseForSchedule.id}
+          courseTitle={selectedCourseForSchedule.title}
+          assignedTeacher={selectedCourseForSchedule.assigned_teacher}
         />
       )}
     </>

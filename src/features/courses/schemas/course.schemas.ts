@@ -19,7 +19,7 @@ const courseFormBaseSchema = z.object({
   monthly_fee: z.number().min(0).max(999999.99).optional().nullable(),
   course_type: z.enum([COURSE_TYPE.ONE_ON_ONE, COURSE_TYPE.PRIVATE, COURSE_TYPE.GROUP, COURSE_TYPE.TEACHER_TRAINING]).optional(),
   status: z.enum([COURSE_STATUS.UPCOMING, COURSE_STATUS.IN_PROGRESS, COURSE_STATUS.COMPLETED, COURSE_STATUS.CANCELLED]).optional(),
-  start_date: z.string().optional().nullable(),
+  start_date: z.string().min(1, VALIDATION_MESSAGES.REQUIRED('Start date')),
   end_date: z.string().optional().nullable(),
 })
 
@@ -54,6 +54,7 @@ export const updateCourseSchema = courseFormBaseSchema.extend({
     .min(VALIDATION.MIN_NAME_LENGTH, VALIDATION_MESSAGES.MIN_LENGTH('Title', VALIDATION.MIN_NAME_LENGTH))
     .optional()
     .or(z.literal('')),
+  start_date: z.string().min(1, VALIDATION_MESSAGES.REQUIRED('Start date')),
 }).refine(
   (data) => {
     // If both dates are provided, end_date must be after start_date

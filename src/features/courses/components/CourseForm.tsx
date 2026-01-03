@@ -73,7 +73,7 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
       monthly_fee: undefined,
       course_type: COURSE_TYPE.GROUP,
       status: COURSE_STATUS.UPCOMING,
-      start_date: undefined,
+      start_date: '',
       end_date: undefined,
     },
   })
@@ -110,7 +110,7 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
       monthly_fee: course.monthly_fee || undefined,
       course_type: course.course_type || COURSE_TYPE.GROUP,
       status: course.status || COURSE_STATUS.UPCOMING,
-      start_date: course.start_date || undefined,
+        start_date: course.start_date || '',
       end_date: course.end_date || undefined,
     }, {
       keepDefaultValues: false,
@@ -133,7 +133,7 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
         monthly_fee: updateFormData.monthly_fee ?? undefined,
         course_type: updateFormData.course_type || undefined,
         status: updateFormData.status || undefined,
-        start_date: updateFormData.start_date || undefined,
+        start_date: updateFormData.start_date,
         end_date: updateFormData.end_date || undefined,
       }
       updateCourse.mutate({ slug: courseSlug, data: updateData })
@@ -146,7 +146,7 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
         monthly_fee: createFormData.monthly_fee ?? undefined,
         course_type: createFormData.course_type || undefined,
         status: createFormData.status || undefined,
-        start_date: createFormData.start_date || undefined,
+        start_date: createFormData.start_date,
         end_date: createFormData.end_date || undefined,
       }
       createCourse.mutate(createData)
@@ -305,12 +305,15 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
 
               {/* Start Date */}
               <div className="space-y-2">
-                <Label htmlFor="start_date">{t('course.form.startDate')}</Label>
+                <Label htmlFor="start_date">
+                  {t('course.form.startDate')} <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   id="start_date"
                   type="date"
                   {...register('start_date')}
                   disabled={isSubmitting}
+                  required
                 />
                 {errors.start_date && (
                   <p className="text-sm text-destructive">{errors.start_date.message}</p>

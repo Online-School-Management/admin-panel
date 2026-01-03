@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Search, Edit, Trash2, Eye, MoreVertical, RefreshCw, UserPlus } from 'lucide-react'
+import format from 'date-fns/format'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -215,6 +216,7 @@ export function CoursesList() {
                     { width: 'w-32', className: 'hidden md:table-cell' },
                     { width: 'w-32', className: 'hidden lg:table-cell' },
                     { width: 'w-32', className: 'hidden lg:table-cell' },
+                    { width: 'w-32', className: 'hidden xl:table-cell' },
                     { width: 'w-40', className: 'hidden xl:table-cell' },
                     { width: 'w-24', className: 'hidden xl:table-cell' },
                     { width: 'w-8', className: 'text-right' },
@@ -241,6 +243,7 @@ export function CoursesList() {
                         <TableHead className="hidden lg:table-cell">{t('course.table.monthlyFee')}</TableHead>
                         <TableHead className="hidden md:table-cell">{t('course.table.duration')}</TableHead>
                         <TableHead className="hidden lg:table-cell">{t('course.table.totalHours')}</TableHead>
+                        <TableHead className="hidden xl:table-cell">{t('course.table.startDate')}</TableHead>
                         <TableHead className="hidden xl:table-cell">{t('course.table.assignedTeacher')}</TableHead>
                         <TableHead className="hidden xl:table-cell">{t('course.table.status')}</TableHead>
                         <TableHead className="text-right">{t('course.table.actions')}</TableHead>
@@ -275,6 +278,11 @@ export function CoursesList() {
                             <TableCell className="hidden lg:table-cell">
                               {course.total_hours && course.total_hours > 0
                                 ? `${course.total_hours} ${t('course.table.hours')}`
+                                : '-'}
+                            </TableCell>
+                            <TableCell className="hidden xl:table-cell">
+                              {course.start_date
+                                ? format(new Date(course.start_date), 'MMM dd, yyyy')
                                 : '-'}
                             </TableCell>
                             <TableCell className="hidden xl:table-cell">

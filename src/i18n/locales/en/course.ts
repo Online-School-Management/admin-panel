@@ -49,6 +49,7 @@ export const course = {
     monthlyFee: 'Monthly Fee/student',
     totalHours: 'Total Hours',
     hours: 'hours',
+    startDate: 'Start Date',
     assignedTeacher: 'Assigned Teacher',
     status: 'Status',
     actions: 'Actions',

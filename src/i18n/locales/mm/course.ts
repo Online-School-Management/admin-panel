@@ -49,6 +49,7 @@ export const course = {
     monthlyFee: 'သင်တန်းကြေး',
     totalHours: 'စုစုပေါင်း နာရီ',
     hours: 'နာရီ',
+    startDate: 'စတင်ရက်',
     assignedTeacher: 'ခန့်အပ်ထားသော ဆရာ',
     status: 'အခြေအနေ',
     actions: 'လုပ်ဆောင်ချက်များ',

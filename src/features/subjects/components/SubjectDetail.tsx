@@ -115,3 +115,5 @@ export function SubjectDetail({ subjectSlug }: SubjectDetailProps) {
   )
 }
 
+
+

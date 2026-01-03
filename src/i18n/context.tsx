@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react'
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react'
 import { translations, defaultLocale, supportedLocales } from './index'
 import type { Locale, TranslationParams } from './types'
 
@@ -18,13 +18,29 @@ const I18nContext = createContext<I18nContextType | undefined>(undefined)
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(() => {
     // Get from localStorage or use default
-    const saved = localStorage.getItem('locale') as Locale
-    return saved && supportedLocales.includes(saved) ? saved : defaultLocale
+    // Use try-catch to handle cases where localStorage might not be available
+    try {
+      const saved = localStorage.getItem('locale') as Locale
+      return saved && supportedLocales.includes(saved) ? saved : defaultLocale
+    } catch {
+      return defaultLocale
+    }
   })
+
+  // Ensure locale is valid on mount (handles HMR issues)
+  useEffect(() => {
+    if (!supportedLocales.includes(locale)) {
+      setLocaleState(defaultLocale)
+    }
+  }, [locale])
 
   const setLocale = (newLocale: Locale) => {
     setLocaleState(newLocale)
-    localStorage.setItem('locale', newLocale)
+    try {
+      localStorage.setItem('locale', newLocale)
+    } catch {
+      // Ignore localStorage errors (e.g., in private browsing)
+    }
   }
 
   /**
@@ -71,10 +87,21 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 /**
  * useTranslation hook
  * Must be used within I18nProvider
+ * Includes fallback to prevent errors during HMR or lazy loading
  */
 export function useTranslation() {
   const context = useContext(I18nContext)
   if (!context) {
+    // During development/HMR, provide a fallback instead of throwing
+    // This prevents errors when components render before provider is ready
+    if (import.meta.env.DEV) {
+      console.warn('useTranslation called outside I18nProvider, using fallback')
+      return {
+        locale: defaultLocale,
+        setLocale: () => {},
+        t: (key: string) => key, // Return key as fallback
+      }
+    }
     throw new Error('useTranslation must be used within I18nProvider')
   }
   return context

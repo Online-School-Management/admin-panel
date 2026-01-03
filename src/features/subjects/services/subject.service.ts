@@ -58,3 +58,5 @@ export async function deleteSubject(slug: string): Promise<void> {
   await apiClient.delete(`/subjects/${slug}`)
 }
 
+
+

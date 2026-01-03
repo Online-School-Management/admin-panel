@@ -95,16 +95,31 @@ export const DEPARTMENT_OPTIONS = [
 // Course status options
 export const COURSE_STATUS = {
   UPCOMING: 'upcoming',
-  ACTIVE: 'active',
+  IN_PROGRESS: 'in_progress',
   COMPLETED: 'completed',
   CANCELLED: 'cancelled',
 } as const
 
 export const COURSE_STATUS_OPTIONS = [
   { value: COURSE_STATUS.UPCOMING, label: 'Upcoming' },
-  { value: COURSE_STATUS.ACTIVE, label: 'Active' },
+  { value: COURSE_STATUS.IN_PROGRESS, label: 'In Progress' },
   { value: COURSE_STATUS.COMPLETED, label: 'Completed' },
   { value: COURSE_STATUS.CANCELLED, label: 'Cancelled' },
+] as const
+
+// Course type options
+export const COURSE_TYPE = {
+  ONE_ON_ONE: 'one_on_one',
+  PRIVATE: 'private',
+  GROUP: 'group',
+  TEACHER_TRAINING: 'teacher_training',
+} as const
+
+export const COURSE_TYPE_OPTIONS = [
+  { value: COURSE_TYPE.ONE_ON_ONE, label: 'One-on-One' },
+  { value: COURSE_TYPE.PRIVATE, label: 'Private' },
+  { value: COURSE_TYPE.GROUP, label: 'Group' },
+  { value: COURSE_TYPE.TEACHER_TRAINING, label: 'Teacher Training' },
 ] as const
 
 // API configuration

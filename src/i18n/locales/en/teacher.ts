@@ -37,7 +37,7 @@ export const teacher = {
     enterFullName: 'Enter full name',
     enterPassword: 'Enter password',
     confirmPasswordPlaceholder: 'Confirm password',
-    enterCommissionRate: 'Enter commission rate (0-999.99)',
+    enterCommissionRate: 'Enter commission rate (0-99)',
     noSubject: 'No subject',
   },
 

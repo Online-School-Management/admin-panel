@@ -37,7 +37,7 @@ export const teacher = {
     enterFullName: 'အမည် အပြည့်အစုံ ထည့်ရန်',
     enterPassword: 'စကားဝှက် ထည့်ရန်',
     confirmPasswordPlaceholder: 'စကားဝှက် အတည်ပြုရန်',
-    enterCommissionRate: 'ကော်မရှင် ရာခိုင်နှုန်း ထည့်ရန် (0-999.99)',
+    enterCommissionRate: 'ကော်မရှင် ရာခိုင်နှုန်း ထည့်ရန် (0-99)',
     noSubject: 'ဘာသာရပ် မရှိ',
   },
 

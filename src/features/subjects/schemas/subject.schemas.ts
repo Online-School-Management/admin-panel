@@ -34,3 +34,5 @@ export const updateSubjectSchema = subjectFormBaseSchema.extend({
 export type CreateSubjectFormData = z.infer<typeof createSubjectSchema>
 export type UpdateSubjectFormData = z.infer<typeof updateSubjectSchema>
 
+
+

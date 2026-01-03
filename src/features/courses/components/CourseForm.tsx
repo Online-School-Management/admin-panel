@@ -19,7 +19,7 @@ import { useCreateCourse, useUpdateCourse, useCourse } from '../hooks/useCourses
 import { useSubjects } from '@/features/subjects/hooks/useSubjects'
 import type { CreateCourseInput, UpdateCourseInput } from '../types/course.types'
 import { createCourseSchema, updateCourseSchema, type CreateCourseFormData, type UpdateCourseFormData } from '../schemas/course.schemas'
-import { COURSE_STATUS_OPTIONS, COURSE_STATUS } from '@/constants'
+import { COURSE_STATUS_OPTIONS, COURSE_STATUS, COURSE_TYPE_OPTIONS, COURSE_TYPE } from '@/constants'
 import { useTranslation } from '@/i18n/context'
 
 interface CourseFormProps {
@@ -71,6 +71,7 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
       title: '',
       duration_months: 3,
       monthly_fee: undefined,
+      course_type: COURSE_TYPE.GROUP,
       status: COURSE_STATUS.UPCOMING,
       start_date: undefined,
       end_date: undefined,
@@ -107,6 +108,7 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
       title: course.title || '',
       duration_months: course.duration_months || 3,
       monthly_fee: course.monthly_fee || undefined,
+      course_type: course.course_type || COURSE_TYPE.GROUP,
       status: course.status || COURSE_STATUS.UPCOMING,
       start_date: course.start_date || undefined,
       end_date: course.end_date || undefined,
@@ -129,6 +131,7 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
         title: updateFormData.title || undefined,
         duration_months: updateFormData.duration_months || undefined,
         monthly_fee: updateFormData.monthly_fee ?? undefined,
+        course_type: updateFormData.course_type || undefined,
         status: updateFormData.status || undefined,
         start_date: updateFormData.start_date || undefined,
         end_date: updateFormData.end_date || undefined,
@@ -141,6 +144,7 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
         title: createFormData.title,
         duration_months: createFormData.duration_months || undefined,
         monthly_fee: createFormData.monthly_fee ?? undefined,
+        course_type: createFormData.course_type || undefined,
         status: createFormData.status || undefined,
         start_date: createFormData.start_date || undefined,
         end_date: createFormData.end_date || undefined,
@@ -245,6 +249,30 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
                 />
                 {errors.monthly_fee && (
                   <p className="text-sm text-destructive">{errors.monthly_fee.message}</p>
+                )}
+              </div>
+
+              {/* Course Type */}
+              <div className="space-y-2">
+                <Label htmlFor="course_type">{t('course.form.courseType')}</Label>
+                <Select
+                  value={watch('course_type') || COURSE_TYPE.GROUP}
+                  onValueChange={(value) => setValue('course_type', value as typeof COURSE_TYPE.GROUP, { shouldValidate: true })}
+                  disabled={isSubmitting}
+                >
+                  <SelectTrigger id="course_type">
+                    <SelectValue placeholder={t('course.form.selectCourseType')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {COURSE_TYPE_OPTIONS.map((type) => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.course_type && (
+                  <p className="text-sm text-destructive">{errors.course_type.message}</p>
                 )}
               </div>
             </div>

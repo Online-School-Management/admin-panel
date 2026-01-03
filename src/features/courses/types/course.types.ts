@@ -17,9 +17,17 @@ export interface Course {
   duration_months: number
   monthly_fee?: number | null
   total_fee?: number | null
-  status: 'upcoming' | 'active' | 'completed' | 'cancelled'
+  course_type: 'one_on_one' | 'private' | 'group' | 'teacher_training'
+  total_hours?: number | null
+  status: 'upcoming' | 'in_progress' | 'completed' | 'cancelled'
   start_date?: string | null
   end_date?: string | null
+  assigned_teacher: {
+    id: number
+    name: string
+    email: string
+    commission_rate: number | null
+  } | null
   created_at?: string
   updated_at?: string
 }
@@ -37,9 +45,16 @@ export interface CourseCollectionItem {
   duration_months: number
   monthly_fee: number | null
   total_fee: number | null
-  status: 'upcoming' | 'active' | 'completed' | 'cancelled'
+  course_type: 'one_on_one' | 'private' | 'group' | 'teacher_training'
+  total_hours: number | null
+  status: 'upcoming' | 'in_progress' | 'completed' | 'cancelled'
   start_date: string | null
   end_date: string | null
+  assigned_teacher: {
+    id: number
+    name: string
+    commission_rate: number | null
+  } | null
   created_at: string
 }
 
@@ -49,7 +64,8 @@ export interface CreateCourseInput {
   slug?: string
   duration_months?: number
   monthly_fee?: number | null
-  status?: 'upcoming' | 'active' | 'completed' | 'cancelled'
+  course_type?: 'one_on_one' | 'private' | 'group' | 'teacher_training'
+  status?: 'upcoming' | 'in_progress' | 'completed' | 'cancelled'
   start_date?: string | null
   end_date?: string | null
 }
@@ -60,7 +76,8 @@ export interface UpdateCourseInput {
   slug?: string
   duration_months?: number
   monthly_fee?: number | null
-  status?: 'upcoming' | 'active' | 'completed' | 'cancelled'
+  course_type?: 'one_on_one' | 'private' | 'group' | 'teacher_training'
+  status?: 'upcoming' | 'in_progress' | 'completed' | 'cancelled'
   start_date?: string | null
   end_date?: string | null
 }

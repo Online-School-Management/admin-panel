@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { VALIDATION, VALIDATION_MESSAGES, COURSE_STATUS } from '@/constants'
+import { VALIDATION, VALIDATION_MESSAGES, COURSE_STATUS, COURSE_TYPE } from '@/constants'
 
 /**
  * Course form validation schemas
@@ -17,7 +17,8 @@ const courseFormBaseSchema = z.object({
     .min(VALIDATION.MIN_NAME_LENGTH, VALIDATION_MESSAGES.MIN_LENGTH('Title', VALIDATION.MIN_NAME_LENGTH)),
   duration_months: z.number().int().min(1).max(120).optional(),
   monthly_fee: z.number().min(0).max(999999.99).optional().nullable(),
-  status: z.enum([COURSE_STATUS.UPCOMING, COURSE_STATUS.ACTIVE, COURSE_STATUS.COMPLETED, COURSE_STATUS.CANCELLED]).optional(),
+  course_type: z.enum([COURSE_TYPE.ONE_ON_ONE, COURSE_TYPE.PRIVATE, COURSE_TYPE.GROUP, COURSE_TYPE.TEACHER_TRAINING]).optional(),
+  status: z.enum([COURSE_STATUS.UPCOMING, COURSE_STATUS.IN_PROGRESS, COURSE_STATUS.COMPLETED, COURSE_STATUS.CANCELLED]).optional(),
   start_date: z.string().optional().nullable(),
   end_date: z.string().optional().nullable(),
 })

@@ -1,9 +1,12 @@
-import { Calendar, DollarSign, Clock, BookOpen } from 'lucide-react'
+import { useState } from 'react'
+import { Calendar, DollarSign, Clock, BookOpen, UserPlus, User, Mail, Percent } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { DetailSkeleton } from '@/components/common/skeletons/DetailSkeleton'
 import { useCourse } from '../hooks/useCourses'
+import { AssignTeacherModal } from '@/features/course-teachers/components/AssignTeacherModal'
 import format from 'date-fns/format'
 import type { Course } from '../types/course.types'
 import { useTranslation } from '@/i18n/context'
@@ -17,6 +20,7 @@ interface CourseDetailProps {
  */
 export function CourseDetail({ courseSlug }: CourseDetailProps) {
   const { t } = useTranslation()
+  const [assignTeacherModalOpen, setAssignTeacherModalOpen] = useState(false)
   const { data: courseData, isLoading, error } = useCourse(courseSlug)
 
   if (isLoading) {
@@ -49,7 +53,7 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
-      case 'active':
+      case 'in_progress':
         return 'default'
       case 'upcoming':
         return 'secondary'
@@ -64,6 +68,17 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
 
   return (
     <div className="space-y-6">
+      {/* Assign Teacher Button */}
+      <div className="flex justify-end">
+        <Button
+          onClick={() => setAssignTeacherModalOpen(true)}
+          variant="default"
+        >
+          <UserPlus className="h-4 w-4 mr-2" />
+          {t('course.actions.assignTeacher')}
+        </Button>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Information */}
         <div className="lg:col-span-2 space-y-6">
@@ -99,7 +114,7 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
                       {t('course.detail.monthlyFee')}
                     </p>
                     <p className="text-base">
-                      ${course.monthly_fee.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {course.monthly_fee.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Kyats
                     </p>
                   </div>
                 )}
@@ -114,6 +129,28 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
                     </p>
                   </div>
                 )}
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">
+                    {t('course.detail.courseType')}
+                  </p>
+                  <p className="text-base font-semibold">
+                    {course.course_type === 'one_on_one' && 'One-on-One'}
+                    {course.course_type === 'private' && 'Private'}
+                    {course.course_type === 'group' && 'Group'}
+                    {course.course_type === 'teacher_training' && 'Teacher Training'}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    {t('course.detail.totalHours')}
+                  </p>
+                  <p className="text-base">
+                    {course.total_hours && course.total_hours > 0
+                      ? `${course.total_hours} ${t('course.detail.hours') || 'hours'}`
+                      : '0'}
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -156,6 +193,50 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
 
         {/* Sidebar */}
         <div className="space-y-6">
+          {/* Assigned Teacher */}
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('course.detail.assignedTeacher')}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {course.assigned_teacher ? (
+                <>
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      {t('course.detail.teacherName')}
+                    </p>
+                    <p className="text-base font-semibold">{course.assigned_teacher.name}</p>
+                  </div>
+                  <Separator />
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <Mail className="h-4 w-4" />
+                      {t('course.detail.teacherEmail')}
+                    </p>
+                    <p className="text-base">{course.assigned_teacher.email}</p>
+                  </div>
+                  {course.assigned_teacher.commission_rate !== null && (
+                    <>
+                      <Separator />
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                          <Percent className="h-4 w-4" />
+                          {t('course.detail.commissionRate')}
+                        </p>
+                        <p className="text-base">
+                          {course.assigned_teacher.commission_rate.toFixed(2)}%
+                        </p>
+                      </div>
+                    </>
+                  )}
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground">{t('course.detail.noTeacherAssigned')}</p>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Status */}
           <Card>
             <CardHeader>
@@ -200,6 +281,16 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
           </Card>
         </div>
       </div>
+
+      {/* Assign Teacher Modal */}
+      {courseData?.data && (
+        <AssignTeacherModal
+          open={assignTeacherModalOpen}
+          onOpenChange={setAssignTeacherModalOpen}
+          courseId={courseData.data.id}
+          courseTitle={courseData.data.title}
+        />
+      )}
     </div>
   )
 }

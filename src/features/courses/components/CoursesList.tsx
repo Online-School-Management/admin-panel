@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Edit, Trash2, Eye, MoreVertical, RefreshCw } from 'lucide-react'
+import { Search, Edit, Trash2, Eye, MoreVertical, RefreshCw, UserPlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -29,11 +29,32 @@ import {
 import { useCourses, useDeleteCourse } from '../hooks/useCourses'
 import { useSubjects } from '@/features/subjects/hooks/useSubjects'
 import { DeleteCourseDialog } from './DeleteCourseDialog'
+import { AssignTeacherModal } from '@/features/course-teachers/components/AssignTeacherModal'
 import { Pagination } from '@/components/common/Pagination'
 import { TableSkeleton } from '@/components/common/skeletons/TableSkeleton'
 import { PAGINATION, COURSE_STATUS_OPTIONS } from '@/constants'
 import type { CourseCollectionItem } from '../types/course.types'
 import { useTranslation } from '@/i18n/context'
+
+/**
+ * Component to display assigned teacher for a course
+ */
+function AssignedTeacherCell({ course }: { course: CourseCollectionItem }) {
+  if (!course.assigned_teacher) {
+    return <span className="text-muted-foreground text-sm">-</span>
+  }
+
+  return (
+    <div className="flex flex-col">
+      <span className="text-sm font-medium">{course.assigned_teacher.name}</span>
+      {course.assigned_teacher.commission_rate !== null && (
+        <span className="text-xs text-muted-foreground">
+          {course.assigned_teacher.commission_rate.toFixed(2)}%
+        </span>
+      )}
+    </div>
+  )
+}
 
 /**
  * CoursesList component - displays courses in a table with CRUD actions
@@ -47,6 +68,8 @@ export function CoursesList() {
   const perPage = PAGINATION.DEFAULT_PER_PAGE
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedCourse, setSelectedCourse] = useState<CourseCollectionItem | null>(null)
+  const [assignTeacherModalOpen, setAssignTeacherModalOpen] = useState(false)
+  const [selectedCourseForAssignment, setSelectedCourseForAssignment] = useState<CourseCollectionItem | null>(null)
 
   // Fetch subjects for filter dropdown
   const { data: subjectsData } = useSubjects({ per_page: 0 })
@@ -86,7 +109,7 @@ export function CoursesList() {
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
-      case 'active':
+      case 'in_progress':
         return 'default'
       case 'upcoming':
         return 'secondary'
@@ -192,6 +215,7 @@ export function CoursesList() {
                     { width: 'w-32', className: 'hidden md:table-cell' },
                     { width: 'w-32', className: 'hidden lg:table-cell' },
                     { width: 'w-32', className: 'hidden lg:table-cell' },
+                    { width: 'w-40', className: 'hidden xl:table-cell' },
                     { width: 'w-24', className: 'hidden xl:table-cell' },
                     { width: 'w-8', className: 'text-right' },
                   ]}
@@ -214,9 +238,10 @@ export function CoursesList() {
                         <TableHead className="w-16">{t('course.table.no')}</TableHead>
                         <TableHead>{t('course.table.title')}</TableHead>
                         <TableHead>{t('course.table.subject')}</TableHead>
-                        <TableHead className="hidden md:table-cell">{t('course.table.duration')}</TableHead>
                         <TableHead className="hidden lg:table-cell">{t('course.table.monthlyFee')}</TableHead>
-                        <TableHead className="hidden lg:table-cell">{t('course.table.totalFee')}</TableHead>
+                        <TableHead className="hidden md:table-cell">{t('course.table.duration')}</TableHead>
+                        <TableHead className="hidden lg:table-cell">{t('course.table.totalHours')}</TableHead>
+                        <TableHead className="hidden xl:table-cell">{t('course.table.assignedTeacher')}</TableHead>
                         <TableHead className="hidden xl:table-cell">{t('course.table.status')}</TableHead>
                         <TableHead className="text-right">{t('course.table.actions')}</TableHead>
                       </TableRow>
@@ -239,53 +264,70 @@ export function CoursesList() {
                             <TableCell>
                               <span className="text-sm">{course.subject.name}</span>
                             </TableCell>
+                            <TableCell className="hidden lg:table-cell">
+                              {course.monthly_fee
+                                ? `${course.monthly_fee.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Kyats`
+                                : '-'}
+                            </TableCell>
                             <TableCell className="hidden md:table-cell">
                               {course.duration_months} {t('course.table.months')}
                             </TableCell>
                             <TableCell className="hidden lg:table-cell">
-                              {course.monthly_fee
-                                ? `$${course.monthly_fee.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                              {course.total_hours && course.total_hours > 0
+                                ? `${course.total_hours} ${t('course.table.hours')}`
                                 : '-'}
                             </TableCell>
-                            <TableCell className="hidden lg:table-cell">
-                              {course.total_fee
-                                ? `$${course.total_fee.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                                : '-'}
+                            <TableCell className="hidden xl:table-cell">
+                              <AssignedTeacherCell course={course} />
                             </TableCell>
                             <TableCell className="hidden xl:table-cell">
                               <Badge variant={getStatusBadgeVariant(course.status)}>
                                 {t(`common.status.${course.status}`)}
                               </Badge>
                             </TableCell>
-                            <TableCell className="text-right">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="h-10 w-10">
-                                    <MoreVertical className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem asChild>
-                                    <Link to={`/courses/${course.slug}`}>
-                                      <Eye className="h-4 w-4 mr-2" />
-                                      {t('course.actions.view')}
-                                    </Link>
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem asChild>
-                                    <Link to={`/courses/${course.slug}/edit`}>
-                                      <Edit className="h-4 w-4 mr-2" />
-                                      {t('course.actions.edit')}
-                                    </Link>
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    onClick={() => handleDeleteClick(course)}
-                                    className="text-destructive"
-                                  >
-                                    <Trash2 className="h-4 w-4 mr-2" />
-                                    {t('course.actions.delete')}
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
+                            <TableCell>
+                              <div className="flex items-center justify-end gap-2">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  onClick={() => {
+                                    setSelectedCourseForAssignment(course)
+                                    setAssignTeacherModalOpen(true)
+                                  }}
+                                  title={t('course.actions.assignTeacher')}
+                                >
+                                  <UserPlus className="h-4 w-4" />
+                                </Button>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                      <MoreVertical className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem asChild>
+                                      <Link to={`/courses/${course.slug}`}>
+                                        <Eye className="h-4 w-4 mr-2" />
+                                        {t('course.actions.view')}
+                                      </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                      <Link to={`/courses/${course.slug}/edit`}>
+                                        <Edit className="h-4 w-4 mr-2" />
+                                        {t('course.actions.edit')}
+                                      </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() => handleDeleteClick(course)}
+                                      className="text-destructive"
+                                    >
+                                      <Trash2 className="h-4 w-4 mr-2" />
+                                      {t('course.actions.delete')}
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
                             </TableCell>
                           </TableRow>
                         )
@@ -314,6 +356,21 @@ export function CoursesList() {
         courseTitle={selectedCourse?.title || ''}
         isLoading={deleteCourse.isPending}
       />
+
+      {/* Assign Teacher Modal */}
+      {selectedCourseForAssignment && (
+        <AssignTeacherModal
+          open={assignTeacherModalOpen}
+          onOpenChange={(open) => {
+            setAssignTeacherModalOpen(open)
+            if (!open) {
+              setSelectedCourseForAssignment(null)
+            }
+          }}
+          courseId={selectedCourseForAssignment.id}
+          courseTitle={selectedCourseForAssignment.title}
+        />
+      )}
     </>
   )
 }

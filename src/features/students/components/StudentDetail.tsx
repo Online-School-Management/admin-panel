@@ -209,3 +209,5 @@ export function StudentDetail({ studentSlug }: StudentDetailProps) {
   )
 }
 
+
+

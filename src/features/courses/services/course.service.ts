@@ -60,3 +60,5 @@ export async function deleteCourse(slug: string): Promise<void> {
   await apiClient.delete(`/courses/${slug}`)
 }
 
+
+

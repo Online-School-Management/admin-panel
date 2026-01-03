@@ -63,6 +63,7 @@ export const common = {
     suspended: 'Suspended',
     all: 'All',
     upcoming: "Upcoming",
+    in_progress: "In Progress",
     completed: "Completed",
     cancelled: "Cancelled",
   },

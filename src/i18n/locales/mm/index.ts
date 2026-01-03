@@ -15,6 +15,7 @@ import { teacher } from './teacher'
 import { student } from './student'
 import { subject } from './subject'
 import { course } from './course'
+import { courseTeacher } from './course-teacher'
 
 export const mm = {
   common,
@@ -29,6 +30,7 @@ export const mm = {
   student,
   subject,
   course,
+  courseTeacher,
 }
 
 

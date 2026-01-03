@@ -356,7 +356,7 @@ export function TeacherForm({ teacherSlug }: TeacherFormProps) {
                   type="number"
                   step="0.01"
                   min="0"
-                  max="999.99"
+                  max="99"
                   {...register('commission_rate', { valueAsNumber: true })}
                   placeholder={t('teacher.form.enterCommissionRate')}
                   disabled={isSubmitting}

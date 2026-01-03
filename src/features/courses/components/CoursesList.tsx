@@ -116,7 +116,7 @@ export function CoursesList() {
       case 'in_progress':
         return 'default'
       case 'upcoming':
-        return 'secondary'
+        return 'warning'
       case 'completed':
         return 'outline'
       case 'cancelled':

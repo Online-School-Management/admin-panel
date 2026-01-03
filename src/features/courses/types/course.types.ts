@@ -9,6 +9,14 @@ export interface CourseSubject {
   description?: string | null
 }
 
+export interface CourseSchedule {
+  id: number
+  day_of_week: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday'
+  start_time: string
+  end_time: string
+  room_or_link: string | null
+}
+
 export interface Course {
   id: number
   slug: string
@@ -28,6 +36,7 @@ export interface Course {
     email: string
     commission_rate: number | null
   } | null
+  schedules: CourseSchedule[]
   created_at?: string
   updated_at?: string
 }

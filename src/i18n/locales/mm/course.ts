@@ -96,6 +96,8 @@ export const course = {
     endDate: 'ပြီးဆုံးရက်',
     status: 'အခြေအနေ',
     courseStatus: 'သင်တန်း အခြေအနေ',
+    schedules: 'သင်တန်းချိန်ဇယားများ',
+    noSchedules: 'ဤသင်တန်းအတွက် သင်တန်းချိန်ဇယား မသတ်မှတ်ရသေးပါ',
     timestamps: 'အချိန်မှတ်တမ်းများ',
     created: 'ဖန်တီးထားသည်',
     updated: 'အပ်ဒိတ်လုပ်ထားသည်',

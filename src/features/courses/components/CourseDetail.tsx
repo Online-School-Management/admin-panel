@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Calendar, DollarSign, Clock, BookOpen, UserPlus, User, Mail, Percent } from 'lucide-react'
+import { Calendar, DollarSign, Clock, BookOpen, UserPlus, User, Mail, Percent, CalendarDays, CalendarIcon } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -58,7 +58,7 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
       case 'in_progress':
         return 'default'
       case 'upcoming':
-        return 'secondary'
+        return 'warning'
       case 'completed':
         return 'outline'
       case 'cancelled':
@@ -70,23 +70,6 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
 
   return (
     <div className="space-y-6">
-      {/* Action Buttons */}
-      <div className="flex justify-end gap-2">
-        <Button
-          onClick={() => setAssignTeacherModalOpen(true)}
-          variant="default"
-        >
-          <UserPlus className="h-4 w-4 mr-2" />
-          {t('course.actions.assignTeacher')}
-        </Button>
-        <Button
-          onClick={() => setScheduleModalOpen(true)}
-          variant="default"
-        >
-          <Calendar className="h-4 w-4 mr-2" />
-          {t('course.actions.manageSchedule')}
-        </Button>
-      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Information */}
@@ -127,28 +110,6 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
                     </p>
                   </div>
                 )}
-                {course.total_fee && (
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                      <DollarSign className="h-4 w-4" />
-                      {t('course.detail.totalFee')}
-                    </p>
-                    <p className="text-base">
-                      ${course.total_fee.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </p>
-                  </div>
-                )}
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    {t('course.detail.courseType')}
-                  </p>
-                  <p className="text-base font-semibold">
-                    {course.course_type === 'one_on_one' && 'One-on-One'}
-                    {course.course_type === 'private' && 'Private'}
-                    {course.course_type === 'group' && 'Group'}
-                    {course.course_type === 'teacher_training' && 'Teacher Training'}
-                  </p>
-                </div>
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                     <Clock className="h-4 w-4" />
@@ -160,44 +121,50 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
                       : '0'}
                   </p>
                 </div>
+                {course.total_fee && (
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <DollarSign className="h-4 w-4" />
+                      {t('course.detail.totalFee')}
+                    </p>
+                    <p className="text-base">
+                      ${course.total_fee.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                  </div>
+                )}
+                
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">
+                    {t('course.detail.courseType')}
+                  </p>
+                  <p className="text-base font-semibold">
+                    {course.course_type === 'one_on_one' && 'One-on-One'}
+                    {course.course_type === 'private' && 'Private'}
+                    {course.course_type === 'group' && 'Group'}
+                    {course.course_type === 'teacher_training' && 'Teacher Training'}
+                  </p>
+                </div>
+
+                {/* Dates Section */}
+                {(course.start_date || course.end_date) && (
+                  <>
+                    {/* <Separator className="my-4" /> */}
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                        <CalendarIcon className="h-4 w-4" />
+                        {t('course.detail.startDate')}
+                      </p>
+                      {course.start_date && (
+                        <p className="text-base">
+                            {format(new Date(course.start_date), 'MMM dd, yyyy')}
+                        </p>
+                      )}
+                    </div>
+                  </>
+                )}
               </div>
             </CardContent>
           </Card>
-
-          {/* Dates */}
-          {(course.start_date || course.end_date) && (
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('course.detail.dates')}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {course.start_date && (
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        {t('course.detail.startDate')}
-                      </p>
-                      <p className="text-base">
-                        {format(new Date(course.start_date), 'MMM dd, yyyy')}
-                      </p>
-                    </div>
-                  )}
-                  {course.end_date && (
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        {t('course.detail.endDate')}
-                      </p>
-                      <p className="text-base">
-                        {format(new Date(course.end_date), 'MMM dd, yyyy')}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          )}
         </div>
 
         {/* Sidebar */}
@@ -205,7 +172,19 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
           {/* Assigned Teacher */}
           <Card>
             <CardHeader>
-              <CardTitle>{t('course.detail.assignedTeacher')}</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle>{t('course.detail.assignedTeacher')}</CardTitle>
+                {course.assigned_teacher && (
+                  <Button
+                    onClick={() => setAssignTeacherModalOpen(true)}
+                    variant="default"
+                    size="sm"
+                  >
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    {t('course.actions.assignTeacher')}
+                  </Button>
+                )}
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               {course.assigned_teacher ? (
@@ -241,7 +220,94 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
                   )}
                 </>
               ) : (
-                <p className="text-sm text-muted-foreground">{t('course.detail.noTeacherAssigned')}</p>
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">{t('course.detail.noTeacherAssigned')}</p>
+                  <div className="flex justify-center">
+                    <Button
+                      onClick={() => setAssignTeacherModalOpen(true)}
+                      variant="default"
+                    >
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      {t('course.actions.assignTeacher')}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Schedules */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <CalendarDays className="h-5 w-5" />
+                  {t('course.detail.schedules')}
+                </CardTitle>
+                {course.schedules && course.schedules.length > 0 && course.assigned_teacher && (
+                  <Button
+                    onClick={() => setScheduleModalOpen(true)}
+                    variant="default"
+                    size="sm"
+                  >
+                    <Calendar className="h-4 w-4 mr-2" />
+                    {t('course.actions.manageSchedule')}
+                  </Button>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent>
+              {course.schedules && course.schedules.length > 0 ? (
+                <div className="space-y-3">
+                  {course.schedules.map((schedule) => {
+                    const formatTimeTo12Hour = (time24: string): string => {
+                      if (!time24) return time24
+                      const [hours, minutes] = time24.split(':').map(Number)
+                      const period = hours >= 12 ? 'PM' : 'AM'
+                      const hours12 = hours % 12 || 12
+                      const minutesStr = minutes.toString().padStart(2, '0')
+                      return `${hours12}:${minutesStr} ${period}`
+                    }
+
+                    return (
+                      <div key={schedule.id} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Badge variant="default">{schedule.day_of_week}</Badge>
+                          <div>
+                            <p className="font-medium">
+                              {formatTimeTo12Hour(schedule.start_time)} - {formatTimeTo12Hour(schedule.end_time)}
+                            </p>
+                            {schedule.room_or_link && (
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {t('schedule.modal.roomOrLink')}: {schedule.room_or_link}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    {t('course.detail.noSchedules')}
+                  </p>
+                  <div className="flex justify-center">
+                    <Button
+                      onClick={() => setScheduleModalOpen(true)}
+                      variant="default"
+                    >
+                      <Calendar className="h-4 w-4 mr-2" />
+                      {t('course.actions.manageSchedule')}
+                    </Button>
+                  </div>
+                  {!course.assigned_teacher && (
+                    <p className="text-xs text-muted-foreground text-center">
+                      {t('schedule.modal.assignTeacherFirst')}
+                    </p>
+                  )}
+                </div>
               )}
             </CardContent>
           </Card>

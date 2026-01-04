@@ -98,16 +98,20 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
                     <Clock className="h-4 w-4" />
                     {t('course.detail.duration')}
                   </p>
-                  <p className="text-base">{course.duration_months} {t('course.detail.months')}</p>
+                  <p className="text-base">
+                    {course.duration} {course.duration_unit === 'day' ? t('course.detail.days') : t('course.detail.months')}
+                  </p>
                 </div>
-                {course.monthly_fee && (
+                {course.monthly_fee !== null && course.monthly_fee !== undefined && (
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                       <DollarSign className="h-4 w-4" />
                       {t('course.detail.monthlyFee')}
                     </p>
                     <p className="text-base">
-                      {course.monthly_fee.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Kyats
+                      {course.monthly_fee === 0 
+                        ? 'Free' 
+                        : `${course.monthly_fee.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Kyats`}
                     </p>
                   </div>
                 )}

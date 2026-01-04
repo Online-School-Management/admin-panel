@@ -15,7 +15,8 @@ const courseFormBaseSchema = z.object({
   title: z
     .string()
     .min(VALIDATION.MIN_NAME_LENGTH, VALIDATION_MESSAGES.MIN_LENGTH('Title', VALIDATION.MIN_NAME_LENGTH)),
-  duration_months: z.number().int().min(1).max(120).optional(),
+  duration: z.number().int().min(1).optional(),
+  duration_unit: z.enum(['month', 'day']).optional(),
   monthly_fee: z.number().min(0).max(999999.99).optional().nullable(),
   course_type: z.enum([COURSE_TYPE.ONE_ON_ONE, COURSE_TYPE.PRIVATE, COURSE_TYPE.GROUP, COURSE_TYPE.TEACHER_TRAINING]).optional(),
   status: z.enum([COURSE_STATUS.UPCOMING, COURSE_STATUS.IN_PROGRESS, COURSE_STATUS.COMPLETED, COURSE_STATUS.CANCELLED]).optional(),

@@ -23,7 +23,7 @@ export const course = {
   form: {
     subject: 'ဘာသာရပ်',
     title: 'ခေါင်းစဉ်',
-    durationMonths: 'ကြာချိန် (လ)',
+    duration: 'ကြာချိန်',
     monthlyFee: 'လစဉ် သင်တန်းကြေး',
     totalFee: 'စုစုပေါင်း သင်တန်းကြေး',
     courseType: 'သင်တန်း အမျိုးအစား',
@@ -33,10 +33,12 @@ export const course = {
     endDate: 'ပြီးဆုံးရက်',
     selectSubject: 'ဘာသာရပ် ရွေးချယ်ရန်',
     enterTitle: 'သင်တန်း ခေါင်းစဉ် ထည့်ရန်',
-    enterDuration: 'ကြာချိန် (လ) ထည့်ရန်',
+    enterDuration: 'ကြာချိန် ထည့်ရန်',
     enterMonthlyFee: 'ကျောင်းသား သင်တန်းကြေး ထည့်ရန်',
     enterTotalFee: 'စုစုပေါင်း သင်တန်းကြေး ထည့်ရန်',
     selectStatus: 'အခြေအနေ ရွေးချယ်ရန်',
+    month: 'လ',
+    day: 'ရက်',
   },
 
   // Table headers
@@ -46,6 +48,7 @@ export const course = {
     subject: 'ဘာသာရပ်',
     duration: 'ကြာချိန်',
     months: 'လ',
+    days: 'ရက်',
     monthlyFee: 'သင်တန်းကြေး',
     totalHours: 'စုစုပေါင်း နာရီ',
     hours: 'နာရီ',
@@ -86,6 +89,7 @@ export const course = {
     title: 'ခေါင်းစဉ်',
     duration: 'ကြာချိန်',
     months: 'လ',
+    days: 'ရက်',
     monthlyFee: 'လစဉ် သင်တန်းကြေး',
     totalFee: 'စုစုပေါင်း သင်တန်းကြေး',
     courseType: 'သင်တန်း အမျိုးအစား',

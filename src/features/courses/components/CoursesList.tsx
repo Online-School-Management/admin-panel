@@ -271,12 +271,14 @@ export function CoursesList() {
                               <span className="text-sm">{course.subject.name}</span>
                             </TableCell>
                             <TableCell className="hidden lg:table-cell">
-                              {course.monthly_fee
-                                ? `${course.monthly_fee.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Kyats`
-                                : '-'}
+                              {course.monthly_fee === null || course.monthly_fee === undefined
+                                ? '-'
+                                : course.monthly_fee === 0
+                                ? 'Free'
+                                : `${course.monthly_fee.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Kyats`}
                             </TableCell>
                             <TableCell className="hidden md:table-cell">
-                              {course.duration_months} {t('course.table.months')}
+                              {course.duration} {course.duration_unit === 'day' ? t('course.table.days') : t('course.table.months')}
                             </TableCell>
                             <TableCell className="hidden lg:table-cell">
                               {course.total_hours && course.total_hours > 0

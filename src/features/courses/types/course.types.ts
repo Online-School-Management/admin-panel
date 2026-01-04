@@ -37,7 +37,8 @@ export interface Course {
   slug: string
   subject: CourseSubject
   title: string
-  duration_months: number
+  duration: number
+  duration_unit: 'month' | 'day'
   monthly_fee?: number | null
   total_fee?: number | null
   course_type: 'one_on_one' | 'private' | 'group' | 'teacher_training'
@@ -67,7 +68,8 @@ export interface CourseCollectionItem {
     slug: string
   }
   title: string
-  duration_months: number
+  duration: number
+  duration_unit: 'month' | 'day'
   monthly_fee: number | null
   total_fee: number | null
   course_type: 'one_on_one' | 'private' | 'group' | 'teacher_training'
@@ -87,7 +89,8 @@ export interface CreateCourseInput {
   subject_id: number
   title: string
   slug?: string
-  duration_months?: number
+  duration?: number
+  duration_unit?: 'month' | 'day'
   monthly_fee?: number | null
   course_type?: 'one_on_one' | 'private' | 'group' | 'teacher_training'
   status?: 'upcoming' | 'in_progress' | 'completed' | 'cancelled'
@@ -99,7 +102,8 @@ export interface UpdateCourseInput {
   subject_id?: number
   title?: string
   slug?: string
-  duration_months?: number
+  duration?: number
+  duration_unit?: 'month' | 'day'
   monthly_fee?: number | null
   course_type?: 'one_on_one' | 'private' | 'group' | 'teacher_training'
   status?: 'upcoming' | 'in_progress' | 'completed' | 'cancelled'

@@ -69,7 +69,8 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
     defaultValues: {
       subject_id: undefined,
       title: '',
-      duration_months: 3,
+      duration: 3,
+      duration_unit: 'month',
       monthly_fee: undefined,
       course_type: COURSE_TYPE.GROUP,
       status: COURSE_STATUS.UPCOMING,
@@ -106,7 +107,8 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
     reset({
       subject_id: course.subject.id,
       title: course.title || '',
-      duration_months: course.duration_months || 3,
+      duration: course.duration || 3,
+      duration_unit: course.duration_unit || 'month',
       monthly_fee: course.monthly_fee || undefined,
       course_type: course.course_type || COURSE_TYPE.GROUP,
       status: course.status || COURSE_STATUS.UPCOMING,
@@ -129,7 +131,8 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
       const updateData: UpdateCourseInput = {
         subject_id: updateFormData.subject_id || undefined,
         title: updateFormData.title || undefined,
-        duration_months: updateFormData.duration_months || undefined,
+        duration: updateFormData.duration || undefined,
+        duration_unit: updateFormData.duration_unit || undefined,
         monthly_fee: updateFormData.monthly_fee ?? undefined,
         course_type: updateFormData.course_type || undefined,
         status: updateFormData.status || undefined,
@@ -142,7 +145,8 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
       const createData: CreateCourseInput = {
         subject_id: createFormData.subject_id,
         title: createFormData.title,
-        duration_months: createFormData.duration_months || undefined,
+        duration: createFormData.duration || undefined,
+        duration_unit: createFormData.duration_unit || undefined,
         monthly_fee: createFormData.monthly_fee ?? undefined,
         course_type: createFormData.course_type || undefined,
         status: createFormData.status || undefined,
@@ -218,20 +222,38 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
                 )}
               </div>
 
-              {/* Duration Months */}
+              {/* Duration */}
               <div className="space-y-2">
-                <Label htmlFor="duration_months">{t('course.form.durationMonths')}</Label>
-                <Input
-                  id="duration_months"
-                  type="number"
-                  min="1"
-                  max="120"
-                  {...register('duration_months', { valueAsNumber: true })}
-                  placeholder={t('course.form.enterDuration')}
-                  disabled={isSubmitting}
-                />
-                {errors.duration_months && (
-                  <p className="text-sm text-destructive">{errors.duration_months.message}</p>
+                <Label htmlFor="duration">{t('course.form.duration')}</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="duration"
+                    type="number"
+                    min="1"
+                    className="flex-1"
+                    {...register('duration', { valueAsNumber: true })}
+                    placeholder={t('course.form.enterDuration')}
+                    disabled={isSubmitting}
+                  />
+                  <Select
+                    value={watch('duration_unit') || 'month'}
+                    onValueChange={(value) => setValue('duration_unit', value as 'month' | 'day', { shouldValidate: true })}
+                    disabled={isSubmitting}
+                  >
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="month">{t('course.form.month')}</SelectItem>
+                      <SelectItem value="day">{t('course.form.day')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {errors.duration && (
+                  <p className="text-sm text-destructive">{errors.duration.message}</p>
+                )}
+                {errors.duration_unit && (
+                  <p className="text-sm text-destructive">{errors.duration_unit.message}</p>
                 )}
               </div>
 

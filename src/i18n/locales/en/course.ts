@@ -23,7 +23,7 @@ export const course = {
   form: {
     subject: 'Subject',
     title: 'Title',
-    durationMonths: 'Duration (Months)',
+    duration: 'Duration',
     monthlyFee: 'Monthly Fee for a student',
     totalFee: 'Total Fee',
     courseType: 'Course Type',
@@ -33,10 +33,12 @@ export const course = {
     endDate: 'End Date',
     selectSubject: 'Select a subject',
     enterTitle: 'Enter course title',
-    enterDuration: 'Enter duration in months',
+    enterDuration: 'Enter duration',
     enterMonthlyFee: 'Enter monthly fee',
     enterTotalFee: 'Enter total fee',
     selectStatus: 'Select status',
+    month: 'Month',
+    day: 'Day',
   },
 
   // Table headers
@@ -46,6 +48,7 @@ export const course = {
     subject: 'Subject',
     duration: 'Duration',
     months: 'months',
+    days: 'days',
     monthlyFee: 'Monthly Fee/student',
     totalHours: 'Total Hours',
     hours: 'hours',
@@ -86,6 +89,7 @@ export const course = {
     title: 'Title',
     duration: 'Duration',
     months: 'months',
+    days: 'days',
     monthlyFee: 'Monthly Fee / per student',
     totalFee: 'Total Fee / per student',
     courseType: 'Course Type',

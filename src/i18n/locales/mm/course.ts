@@ -63,8 +63,10 @@ export const course = {
     searchCourses: 'သင်တန်းများကို ရှာဖွေရန်...',
     status: 'အခြေအနေ',
     subject: 'ဘာသာရပ်',
+    teacher: 'ဆရာ',
     allStatuses: 'အခြေအနေ အားလုံး',
     allSubjects: 'ဘာသာရပ် အားလုံး',
+    allTeachers: 'ဆရာ အားလုံး',
   },
 
   // Messages

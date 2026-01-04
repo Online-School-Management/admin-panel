@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/select'
 import { useCourses, useDeleteCourse } from '../hooks/useCourses'
 import { useSubjects } from '@/features/subjects/hooks/useSubjects'
+import { useTeachers } from '@/features/teachers/hooks/useTeachers'
 import { DeleteCourseDialog } from './DeleteCourseDialog'
 import { AssignTeacherModal } from '@/features/course-teachers/components/AssignTeacherModal'
 import { ScheduleModal } from '@/features/schedules/components/ScheduleModal'
@@ -66,6 +67,7 @@ export function CoursesList() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [subjectFilter, setSubjectFilter] = useState<string>('all')
+  const [teacherFilter, setTeacherFilter] = useState<string>('all')
   const [page, setPage] = useState<number>(PAGINATION.DEFAULT_PAGE)
   const perPage = PAGINATION.DEFAULT_PER_PAGE
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -77,12 +79,15 @@ export function CoursesList() {
 
   // Fetch subjects for filter dropdown
   const { data: subjectsData } = useSubjects({ per_page: 0 })
+  // Fetch teachers for filter dropdown
+  const { data: teachersData } = useTeachers({ per_page: 0 })
 
   const { data, isLoading, error } = useCourses({
     page,
     per_page: perPage,
     status: statusFilter !== 'all' ? statusFilter : undefined,
     subject_id: subjectFilter !== 'all' ? Number(subjectFilter) : undefined,
+    teacher_id: teacherFilter !== 'all' ? Number(teacherFilter) : undefined,
     search: search || undefined,
   })
 
@@ -108,6 +113,7 @@ export function CoursesList() {
     setSearch('')
     setStatusFilter('all')
     setSubjectFilter('all')
+    setTeacherFilter('all')
     setPage(1)
   }
 
@@ -129,6 +135,7 @@ export function CoursesList() {
   const courses = data?.data || []
   const pagination = data?.meta?.pagination
   const subjects = subjectsData?.data || []
+  const teachers = teachersData?.data || []
 
   if (error) {
     return (
@@ -193,6 +200,25 @@ export function CoursesList() {
               {subjects.map((subject) => (
                 <SelectItem key={subject.id} value={String(subject.id)}>
                   {subject.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={teacherFilter}
+            onValueChange={(value) => {
+              setTeacherFilter(value)
+              setPage(1)
+            }}
+          >
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectValue placeholder={t('course.filters.teacher')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('course.filters.allTeachers')}</SelectItem>
+              {teachers.map((teacher) => (
+                <SelectItem key={teacher.id} value={String(teacher.id)}>
+                  {teacher.user.name}
                 </SelectItem>
               ))}
             </SelectContent>

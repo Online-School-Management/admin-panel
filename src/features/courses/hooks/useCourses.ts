@@ -43,6 +43,7 @@ export function useCourses(params?: {
   sort_order?: string
   status?: string
   subject_id?: number
+  teacher_id?: number
 }) {
   return useQuery({
     queryKey: courseKeys.list(params),

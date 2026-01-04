@@ -63,8 +63,10 @@ export const course = {
     searchCourses: 'Search courses...',
     status: 'Status',
     subject: 'Subject',
+    teacher: 'Teacher',
     allStatuses: 'All Statuses',
     allSubjects: 'All Subjects',
+    allTeachers: 'All Teachers',
   },
 
   // Messages

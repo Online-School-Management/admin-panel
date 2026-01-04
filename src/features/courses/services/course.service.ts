@@ -21,6 +21,7 @@ export async function getCourses(params?: {
   sort_order?: string
   status?: string
   subject_id?: number
+  teacher_id?: number
 }): Promise<CoursesResponse> {
   const response = await apiClient.get<CoursesResponse>('/courses', { params })
   return response.data

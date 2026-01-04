@@ -98,6 +98,8 @@ export const course = {
     courseStatus: 'Course Status',
     schedules: 'Schedules',
     noSchedules: 'No schedules defined for this course',
+    classSessions: 'Class Sessions',
+    moreSessions: '+{{count}} more sessions',
     timestamps: 'Timestamps',
     created: 'Created',
     updated: 'Updated',

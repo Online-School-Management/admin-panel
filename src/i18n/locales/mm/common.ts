@@ -64,6 +64,7 @@ export const common = {
     all: 'အားလုံး',
     upcoming: "Upcoming",
     in_progress: "လုပ်ဆောင်နေသည်",
+    scheduled: "သတ်မှတ်ထားသည်",
     completed: "Completed",
     cancelled: "Cancelled",
   },

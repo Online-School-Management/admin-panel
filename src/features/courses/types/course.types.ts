@@ -17,6 +17,21 @@ export interface CourseSchedule {
   room_or_link: string | null
 }
 
+export interface ClassSession {
+  id: number
+  schedule_id: number
+  schedule: {
+    id: number
+    day_of_week: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday'
+    start_time: string
+    end_time: string
+    room_or_link: string | null
+  }
+  session_date: string
+  status: 'scheduled' | 'completed' | 'cancelled'
+  topic_covered: string | null
+}
+
 export interface Course {
   id: number
   slug: string
@@ -37,6 +52,7 @@ export interface Course {
     commission_rate: number | null
   } | null
   schedules: CourseSchedule[]
+  class_sessions: ClassSession[]
   created_at?: string
   updated_at?: string
 }

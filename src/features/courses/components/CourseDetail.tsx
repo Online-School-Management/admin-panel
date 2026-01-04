@@ -8,6 +8,7 @@ import { DetailSkeleton } from '@/components/common/skeletons/DetailSkeleton'
 import { useCourse } from '../hooks/useCourses'
 import { AssignTeacherModal } from '@/features/course-teachers/components/AssignTeacherModal'
 import { ScheduleModal } from '@/features/schedules/components/ScheduleModal'
+import { ClassSessionsCard } from './ClassSessionsCard'
 import format from 'date-fns/format'
 import type { Course } from '../types/course.types'
 import { useTranslation } from '@/i18n/context'
@@ -165,6 +166,12 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
               </div>
             </CardContent>
           </Card>
+
+          {/* Class Sessions */}
+          <ClassSessionsCard 
+            classSessions={course.class_sessions} 
+            maxDisplay={28}
+          />
         </div>
 
         {/* Sidebar */}

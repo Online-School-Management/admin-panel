@@ -64,6 +64,7 @@ export const common = {
     all: 'All',
     upcoming: "Upcoming",
     in_progress: "In Progress",
+    scheduled: "Scheduled",
     completed: "Completed",
     cancelled: "Cancelled",
   },

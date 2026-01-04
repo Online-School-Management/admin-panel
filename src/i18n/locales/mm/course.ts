@@ -39,6 +39,8 @@ export const course = {
     selectStatus: 'အခြေအနေ ရွေးချယ်ရန်',
     month: 'လ',
     day: 'ရက်',
+    notes: 'မှတ်စု',
+    enterNotes: 'သင်တန်း မှတ်စု ထည့်ရန်...',
   },
 
   // Table headers
@@ -100,6 +102,7 @@ export const course = {
     dates: 'ရက်စွဲများ',
     startDate: 'စတင်ရက်',
     endDate: 'ပြီးဆုံးရက်',
+    notes: 'မှတ်စု',
     status: 'အခြေအနေ',
     courseStatus: 'သင်တန်း အခြေအနေ',
     schedules: 'သင်တန်းချိန်ဇယားများ',

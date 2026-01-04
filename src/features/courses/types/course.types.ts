@@ -46,6 +46,7 @@ export interface Course {
   status: 'upcoming' | 'in_progress' | 'completed' | 'cancelled'
   start_date?: string | null
   end_date?: string | null
+  notes?: string | null
   assigned_teacher: {
     id: number
     name: string
@@ -77,6 +78,7 @@ export interface CourseCollectionItem {
   status: 'upcoming' | 'in_progress' | 'completed' | 'cancelled'
   start_date: string | null
   end_date: string | null
+  notes: string | null
   assigned_teacher: {
     id: number
     name: string
@@ -96,6 +98,7 @@ export interface CreateCourseInput {
   status?: 'upcoming' | 'in_progress' | 'completed' | 'cancelled'
   start_date?: string | null
   end_date?: string | null
+  notes?: string | null
 }
 
 export interface UpdateCourseInput {
@@ -109,6 +112,7 @@ export interface UpdateCourseInput {
   status?: 'upcoming' | 'in_progress' | 'completed' | 'cancelled'
   start_date?: string | null
   end_date?: string | null
+  notes?: string | null
 }
 
 export interface CoursesResponse {

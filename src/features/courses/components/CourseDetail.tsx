@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Calendar, DollarSign, Clock, BookOpen, UserPlus, User, Mail, Percent, CalendarDays, CalendarIcon } from 'lucide-react'
+import { Calendar, DollarSign, Clock, BookOpen, UserPlus, User, Mail, Percent, CalendarDays, CalendarIcon, FileText } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -164,6 +164,20 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
                             {format(new Date(course.start_date), 'MMM dd, yyyy')}
                         </p>
                       )}
+                    </div>
+                  </>
+                )}
+
+                {/* Notes Section */}
+                {course.notes && (
+                  <>
+                    <Separator className="my-4 md:col-span-2" />
+                    <div className="space-y-2 md:col-span-2">
+                      <p className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+                        <FileText className="h-4 w-4" />
+                        {t('course.detail.notes')}
+                      </p>
+                      <p className="text-base whitespace-pre-wrap">{course.notes}</p>
                     </div>
                   </>
                 )}

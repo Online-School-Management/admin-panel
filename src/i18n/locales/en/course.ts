@@ -39,6 +39,8 @@ export const course = {
     selectStatus: 'Select status',
     month: 'Month',
     day: 'Day',
+    notes: 'Notes',
+    enterNotes: 'Enter course notes...',
   },
 
   // Table headers
@@ -100,6 +102,7 @@ export const course = {
     dates: 'Dates',
     startDate: 'Start Date',
     endDate: 'End Date',
+    notes: 'Notes',
     status: 'Status',
     courseStatus: 'Course Status',
     schedules: 'Schedules',

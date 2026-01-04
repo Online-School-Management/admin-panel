@@ -22,6 +22,7 @@ const courseFormBaseSchema = z.object({
   status: z.enum([COURSE_STATUS.UPCOMING, COURSE_STATUS.IN_PROGRESS, COURSE_STATUS.COMPLETED, COURSE_STATUS.CANCELLED]).optional(),
   start_date: z.string().min(1, VALIDATION_MESSAGES.REQUIRED('Start date')),
   end_date: z.string().optional().nullable(),
+  notes: z.string().max(5000).optional().nullable(),
 })
 
 /**

@@ -6,6 +6,7 @@ import { ArrowLeft, Plus, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectContent,
@@ -76,6 +77,7 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
       status: COURSE_STATUS.UPCOMING,
       start_date: '',
       end_date: undefined,
+      notes: undefined,
     },
   })
 
@@ -114,6 +116,7 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
       status: course.status || COURSE_STATUS.UPCOMING,
         start_date: course.start_date || '',
       end_date: course.end_date || undefined,
+      notes: course.notes || undefined,
     }, {
       keepDefaultValues: false,
     })
@@ -138,6 +141,7 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
         status: updateFormData.status || undefined,
         start_date: updateFormData.start_date,
         end_date: updateFormData.end_date || undefined,
+        notes: updateFormData.notes ?? undefined,
       }
       updateCourse.mutate({ slug: courseSlug, data: updateData })
     } else {
@@ -152,6 +156,7 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
         status: createFormData.status || undefined,
         start_date: createFormData.start_date,
         end_date: createFormData.end_date || undefined,
+        notes: createFormData.notes ?? undefined,
       }
       createCourse.mutate(createData)
     }
@@ -257,46 +262,24 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
                 )}
               </div>
 
+              {/* Monthly Fee and Course Type - Horizontal */}
               {/* Monthly Fee */}
-              <div className="space-y-2">
-                <Label htmlFor="monthly_fee">{t('course.form.monthlyFee')}</Label>
-                <Input
-                  id="monthly_fee"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  {...register('monthly_fee', { valueAsNumber: true })}
-                  placeholder={t('course.form.enterMonthlyFee')}
-                  disabled={isSubmitting}
-                />
-                {errors.monthly_fee && (
-                  <p className="text-sm text-destructive">{errors.monthly_fee.message}</p>
-                )}
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="monthly_fee">{t('course.form.monthlyFee')}</Label>
+                  <Input
+                    id="monthly_fee"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    {...register('monthly_fee', { valueAsNumber: true })}
+                    placeholder={t('course.form.enterMonthlyFee')}
+                    disabled={isSubmitting}
+                  />
+                  {errors.monthly_fee && (
+                    <p className="text-sm text-destructive">{errors.monthly_fee.message}</p>
+                  )}
+                </div>
 
-              {/* Course Type */}
-              <div className="space-y-2">
-                <Label htmlFor="course_type">{t('course.form.courseType')}</Label>
-                <Select
-                  value={watch('course_type') || COURSE_TYPE.GROUP}
-                  onValueChange={(value) => setValue('course_type', value as typeof COURSE_TYPE.GROUP, { shouldValidate: true })}
-                  disabled={isSubmitting}
-                >
-                  <SelectTrigger id="course_type">
-                    <SelectValue placeholder={t('course.form.selectCourseType')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {COURSE_TYPE_OPTIONS.map((type) => (
-                      <SelectItem key={type.value} value={type.value}>
-                        {type.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.course_type && (
-                  <p className="text-sm text-destructive">{errors.course_type.message}</p>
-                )}
-              </div>
             </div>
 
             {/* Right Column */}
@@ -355,7 +338,47 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
                   <p className="text-sm text-destructive">{errors.end_date.message}</p>
                 )}
               </div>
+
+              {/* Course Type */}
+                <div className="space-y-2">
+                  <Label htmlFor="course_type">{t('course.form.courseType')}</Label>
+                  <Select
+                    value={watch('course_type') || COURSE_TYPE.GROUP}
+                    onValueChange={(value) => setValue('course_type', value as typeof COURSE_TYPE.GROUP, { shouldValidate: true })}
+                    disabled={isSubmitting}
+                  >
+                    <SelectTrigger id="course_type">
+                      <SelectValue placeholder={t('course.form.selectCourseType')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {COURSE_TYPE_OPTIONS.map((type) => (
+                        <SelectItem key={type.value} value={type.value}>
+                          {type.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.course_type && (
+                    <p className="text-sm text-destructive">{errors.course_type.message}</p>
+                  )}
+                </div>
             </div>
+          </div>
+
+          {/* Notes - Full Width */}
+          <div className="space-y-2">
+            <Label htmlFor="notes">{t('course.form.notes')}</Label>
+            <Textarea
+              id="notes"
+              {...register('notes')}
+              placeholder={t('course.form.enterNotes')}
+              disabled={isSubmitting}
+              rows={4}
+              maxLength={5000}
+            />
+            {errors.notes && (
+              <p className="text-sm text-destructive">{errors.notes.message}</p>
+            )}
           </div>
 
           {/* Form Actions */}

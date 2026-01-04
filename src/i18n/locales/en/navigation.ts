@@ -13,6 +13,7 @@ export const navigation = {
   adminPanel: 'Admin Panel',
   closeSidebar: 'Close sidebar',
   courses: 'Courses',
+  enrollments: 'Enrollment',
 }
 
 

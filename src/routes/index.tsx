@@ -46,6 +46,12 @@ const CreateCoursePage = lazy(() => import('@/pages/courses/create'))
 const EditCoursePage = lazy(() => import('@/pages/courses/edit'))
 const CourseDetailPage = lazy(() => import('@/pages/courses/detail'))
 
+// Enrollment pages
+const EnrollmentsListPage = lazy(() => import('@/pages/enrollments/list'))
+const CreateEnrollmentPage = lazy(() => import('@/pages/enrollments/create'))
+const EditEnrollmentPage = lazy(() => import('@/pages/enrollments/edit'))
+const EnrollmentDetailPage = lazy(() => import('@/pages/enrollments/detail'))
+
 /**
  * Route configuration using createBrowserRouter (data router API)
  * Each route is individually wrapped with ProtectedRoute (which includes AdminLayout)
@@ -159,6 +165,22 @@ export const router = createBrowserRouter([
   {
     path: '/courses/:slug',
     element: <ProtectedRoute><CourseDetailPage /></ProtectedRoute>,
+  },
+  {
+    path: '/enrollments',
+    element: <ProtectedRoute><EnrollmentsListPage /></ProtectedRoute>,
+  },
+  {
+    path: '/enrollments/new',
+    element: <ProtectedRoute><CreateEnrollmentPage /></ProtectedRoute>,
+  },
+  {
+    path: '/enrollments/:id/edit',
+    element: <ProtectedRoute><EditEnrollmentPage /></ProtectedRoute>,
+  },
+  {
+    path: '/enrollments/:id',
+    element: <ProtectedRoute><EnrollmentDetailPage /></ProtectedRoute>,
   },
 ])
 

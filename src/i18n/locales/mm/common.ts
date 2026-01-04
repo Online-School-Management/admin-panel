@@ -67,6 +67,7 @@ export const common = {
     scheduled: "သတ်မှတ်ထားသည်",
     completed: "Completed",
     cancelled: "Cancelled",
+    dropped: "ထွက်သွားသည်",
   },
 
   // Common messages

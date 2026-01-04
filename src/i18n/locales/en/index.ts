@@ -17,6 +17,7 @@ import { subject } from './subject'
 import { course } from './course'
 import { courseTeacher } from './course-teacher'
 import { schedule } from './schedule'
+import { enrollment } from './enrollment'
 
 export const en = {
   common,
@@ -33,6 +34,7 @@ export const en = {
   course,
   courseTeacher,
   schedule,
+  enrollment,
 }
 
 

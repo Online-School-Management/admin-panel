@@ -67,6 +67,7 @@ export const common = {
     scheduled: "Scheduled",
     completed: "Completed",
     cancelled: "Cancelled",
+    dropped: "Dropped",
   },
 
   // Common messages

@@ -10,6 +10,7 @@ export const mainNavigation: NavigationItem[] = [
   { to: '/dashboard', icon: Home, label: 'Dashboard' },
   { to: '/teachers', icon: GraduationCap, label: 'Teachers' },
   { to: '/students', icon: Users, label: 'Students' },
+  { to: '/enrollments', icon: BookText, label: 'Enrollments' }
 ]
 
 export const subjectNavigation: NavigationItem[] = [

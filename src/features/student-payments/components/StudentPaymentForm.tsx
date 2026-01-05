@@ -240,14 +240,14 @@ export function StudentPaymentForm({ paymentId }: StudentPaymentFormProps) {
             <div className="space-y-2">
               <Label htmlFor="received_by">{t('studentPayment.form.receivedBy')}</Label>
               <Select
-                value={watch('received_by')?.toString() || ''}
-                onValueChange={(value) => setValue('received_by', value ? parseInt(value) : undefined)}
+                value={watch('received_by')?.toString() || 'none'}
+                onValueChange={(value) => setValue('received_by', value === 'none' ? undefined : parseInt(value))}
               >
                 <SelectTrigger id="received_by" className={errors.received_by ? 'border-destructive' : ''}>
                   <SelectValue placeholder={t('studentPayment.form.selectAdmin')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">{t('studentPayment.form.noAdmin')}</SelectItem>
+                  <SelectItem value="none">{t('studentPayment.form.noAdmin')}</SelectItem>
                   {adminsData.data.map((admin) => (
                     <SelectItem key={admin.id} value={admin.id.toString()}>
                       {admin.user.name}

@@ -59,6 +59,7 @@ export const studentPayment = {
   messages: {
     noPayments: 'No payments available',
     noPaymentsFound: 'No payments found matching your criteria',
+    noPaymentsForMonth: 'No payments found for this month',
     updating: 'Updating...',
     deleting: 'Deleting...',
     paymentNotFound: 'Payment not found',
@@ -102,6 +103,7 @@ export const studentPayment = {
     update: 'Update Payment',
     cancel: 'Cancel',
     clear: 'Clear Filters',
+    markAsPaid: 'Mark as Paid',
   },
 
   // Dialog
@@ -111,7 +113,7 @@ export const studentPayment = {
   },
 
   // Helper text
-  monthNumber: 'Month {number}',
+  monthNumber: 'Month {{number}}',
 }
 
 

@@ -43,6 +43,8 @@ export function useStudentPayments(params?: {
   search?: string
   order_by?: string
   order_dir?: string
+  month?: number
+  year?: number
 }) {
   return useQuery({
     queryKey: studentPaymentKeys.list(params),

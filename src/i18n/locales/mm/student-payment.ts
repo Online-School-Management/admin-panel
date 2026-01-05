@@ -59,6 +59,7 @@ export const studentPayment = {
   messages: {
     noPayments: 'ငွေပေးချေမှု မရှိပါ',
     noPaymentsFound: 'သင့်စံနှုန်းနှင့် ကိုက်ညီသော ငွေပေးချေမှု မတွေ့ရှိပါ',
+    noPaymentsForMonth: 'ဤလအတွက် ငွေပေးချေမှု မတွေ့ရှိပါ',
     updating: 'အပ်ဒိတ်လုပ်နေသည်...',
     deleting: 'ဖျက်နေသည်...',
     paymentNotFound: 'ငွေပေးချေမှု မတွေ့ရှိပါ',
@@ -102,6 +103,7 @@ export const studentPayment = {
     update: 'ငွေပေးချေမှု အပ်ဒိတ်လုပ်ရန်',
     cancel: 'ပယ်ဖျက်ရန်',
     clear: 'စစ်ထုတ်မှုများ ရှင်းလင်းရန်',
+    markAsPaid: 'ပေးချေပြီးဟု အမှတ်အသားပြုရန်',
   },
 
   // Dialog
@@ -111,7 +113,7 @@ export const studentPayment = {
   },
 
   // Helper text
-  monthNumber: 'လ {number}',
+  monthNumber: 'လ {{number}}',
 }
 
 

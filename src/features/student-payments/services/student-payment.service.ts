@@ -22,6 +22,8 @@ export async function getStudentPayments(params?: {
   search?: string
   order_by?: string
   order_dir?: string
+  month?: number
+  year?: number
 }): Promise<StudentPaymentsResponse> {
   const response = await apiClient.get<StudentPaymentsResponse>('/student-payments', { params })
   return response.data

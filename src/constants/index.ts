@@ -100,6 +100,32 @@ export const COURSE_STATUS = {
   CANCELLED: 'cancelled',
 } as const
 
+// Payment status options
+export const PAYMENT_STATUS = {
+  PENDING: 'pending',
+  PAID: 'paid',
+} as const
+
+export const PAYMENT_STATUS_OPTIONS = [
+  { value: PAYMENT_STATUS.PENDING, label: 'Pending' },
+  { value: PAYMENT_STATUS.PAID, label: 'Paid' },
+] as const
+
+// Payment method options
+export const PAYMENT_METHOD = {
+  KBZ_PAY: 'kbz_pay',
+  AYA_PAY: 'aya_pay',
+  KBZ_MOBILE_BANKING: 'kbz_mobile_banking',
+  WAVE_MONEY: 'wave_money',
+} as const
+
+export const PAYMENT_METHOD_OPTIONS = [
+  { value: PAYMENT_METHOD.KBZ_PAY, label: 'KBZ Pay' },
+  { value: PAYMENT_METHOD.AYA_PAY, label: 'AYA Pay' },
+  { value: PAYMENT_METHOD.KBZ_MOBILE_BANKING, label: 'KBZ Mobile Banking' },
+  { value: PAYMENT_METHOD.WAVE_MONEY, label: 'Wave Money' },
+] as const
+
 export const COURSE_STATUS_OPTIONS = [
   { value: COURSE_STATUS.UPCOMING, label: 'Upcoming' },
   { value: COURSE_STATUS.IN_PROGRESS, label: 'In Progress' },

@@ -68,6 +68,8 @@ export const common = {
     completed: "Completed",
     cancelled: "Cancelled",
     dropped: "ထွက်သွားသည်",
+    pending: "စောင့်ဆိုင်းနေသည်",
+    paid: "ပေးချေပြီး",
   },
 
   // Common messages

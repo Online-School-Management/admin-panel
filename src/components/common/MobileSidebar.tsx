@@ -7,9 +7,9 @@ import {
 } from '@/components/ui/sheet'
 import { NavItem } from './NavItem'
 import { useUIStore } from '@/store/uiStore'
-import { mainNavigation, adminNavigation } from '@/constants/navigation'
+import { mainNavigation, adminNavigation, subjectNavigation } from '@/constants/navigation'
 
-const navigation = [...mainNavigation, ...adminNavigation]
+const navigation = [...mainNavigation, ...subjectNavigation, ...adminNavigation]
 
 export const MobileSidebar = memo(function MobileSidebar() {
   const mobileMenuOpen = useUIStore((state) => state.mobileMenuOpen)

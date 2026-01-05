@@ -14,6 +14,7 @@ export const navigation = {
   subjects: 'ဘာသာရပ်များ',
   courses: 'သင်တန်းများ',
   enrollments: 'စာရင်းသွင်းမှုများ',
+  'student-payments': 'ကျောင်းသားငွေပေးချေမှုများ',
 }
 
 

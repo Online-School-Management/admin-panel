@@ -52,6 +52,11 @@ const CreateEnrollmentPage = lazy(() => import('@/pages/enrollments/create'))
 const EditEnrollmentPage = lazy(() => import('@/pages/enrollments/edit'))
 const EnrollmentDetailPage = lazy(() => import('@/pages/enrollments/detail'))
 
+// Student Payment pages
+const StudentPaymentsListPage = lazy(() => import('@/pages/student-payments/list'))
+const EditStudentPaymentPage = lazy(() => import('@/pages/student-payments/edit'))
+const StudentPaymentDetailPage = lazy(() => import('@/pages/student-payments/detail'))
+
 /**
  * Route configuration using createBrowserRouter (data router API)
  * Each route is individually wrapped with ProtectedRoute (which includes AdminLayout)
@@ -181,6 +186,18 @@ export const router = createBrowserRouter([
   {
     path: '/enrollments/:id',
     element: <ProtectedRoute><EnrollmentDetailPage /></ProtectedRoute>,
+  },
+  {
+    path: '/student-payments',
+    element: <ProtectedRoute><StudentPaymentsListPage /></ProtectedRoute>,
+  },
+  {
+    path: '/student-payments/:id/edit',
+    element: <ProtectedRoute><EditStudentPaymentPage /></ProtectedRoute>,
+  },
+  {
+    path: '/student-payments/:id',
+    element: <ProtectedRoute><StudentPaymentDetailPage /></ProtectedRoute>,
   },
 ])
 

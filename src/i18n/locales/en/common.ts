@@ -68,6 +68,8 @@ export const common = {
     completed: "Completed",
     cancelled: "Cancelled",
     dropped: "Dropped",
+    pending: "Pending",
+    paid: "Paid",
   },
 
   // Common messages

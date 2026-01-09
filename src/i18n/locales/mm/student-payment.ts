@@ -62,6 +62,7 @@ export const studentPayment = {
     noPaymentsForMonth: 'ဤလအတွက် ငွေပေးချေမှု မတွေ့ရှိပါ',
     updating: 'အပ်ဒိတ်လုပ်နေသည်...',
     deleting: 'ဖျက်နေသည်...',
+    markingAsPaid: 'ပေးချေပြီးဟု အမှတ်အသားပြုနေသည်...',
     paymentNotFound: 'ငွေပေးချေမှု မတွေ့ရှိပါ',
     backToPayments: 'ငွေပေးချေမှုများသို့ ပြန်သွားရန်',
   },
@@ -104,12 +105,16 @@ export const studentPayment = {
     cancel: 'ပယ်ဖျက်ရန်',
     clear: 'စစ်ထုတ်မှုများ ရှင်းလင်းရန်',
     markAsPaid: 'ပေးချေပြီးဟု အမှတ်အသားပြုရန်',
+    confirm: 'အတည်ပြုရန်',
   },
 
   // Dialog
   dialog: {
     deleteTitle: 'ငွေပေးချေမှု ဖျက်ရန်',
     deleteDescription: 'ငွေပေးချေမှု #{id} ကို ဖျက်ရန် သေချာပါသလား? ဤလုပ်ဆောင်ချက်ကို ပြန်လည်ပြုလုပ်မရပါ။',
+    markAsPaidTitle: 'ပေးချေပြီးဟု အမှတ်အသားပြုရန်',
+    markAsPaidDescription: '{studentName} အတွက် ပေးချေမှုကို ပေးချေပြီးဟု အမှတ်အသားပြုရန် သေချာပါသလား?',
+    markAsPaidDescriptionDefault: 'ဤပေးချေမှုကို ပေးချေပြီးဟု အမှတ်အသားပြုရန် သေချာပါသလား?',
   },
 
   // Helper text

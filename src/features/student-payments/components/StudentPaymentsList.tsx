@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { Edit, Trash2, Eye, MoreVertical, DollarSign } from 'lucide-react'
+import { Edit, Trash2, Eye, MoreVertical, DollarSign, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -18,13 +18,14 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useStudentPayments, useDeleteStudentPayment } from '../hooks/useStudentPayments'
+import { useStudentPayments, useDeleteStudentPayment, useMarkAsPaidPayment } from '../hooks/useStudentPayments'
 import { DeleteStudentPaymentDialog } from './DeleteStudentPaymentDialog'
+import { MarkAsPaidDialog } from './MarkAsPaidDialog'
 import { Pagination } from '@/components/common/Pagination'
 import { TableSkeleton } from '@/components/common/skeletons/TableSkeleton'
-import { PAGINATION } from '@/constants'
+import { PAGINATION, PAYMENT_STATUS, PAYMENT_METHOD } from '@/constants'
 import format from 'date-fns/format'
-import type { StudentPaymentCollectionItem } from '../types/student-payment.types'
+import type { StudentPaymentCollectionItem, UpdateStudentPaymentInput } from '../types/student-payment.types'
 import { useTranslation } from '@/i18n/context'
 import { cn } from '@/lib/utils'
 
@@ -37,6 +38,8 @@ export function StudentPaymentsList() {
   const perPage = PAGINATION.DEFAULT_PER_PAGE
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedPayment, setSelectedPayment] = useState<StudentPaymentCollectionItem | null>(null)
+  const [markAsPaidDialogOpen, setMarkAsPaidDialogOpen] = useState(false)
+  const [selectedPaymentForMarkPaid, setSelectedPaymentForMarkPaid] = useState<StudentPaymentCollectionItem | null>(null)
 
   // Month selector - default to current month
   const now = new Date()
@@ -95,6 +98,7 @@ export function StudentPaymentsList() {
   })
 
   const deletePayment = useDeleteStudentPayment()
+  const markAsPaidPayment = useMarkAsPaidPayment()
 
   const handleDeleteClick = (payment: StudentPaymentCollectionItem) => {
     setSelectedPayment(payment)
@@ -109,6 +113,34 @@ export function StudentPaymentsList() {
           setSelectedPayment(null)
         },
       })
+    }
+  }
+
+  const handleMarkAsPaidClick = (payment: StudentPaymentCollectionItem) => {
+    setSelectedPaymentForMarkPaid(payment)
+    setMarkAsPaidDialogOpen(true)
+  }
+
+  const handleMarkAsPaidConfirm = () => {
+    if (selectedPaymentForMarkPaid) {
+      const updateData: UpdateStudentPaymentInput = {
+        status: PAYMENT_STATUS.PAID,
+        payment_date: new Date().toISOString().split('T')[0],
+        paid_at: new Date().toISOString(),
+        payment_method: (selectedPaymentForMarkPaid.payment_method as 'kbz_pay' | 'aya_pay' | 'kbz_mobile_banking' | 'wave_money') || PAYMENT_METHOD.KBZ_PAY,
+        // Keep existing amount_paid if available
+        amount_paid: selectedPaymentForMarkPaid.amount_paid || undefined,
+      }
+
+      markAsPaidPayment.mutate(
+        { id: selectedPaymentForMarkPaid.id, data: updateData },
+        {
+          onSuccess: () => {
+            setMarkAsPaidDialogOpen(false)
+            setSelectedPaymentForMarkPaid(null)
+          },
+        }
+      )
     }
   }
 
@@ -396,34 +428,47 @@ export function StudentPaymentsList() {
                               </Badge>
                             </TableCell>
                             <TableCell className="text-right">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="h-10 w-10">
-                                    <MoreVertical className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem asChild>
-                                    <Link to={`/student-payments/${payment.id}`}>
-                                      <Eye className="h-4 w-4 mr-2" />
-                                      {t('studentPayment.actions.view')}
-                                    </Link>
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem asChild>
-                                    <Link to={`/student-payments/${payment.id}/edit`}>
-                                      <Edit className="h-4 w-4 mr-2" />
-                                      {t('studentPayment.actions.edit')}
-                                    </Link>
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    onClick={() => handleDeleteClick(payment)}
-                                    className="text-destructive"
+                              <div className="flex items-center justify-end gap-2">
+                                {payment.status === PAYMENT_STATUS.PENDING && (
+                                  <Button
+                                    variant="default"
+                                    size="sm"
+                                    onClick={() => handleMarkAsPaidClick(payment)}
+                                    className="h-8"
                                   >
-                                    <Trash2 className="h-4 w-4 mr-2" />
-                                    {t('studentPayment.actions.delete')}
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
+                                    <CheckCircle2 className="h-4 w-4 mr-2" />
+                                    {t('studentPayment.actions.markAsPaid')}
+                                  </Button>
+                                )}
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="h-10 w-10">
+                                      <MoreVertical className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem asChild>
+                                      <Link to={`/student-payments/${payment.id}`}>
+                                        <Eye className="h-4 w-4 mr-2" />
+                                        {t('studentPayment.actions.view')}
+                                      </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                      <Link to={`/student-payments/${payment.id}/edit`}>
+                                        <Edit className="h-4 w-4 mr-2" />
+                                        {t('studentPayment.actions.edit')}
+                                      </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() => handleDeleteClick(payment)}
+                                      className="text-destructive"
+                                    >
+                                      <Trash2 className="h-4 w-4 mr-2" />
+                                      {t('studentPayment.actions.delete')}
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
                             </TableCell>
                           </TableRow>
                         )
@@ -451,6 +496,15 @@ export function StudentPaymentsList() {
         onConfirm={handleDeleteConfirm}
         paymentId={selectedPayment?.id || 0}
         isLoading={deletePayment.isPending}
+      />
+
+      {/* Mark as Paid Dialog */}
+      <MarkAsPaidDialog
+        open={markAsPaidDialogOpen}
+        onOpenChange={setMarkAsPaidDialogOpen}
+        onConfirm={handleMarkAsPaidConfirm}
+        studentName={selectedPaymentForMarkPaid?.enrollment?.student?.name}
+        isLoading={markAsPaidPayment.isPending}
       />
     </>
   )

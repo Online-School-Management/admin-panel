@@ -130,4 +130,34 @@ export function useDeleteStudentPayment() {
   })
 }
 
+/**
+ * Hook to mark a payment as paid (without navigation)
+ * Used for quick actions in list views
+ */
+export function useMarkAsPaidPayment() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: UpdateStudentPaymentInput }) =>
+      updateStudentPayment(id, data),
+    onSuccess: (response, variables) => {
+      // Invalidate and refetch list queries
+      queryClient.invalidateQueries({ queryKey: studentPaymentKeys.lists() })
+      queryClient.refetchQueries({ queryKey: studentPaymentKeys.lists() })
+      // Invalidate and refetch detail query
+      queryClient.invalidateQueries({ queryKey: studentPaymentKeys.detail(variables.id) })
+      queryClient.refetchQueries({ queryKey: studentPaymentKeys.detail(variables.id) })
+      // Invalidate enrollment payments if enrollment_id is available
+      if (response.data.enrollment_id) {
+        queryClient.invalidateQueries({ queryKey: studentPaymentKeys.byEnrollment(response.data.enrollment_id) })
+        queryClient.refetchQueries({ queryKey: studentPaymentKeys.byEnrollment(response.data.enrollment_id) })
+      }
+      showUpdateSuccessToast('student payment', 'Payment has been marked as paid')
+    },
+    onError: (error: unknown) => {
+      showUpdateErrorToast('student payment', error)
+    },
+  })
+}
+
 

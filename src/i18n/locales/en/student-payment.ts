@@ -62,6 +62,7 @@ export const studentPayment = {
     noPaymentsForMonth: 'No payments found for this month',
     updating: 'Updating...',
     deleting: 'Deleting...',
+    markingAsPaid: 'Marking as paid...',
     paymentNotFound: 'Payment not found',
     backToPayments: 'Back to Payments',
   },
@@ -104,12 +105,16 @@ export const studentPayment = {
     cancel: 'Cancel',
     clear: 'Clear Filters',
     markAsPaid: 'Mark as Paid',
+    confirm: 'Confirm',
   },
 
   // Dialog
   dialog: {
     deleteTitle: 'Delete Payment',
     deleteDescription: 'Are you sure you want to delete payment #{id}? This action cannot be undone.',
+    markAsPaidTitle: 'Mark Payment as Paid',
+    markAsPaidDescription: 'Are you sure you want to mark the payment for {studentName} as paid?',
+    markAsPaidDescriptionDefault: 'Are you sure you want to mark this payment as paid?',
   },
 
   // Helper text

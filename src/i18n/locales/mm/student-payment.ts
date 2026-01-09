@@ -51,8 +51,10 @@ export const studentPayment = {
   // Filters
   filters: {
     allStatus: 'အခြေအနေအားလုံး',
-    searchPayments: 'ငွေပေးချေမှုများ ရှာဖွေပါ...',
+    searchPayments: 'ကျောင်းသားအမည် ရှာဖွေပါ...',
     filterByStatus: 'အခြေအနေဖြင့် စစ်ထုတ်ပါ',
+    filterByCourse: 'သင်တန်းဖြင့် စစ်ထုတ်ပါ',
+    allCourses: 'သင်တန်းအားလုံး',
   },
 
   // Messages

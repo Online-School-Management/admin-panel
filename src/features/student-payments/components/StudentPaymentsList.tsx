@@ -1,7 +1,15 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { Trash2, Eye, MoreVertical, DollarSign, CheckCircle2 } from 'lucide-react'
+import { Trash2, Eye, MoreVertical, DollarSign, CheckCircle2, Search, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import {
   Table,
   TableBody,
@@ -19,6 +27,8 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useStudentPayments, useDeleteStudentPayment, useMarkAsPaidPayment } from '../hooks/useStudentPayments'
+import { useCourses } from '@/features/courses/hooks/useCourses'
+import { COURSE_STATUS } from '@/constants'
 import { DeleteStudentPaymentDialog } from './DeleteStudentPaymentDialog'
 import { MarkAsPaidDialog } from './MarkAsPaidDialog'
 import { Pagination } from '@/components/common/Pagination'
@@ -41,10 +51,27 @@ export function StudentPaymentsList() {
   const [markAsPaidDialogOpen, setMarkAsPaidDialogOpen] = useState(false)
   const [selectedPaymentForMarkPaid, setSelectedPaymentForMarkPaid] = useState<StudentPaymentCollectionItem | null>(null)
 
+  // Filters
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [courseFilter, setCourseFilter] = useState<string>('all')
+
   // Month selector - default to current month
   const now = new Date()
   const [selectedMonth, setSelectedMonth] = useState<number>(now.getMonth() + 1)
   const [selectedYear, setSelectedYear] = useState<number>(now.getFullYear())
+
+  // Fetch courses for filter (only upcoming and in_progress)
+  const { data: coursesData } = useCourses({
+    per_page: 100,
+  })
+
+  // Filter courses to only show upcoming and in_progress
+  const availableCourses = useMemo(() => {
+    return coursesData?.data?.filter(
+      (course) => course.status === COURSE_STATUS.UPCOMING || course.status === COURSE_STATUS.IN_PROGRESS
+    ) || []
+  }, [coursesData])
 
   // Generate month options for tabs (last 6 months + current + next 6 months)
   const monthOptions = useMemo(() => {
@@ -95,6 +122,9 @@ export function StudentPaymentsList() {
     per_page: perPage,
     month: selectedMonth,
     year: selectedYear,
+    status: statusFilter !== 'all' ? statusFilter : undefined,
+    course_id: courseFilter !== 'all' ? Number(courseFilter) : undefined,
+    search: search || undefined,
   })
 
   const deletePayment = useDeleteStudentPayment()
@@ -159,6 +189,16 @@ export function StudentPaymentsList() {
   const getStatusLabel = (status: string) => {
     return t(`common.status.${status}`) || status
   }
+
+  const handleReset = () => {
+    setSearch('')
+    setStatusFilter('all')
+    setCourseFilter('all')
+    setPage(1)
+  }
+
+  // Check if any filter is active
+  const hasActiveFilters = search !== '' || statusFilter !== 'all' || courseFilter !== 'all'
 
   const getPaymentMethodLabel = (method: string | null) => {
     if (!method) return '-'
@@ -312,6 +352,66 @@ export function StudentPaymentsList() {
             </div>
           </div>
         )}
+
+        {/* Search and Filters */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder={t('studentPayment.filters.searchPayments') || 'Search student name...'}
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value)
+                setPage(1)
+              }}
+              className="pl-10"
+            />
+          </div>
+          <Select
+            value={statusFilter}
+            onValueChange={(value) => {
+              setStatusFilter(value)
+              setPage(1)
+            }}
+          >
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectValue placeholder={t('studentPayment.filters.filterByStatus') || 'Payment Status'} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('studentPayment.filters.allStatus') || 'All Status'}</SelectItem>
+              <SelectItem value={PAYMENT_STATUS.PENDING}>{getStatusLabel(PAYMENT_STATUS.PENDING)}</SelectItem>
+              <SelectItem value={PAYMENT_STATUS.PAID}>{getStatusLabel(PAYMENT_STATUS.PAID)}</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select
+            value={courseFilter}
+            onValueChange={(value) => {
+              setCourseFilter(value)
+              setPage(1)
+            }}
+          >
+            <SelectTrigger className="w-full sm:w-[350px]">
+              <SelectValue placeholder={t('studentPayment.filters.filterByCourse') || 'Course'} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('studentPayment.filters.allCourses') || 'All Courses'}</SelectItem>
+              {availableCourses.map((course) => (
+                <SelectItem key={course.id} value={String(course.id)}>
+                  {course.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            variant={hasActiveFilters ? 'destructive' : 'outline'}
+            onClick={handleReset}
+            className="w-full sm:w-auto"
+            disabled={!hasActiveFilters}
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            {t('studentPayment.actions.clear') || 'Clear Filters'}
+          </Button>
+        </div>
 
         {/* Payments Table */}
         <div className="space-y-4">

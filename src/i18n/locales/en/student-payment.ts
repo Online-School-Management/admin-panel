@@ -51,8 +51,10 @@ export const studentPayment = {
   // Filters
   filters: {
     allStatus: 'All Status',
-    searchPayments: 'Search payments...',
+    searchPayments: 'Search student name...',
     filterByStatus: 'Filter by status',
+    filterByCourse: 'Filter by course',
+    allCourses: 'All Courses',
   },
 
   // Messages

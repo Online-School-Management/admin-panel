@@ -9,10 +9,13 @@ export interface StudentPaymentEnrollment {
     name: string
     email: string
     student_id: string
+    slug: string
   }
   course: {
     id: number
     title: string
+    slug: string
+    start_date: string
     subject: {
       id: number
       name: string

@@ -1,7 +1,6 @@
 import { Calendar, DollarSign, CreditCard, FileText } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
 import { DetailSkeleton } from '@/components/common/skeletons/DetailSkeleton'
 import { useStudentPayment } from '../hooks/useStudentPayments'
 import format from 'date-fns/format'
@@ -52,7 +51,7 @@ export function StudentPaymentDetail({ paymentId }: StudentPaymentDetailProps) {
       case 'paid':
         return 'default'
       case 'pending':
-        return 'secondary'
+        return 'warning'
       default:
         return 'secondary'
     }
@@ -238,37 +237,6 @@ export function StudentPaymentDetail({ paymentId }: StudentPaymentDetailProps) {
             </CardContent>
           </Card>
 
-          {/* Timestamps */}
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('studentPayment.detail.timestamps')}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {payment.created_at && (
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    {t('studentPayment.detail.created')}
-                  </p>
-                  <p className="text-base text-sm">
-                    {format(new Date(payment.created_at), 'MMM dd, yyyy HH:mm')}
-                  </p>
-                </div>
-              )}
-              {payment.updated_at && (
-                <>
-                  <Separator />
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">
-                      {t('studentPayment.detail.updated')}
-                    </p>
-                    <p className="text-base text-sm">
-                      {format(new Date(payment.updated_at), 'MMM dd, yyyy HH:mm')}
-                    </p>
-                  </div>
-                </>
-              )}
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>

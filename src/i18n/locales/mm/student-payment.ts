@@ -113,7 +113,8 @@ export const studentPayment = {
     deleteTitle: 'ငွေပေးချေမှု ဖျက်ရန်',
     deleteDescription: 'ငွေပေးချေမှု #{id} ကို ဖျက်ရန် သေချာပါသလား? ဤလုပ်ဆောင်ချက်ကို ပြန်လည်ပြုလုပ်မရပါ။',
     markAsPaidTitle: 'ပေးချေပြီးဟု အမှတ်အသားပြုရန်',
-    markAsPaidDescription: '{studentName} အတွက် ပေးချေမှုကို ပေးချေပြီးဟု အမှတ်အသားပြုရန် သေချာပါသလား?',
+    markAsPaidDescription: '',
+    markAsPaidDescriptionEnd: 'အတွက် ပေးချေမှုကို ပေးချေပြီးဟု အမှတ်အသားပြုရန် သေချာပါသလား?',
     markAsPaidDescriptionDefault: 'ဤပေးချေမှုကို ပေးချေပြီးဟု အမှတ်အသားပြုရန် သေချာပါသလား?',
   },
 

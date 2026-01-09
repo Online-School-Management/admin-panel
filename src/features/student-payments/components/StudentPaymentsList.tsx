@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { Edit, Trash2, Eye, MoreVertical, DollarSign, CheckCircle2 } from 'lucide-react'
+import { Trash2, Eye, MoreVertical, DollarSign, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
 import { useStudentPayments, useDeleteStudentPayment, useMarkAsPaidPayment } from '../hooks/useStudentPayments'
 import { DeleteStudentPaymentDialog } from './DeleteStudentPaymentDialog'
 import { MarkAsPaidDialog } from './MarkAsPaidDialog'
@@ -237,6 +238,8 @@ export function StudentPaymentsList() {
           </div>
         </div>
 
+        {/* Separator */}
+        <Separator />
 
         {/* Monthly Summary Cards */}
         {!isLoading && payments.length > 0 && (
@@ -368,7 +371,16 @@ export function StudentPaymentsList() {
                             <TableCell>
                               {payment.enrollment?.student ? (
                                 <div>
-                                  <div className="font-medium">{payment.enrollment.student.name}</div>
+                                  <div className="font-medium">
+                                    <Link
+                                      to={`/students/${payment.enrollment.student.slug}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-primary hover:underline"
+                                    >
+                                      {payment.enrollment.student.name}
+                                    </Link>
+                                  </div>
                                   <div className="text-sm text-muted-foreground">
                                     {payment.enrollment.student.student_id}
                                   </div>
@@ -380,10 +392,24 @@ export function StudentPaymentsList() {
                             <TableCell>
                               {payment.enrollment?.course ? (
                                 <div>
-                                  <div className="font-medium">{payment.enrollment.course.title}</div>
+                                  <div className="font-medium">
+                                    <Link
+                                      to={`/courses/${payment.enrollment.course.slug}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-primary hover:underline"
+                                    >
+                                      {payment.enrollment.course.title}
+                                    </Link>
+                                  </div>
                                   {payment.enrollment.course.subject && (
                                     <div className="text-sm text-muted-foreground">
                                       {payment.enrollment.course.subject.name}
+                                    </div>
+                                  )}
+                                  {payment.enrollment.course.start_date && (
+                                    <div className="text-xs text-muted-foreground mt-1">
+                                      {format(new Date(payment.enrollment.course.start_date), 'MMM dd, yyyy')}
                                     </div>
                                   )}
                                 </div>
@@ -451,12 +477,6 @@ export function StudentPaymentsList() {
                                       <Link to={`/student-payments/${payment.id}`}>
                                         <Eye className="h-4 w-4 mr-2" />
                                         {t('studentPayment.actions.view')}
-                                      </Link>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem asChild>
-                                      <Link to={`/student-payments/${payment.id}/edit`}>
-                                        <Edit className="h-4 w-4 mr-2" />
-                                        {t('studentPayment.actions.edit')}
                                       </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem

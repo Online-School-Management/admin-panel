@@ -36,9 +36,15 @@ export function MarkAsPaidDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>{t('studentPayment.dialog.markAsPaidTitle')}</AlertDialogTitle>
           <AlertDialogDescription>
-            {studentName
-              ? t('studentPayment.dialog.markAsPaidDescription', { studentName })
-              : t('studentPayment.dialog.markAsPaidDescriptionDefault')}
+            {studentName ? (
+              <>
+                {t('studentPayment.dialog.markAsPaidDescription')}{' '}
+                <strong>{studentName}</strong>{' '}
+                {t('studentPayment.dialog.markAsPaidDescriptionEnd')}
+              </>
+            ) : (
+              t('studentPayment.dialog.markAsPaidDescriptionDefault')
+            )}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

@@ -113,7 +113,8 @@ export const studentPayment = {
     deleteTitle: 'Delete Payment',
     deleteDescription: 'Are you sure you want to delete payment #{id}? This action cannot be undone.',
     markAsPaidTitle: 'Mark Payment as Paid',
-    markAsPaidDescription: 'Are you sure you want to mark the payment for {studentName} as paid?',
+    markAsPaidDescription: 'Are you sure you want to mark the payment for',
+    markAsPaidDescriptionEnd: 'as paid?',
     markAsPaidDescriptionDefault: 'Are you sure you want to mark this payment as paid?',
   },
 

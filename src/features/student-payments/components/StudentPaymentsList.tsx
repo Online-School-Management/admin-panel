@@ -18,7 +18,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
 import { useStudentPayments, useDeleteStudentPayment, useMarkAsPaidPayment } from '../hooks/useStudentPayments'
 import { DeleteStudentPaymentDialog } from './DeleteStudentPaymentDialog'
 import { MarkAsPaidDialog } from './MarkAsPaidDialog'
@@ -213,103 +212,104 @@ export function StudentPaymentsList() {
   return (
     <>
       <div className="space-y-4">
-        {/* Month Buttons */}
-        <div className="w-full">
-          <div className="overflow-x-auto overflow-y-hidden -mx-1 px-1 pb-2 scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent hover:scrollbar-thumb-muted-foreground/40 scrollbar-thumb-rounded-full">
-            <div className="inline-flex w-auto gap-2 min-w-full sm:min-w-0 flex-wrap sm:flex-nowrap">
-              {monthOptions.map((option) => {
-                const isActive = option.value === currentMonthValue
-                return (
-                  <Button
-                    key={option.value}
-                    variant={isActive ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => handleMonthChange(option.value)}
-                    className={cn(
-                      "whitespace-nowrap px-3 sm:px-4 py-2 text-xs sm:text-sm md:text-base flex-shrink-0 min-w-fit transition-all",
-                      isActive && "bg-primary-active text-primary shadow-sm font-semibold"
-                    )}
-                  >
-                    {option.shortLabel}
-                  </Button>
-                )
-              })}
+        {/* Month Buttons - Sticky */}
+        <div className="sticky top-[64px] z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 pb-4 -mx-4 lg:-mx-6 xl:-mx-8 px-4 lg:px-6 xl:px-8 pt-4">
+          <div className="w-full">
+            <div className="overflow-x-auto overflow-y-hidden -mx-1 px-1 pb-2 scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent hover:scrollbar-thumb-muted-foreground/40 scrollbar-thumb-rounded-full">
+              <div className="inline-flex w-auto gap-2 min-w-full sm:min-w-0 flex-wrap sm:flex-nowrap">
+                {monthOptions.map((option) => {
+                  const isActive = option.value === currentMonthValue
+                  return (
+                    <Button
+                      key={option.value}
+                      variant={isActive ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => handleMonthChange(option.value)}
+                      className={cn(
+                        "whitespace-nowrap px-3 sm:px-4 py-2 text-xs sm:text-sm md:text-base flex-shrink-0 min-w-fit transition-all",
+                        isActive && "bg-primary-active text-primary shadow-sm font-semibold"
+                      )}
+                    >
+                      {option.shortLabel}
+                    </Button>
+                  )
+                })}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Separator */}
-        <Separator />
-
-        {/* Monthly Summary Cards */}
+        {/* Monthly Summary Cards - Sticky (Compact) */}
         {!isLoading && payments.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {/* Total Students Card */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Total Students
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold">{monthlyStats.totalStudents}</p>
-              </CardContent>
-            </Card>
+          <div className="sticky top-[136px] z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 pb-2 -mx-4 lg:-mx-6 xl:-mx-8 px-4 lg:px-6 xl:px-8 pt-2">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+              {/* Total Students */}
+              <Card className="p-3">
+                <CardHeader className="p-0 pb-2">
+                  <CardTitle className="text-xs font-medium text-muted-foreground">
+                    Total Students
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <p className="text-xl font-bold">{monthlyStats.totalStudents}</p>
+                </CardContent>
+              </Card>
 
-            {/* Total Paid Card */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Total Paid
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold text-green-600">{monthlyStats.paidCount}</p>
-              </CardContent>
-            </Card>
+              {/* Total Paid */}
+              <Card className="p-3">
+                <CardHeader className="p-0 pb-2">
+                  <CardTitle className="text-xs font-medium text-muted-foreground">
+                    Total Paid
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <p className="text-xl font-bold text-green-600">{monthlyStats.paidCount}</p>
+                </CardContent>
+              </Card>
 
-            {/* Total Pending Card */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Total Pending
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold text-orange-600">{monthlyStats.pendingCount}</p>
-              </CardContent>
-            </Card>
+              {/* Total Pending */}
+              <Card className="p-3">
+                <CardHeader className="p-0 pb-2">
+                  <CardTitle className="text-xs font-medium text-muted-foreground">
+                    Total Pending
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <p className="text-xl font-bold text-orange-600">{monthlyStats.pendingCount}</p>
+                </CardContent>
+              </Card>
 
-            {/* Collection Rate Card */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Collection Rate
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold">{monthlyStats.collectionRate}%</p>
-              </CardContent>
-            </Card>
+              {/* Collection Rate */}
+              <Card className="p-3">
+                <CardHeader className="p-0 pb-2">
+                  <CardTitle className="text-xs font-medium text-muted-foreground">
+                    Collection Rate
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <p className="text-xl font-bold">{monthlyStats.collectionRate}%</p>
+                </CardContent>
+              </Card>
 
-            {/* Collected Card */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <DollarSign className="h-4 w-4" />
-                  Collected
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold">
-                  {new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: 'MMK',
-                    minimumFractionDigits: 0,
-                  }).format(monthlyStats.paidAmount)}
-                </p>
-              </CardContent>
-            </Card>
+              {/* Collected */}
+              <Card className="p-3">
+                <CardHeader className="p-0 pb-2">
+                  <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                    <DollarSign className="h-3 w-3" />
+                    Collected
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <p className="text-lg font-bold">
+                    {new Intl.NumberFormat('en-US', {
+                      style: 'currency',
+                      currency: 'MMK',
+                      minimumFractionDigits: 0,
+                    }).format(monthlyStats.paidAmount)}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         )}
 
@@ -344,16 +344,16 @@ export function StudentPaymentsList() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-16">{t('studentPayment.table.no')}</TableHead>
-                        <TableHead>{t('studentPayment.table.student')}</TableHead>
-                        <TableHead>{t('studentPayment.table.course')}</TableHead>
-                        <TableHead>{t('studentPayment.table.monthNumber')}</TableHead>
-                        <TableHead>{t('studentPayment.table.amount')}</TableHead>
-                        <TableHead>{t('studentPayment.table.dueDate')}</TableHead>
-                        <TableHead>{t('studentPayment.table.paymentDate')}</TableHead>
-                        <TableHead>{t('studentPayment.table.paymentMethod')}</TableHead>
-                        <TableHead>{t('studentPayment.table.status')}</TableHead>
-                        <TableHead className="text-right">{t('studentPayment.table.actions')}</TableHead>
+                        <TableHead className="w-16 font-bold">{t('studentPayment.table.no')}</TableHead>
+                        <TableHead className="font-bold">{t('studentPayment.table.student')}</TableHead>
+                        <TableHead className="font-bold">{t('studentPayment.table.course')}</TableHead>
+                        <TableHead className="font-bold">{t('studentPayment.table.monthNumber')}</TableHead>
+                        <TableHead className="font-bold">{t('studentPayment.table.amount')}</TableHead>
+                        <TableHead className="font-bold">{t('studentPayment.table.dueDate')}</TableHead>
+                        <TableHead className="font-bold">{t('studentPayment.table.paymentDate')}</TableHead>
+                        <TableHead className="font-bold">{t('studentPayment.table.paymentMethod')}</TableHead>
+                        <TableHead className="font-bold">{t('studentPayment.table.status')}</TableHead>
+                        <TableHead className="text-right font-bold">{t('studentPayment.table.actions')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -479,13 +479,15 @@ export function StudentPaymentsList() {
                                         {t('studentPayment.actions.view')}
                                       </Link>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                      onClick={() => handleDeleteClick(payment)}
-                                      className="text-destructive"
-                                    >
-                                      <Trash2 className="h-4 w-4 mr-2" />
-                                      {t('studentPayment.actions.delete')}
-                                    </DropdownMenuItem>
+                                    {payment.status !== PAYMENT_STATUS.PAID && (
+                                      <DropdownMenuItem
+                                        onClick={() => handleDeleteClick(payment)}
+                                        className="text-destructive"
+                                      >
+                                        <Trash2 className="h-4 w-4 mr-2" />
+                                        {t('studentPayment.actions.delete')}
+                                      </DropdownMenuItem>
+                                    )}
                                   </DropdownMenuContent>
                                 </DropdownMenu>
                               </div>

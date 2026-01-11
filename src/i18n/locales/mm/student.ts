@@ -73,6 +73,8 @@ export const student = {
     updating: 'အပ်ဒိတ်လုပ်နေသည်...',
     studentNotFound: 'ကျောင်းသား မတွေ့ရှိပါ',
     backToStudents: 'ကျောင်းသားများသို့ ပြန်သွားရန်',
+    restoring: 'ပြန်လည်ထားရှိနေသည်...',
+    forceDeleting: 'ဖျက်နေသည်...',
   },
 
   // Detail page sections
@@ -102,6 +104,14 @@ export const student = {
     deleting: 'ဖျက်နေသည်...',
   },
 
+  // Dialogs
+  dialogs: {
+    restoreTitle: 'ကျောင်းသား ပြန်လည်ထားရှိရန်',
+    restoreMessage: '"{{name}}" ကို ပြန်လည်ထားရှိရန် သေချာပါသလား။ ၎င်းသည် ကျောင်းသားနှင့် ၎င်း၏ အသုံးပြုသူ အကောင့်ကို ပြန်လည်ထားရှိပါမည်။',
+    forceDeleteTitle: 'ကျောင်းသား အပြီးအပိုင် ဖျက်ရန်',
+    forceDeleteMessage: '"{{name}}" ကို အပြီးအပိုင် ဖျက်ရန် သေချာပါသလား။ ဤလုပ်ဆောင်ချက်ကို ပြန်ဖျက်၍မရပါ။ ၎င်းသည် ကျောင်းသား၊ ၎င်း၏ အသုံးပြုသူ အကောင့်နှင့် ဆက်စပ်ဒေတာအားလုံး (စာရင်းသွင်းမှု၊ ငွေပေးချေမှု စသည်) ကို အပြီးအပိုင် ဖျက်ပစ်ပါမည်။',
+  },
+
   // Form actions
   actions: {
     create: 'ကျောင်းသား ထည့်ရန်',
@@ -112,6 +122,13 @@ export const student = {
     edit: 'ပြင်ဆင်ရန်',
     delete: 'ဖျက်ရန်',
     clear: 'ရှင်းလင်းရန်',
+    restore: 'Restore',
+    forceDelete: 'အပြီးအပိုင် ဖျက်ရန်',
+  },
+
+  tabs: {
+    active: 'Active Students',
+    trashed: 'Deleted Students',
   },
 }
 

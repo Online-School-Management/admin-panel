@@ -102,6 +102,11 @@ export function StudentForm({ studentSlug }: StudentFormProps) {
     
     const student = studentData.data
     
+    if (!student.user) {
+      // If user is null, we can't populate the form
+      return
+    }
+    
     // Reset form with all values at once using reset()
     reset({
       name: student.user.name || '',

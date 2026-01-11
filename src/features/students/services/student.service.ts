@@ -20,6 +20,7 @@ export async function getStudents(params?: {
   search?: string
   sort_by?: string
   sort_order?: string
+  trashed?: boolean
 }): Promise<StudentsResponse> {
   const response = await apiClient.get<StudentsResponse>('/students', { params })
   return response.data
@@ -57,6 +58,21 @@ export async function updateStudent(
  */
 export async function deleteStudent(slug: string): Promise<void> {
   await apiClient.delete(`/students/${slug}`)
+}
+
+/**
+ * Restore a soft-deleted student
+ */
+export async function restoreStudent(slug: string): Promise<StudentResponse> {
+  const response = await apiClient.post<StudentResponse>(`/students/${slug}/restore`)
+  return response.data
+}
+
+/**
+ * Permanently delete a soft-deleted student (force delete)
+ */
+export async function forceDeleteStudent(slug: string): Promise<void> {
+  await apiClient.delete(`/students/${slug}/force`)
 }
 
 

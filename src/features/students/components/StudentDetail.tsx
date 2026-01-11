@@ -47,6 +47,18 @@ export function StudentDetail({ studentSlug }: StudentDetailProps) {
 
   const student: Student = studentData.data
 
+  if (!student.user) {
+    return (
+      <Card>
+        <CardContent className="pt-6">
+          <p className="text-destructive">
+            {t('student.messages.userNotFound') || 'User account not found for this student.'}
+          </p>
+        </CardContent>
+      </Card>
+    )
+  }
+
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case 'active':

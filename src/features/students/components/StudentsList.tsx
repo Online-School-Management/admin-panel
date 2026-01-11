@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Edit, Trash2, Eye, MoreVertical, RefreshCw } from 'lucide-react'
+import { Search, Edit, Trash2, Eye, MoreVertical, RefreshCw, RotateCcw, XCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -26,7 +26,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useStudents, useDeleteStudent } from '../hooks/useStudents'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { useStudents, useDeleteStudent, useRestoreStudent, useForceDeleteStudent } from '../hooks/useStudents'
 import { DeleteStudentDialog } from './DeleteStudentDialog'
 import { Pagination } from '@/components/common/Pagination'
 import { TableSkeleton } from '@/components/common/skeletons/TableSkeleton'
@@ -35,17 +45,21 @@ import { PAGINATION } from '@/constants'
 import format from 'date-fns/format'
 import type { StudentCollectionItem } from '../types/student.types'
 import { useTranslation } from '@/i18n/context'
+import { cn } from '@/lib/utils'
 
 /**
  * StudentsList component - displays students in a table with CRUD actions
  */
 export function StudentsList() {
   const { t } = useTranslation()
+  const [activeTab, setActiveTab] = useState<'active' | 'trashed'>('active')
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [page, setPage] = useState<number>(PAGINATION.DEFAULT_PAGE)
   const perPage = PAGINATION.DEFAULT_PER_PAGE
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [restoreDialogOpen, setRestoreDialogOpen] = useState(false)
+  const [forceDeleteDialogOpen, setForceDeleteDialogOpen] = useState(false)
   const [selectedStudent, setSelectedStudent] = useState<StudentCollectionItem | null>(null)
 
   const { data, isLoading, error } = useStudents({
@@ -53,9 +67,12 @@ export function StudentsList() {
     per_page: perPage,
     status: statusFilter !== 'all' ? statusFilter : undefined,
     search: search || undefined,
+    trashed: activeTab === 'trashed',
   })
 
   const deleteStudent = useDeleteStudent()
+  const restoreStudent = useRestoreStudent()
+  const forceDeleteStudent = useForceDeleteStudent()
 
   const handleDeleteClick = (student: StudentCollectionItem) => {
     setSelectedStudent(student)
@@ -73,10 +90,49 @@ export function StudentsList() {
     }
   }
 
+  const handleRestoreClick = (student: StudentCollectionItem) => {
+    setSelectedStudent(student)
+    setRestoreDialogOpen(true)
+  }
+
+  const handleRestoreConfirm = () => {
+    if (selectedStudent) {
+      restoreStudent.mutate(selectedStudent.slug, {
+        onSuccess: () => {
+          setRestoreDialogOpen(false)
+          setSelectedStudent(null)
+          // Switch to active tab after restore
+          setActiveTab('active')
+        },
+      })
+    }
+  }
+
+  const handleForceDeleteClick = (student: StudentCollectionItem) => {
+    setSelectedStudent(student)
+    setForceDeleteDialogOpen(true)
+  }
+
+  const handleForceDeleteConfirm = () => {
+    if (selectedStudent) {
+      forceDeleteStudent.mutate(selectedStudent.slug, {
+        onSuccess: () => {
+          setForceDeleteDialogOpen(false)
+          setSelectedStudent(null)
+        },
+      })
+    }
+  }
+
   const handleReset = () => {
     setSearch('')
     setStatusFilter('all')
     setPage(1)
+  }
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value as 'active' | 'trashed')
+    setPage(1) // Reset to first page when switching tabs
   }
 
   const getStatusBadgeVariant = (status: string) => {
@@ -112,6 +168,38 @@ export function StudentsList() {
   return (
     <>
       <div className="space-y-4">
+        {/* Tab Buttons - Sticky */}
+        <div className="sticky top-[64px] z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 pb-4 -mx-4 lg:-mx-6 xl:-mx-8 px-4 lg:px-6 xl:px-8 pt-4">
+          <div className="w-full">
+            <div className="overflow-x-auto overflow-y-hidden -mx-1 px-1 pb-2 scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent hover:scrollbar-thumb-muted-foreground/40 scrollbar-thumb-rounded-full">
+              <div className="inline-flex w-auto gap-2 min-w-full sm:min-w-0 flex-wrap sm:flex-nowrap">
+                <Button
+                  variant={activeTab === 'active' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleTabChange('active')}
+                  className={cn(
+                    "whitespace-nowrap px-3 sm:px-4 py-2 text-xs sm:text-sm md:text-base flex-shrink-0 min-w-fit transition-all",
+                    activeTab === 'active' && "bg-primary-active text-primary shadow-sm font-semibold"
+                  )}
+                >
+                  {t('student.tabs.active') || 'Active Students'}
+                </Button>
+                <Button
+                  variant={activeTab === 'trashed' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleTabChange('trashed')}
+                  className={cn(
+                    "whitespace-nowrap px-3 sm:px-4 py-2 text-xs sm:text-sm md:text-base flex-shrink-0 min-w-fit transition-all",
+                    activeTab === 'trashed' && "bg-primary-active text-primary shadow-sm font-semibold"
+                  )}
+                >
+                  {t('student.tabs.trashed') || 'Deleted Students'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Search and filters */}
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
@@ -213,16 +301,20 @@ export function StudentsList() {
                               {student.student_id}
                             </TableCell>
                             <TableCell>
-                              <div>
-                                <div className="font-medium">{student.user.name}</div>
-                                {student.user.phone && (
-                                  <div className="text-sm text-muted-foreground">
-                                    {student.user.phone}
-                                  </div>
-                                )}
-                              </div>
+                              {student.user ? (
+                                <div>
+                                  <div className="font-medium">{student.user.name}</div>
+                                  {student.user.phone && (
+                                    <div className="text-sm text-muted-foreground">
+                                      {student.user.phone}
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-muted-foreground italic">User deleted</span>
+                              )}
                             </TableCell>
-                            <TableCell>{student.user.email}</TableCell>
+                            <TableCell>{student.user?.email || '-'}</TableCell>
                             <TableCell>{student.guardian_phone || '-'}</TableCell>
                             <TableCell>{student.age || '-'}</TableCell>
                             <TableCell>
@@ -236,34 +328,57 @@ export function StudentsList() {
                                 : '-'}
                             </TableCell>
                             <TableCell className="text-right">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="h-10 w-10">
-                                    <MoreVertical className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem asChild>
-                                    <Link to={`/students/${student.slug}`}>
-                                      <Eye className="h-4 w-4 mr-2" />
-                                      {t('student.actions.view')}
-                                    </Link>
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem asChild>
-                                    <Link to={`/students/${student.slug}/edit`}>
-                                      <Edit className="h-4 w-4 mr-2" />
-                                      {t('student.actions.edit')}
-                                    </Link>
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    onClick={() => handleDeleteClick(student)}
-                                    className="text-destructive"
+                              {activeTab === 'trashed' ? (
+                                <div className="flex gap-2 justify-end">
+                                  <Button
+                                    variant="default"
+                                    size="sm"
+                                    onClick={() => handleRestoreClick(student)}
+                                    disabled={restoreStudent.isPending || forceDeleteStudent.isPending}
                                   >
-                                    <Trash2 className="h-4 w-4 mr-2" />
-                                    {t('student.actions.delete')}
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
+                                    <RotateCcw className="h-4 w-4 mr-2" />
+                                    {t('student.actions.restore') || 'Restore'}
+                                  </Button>
+                                  <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    onClick={() => handleForceDeleteClick(student)}
+                                    disabled={restoreStudent.isPending || forceDeleteStudent.isPending}
+                                  >
+                                    <XCircle className="h-4 w-4 mr-2" />
+                                    {t('student.actions.forceDelete') || 'Permanent Delete'}
+                                  </Button>
+                                </div>
+                              ) : (
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="h-10 w-10">
+                                      <MoreVertical className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem asChild>
+                                      <Link to={`/students/${student.slug}`}>
+                                        <Eye className="h-4 w-4 mr-2" />
+                                        {t('student.actions.view')}
+                                      </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                      <Link to={`/students/${student.slug}/edit`}>
+                                        <Edit className="h-4 w-4 mr-2" />
+                                        {t('student.actions.edit')}
+                                      </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() => handleDeleteClick(student)}
+                                      className="text-destructive"
+                                    >
+                                      <Trash2 className="h-4 w-4 mr-2" />
+                                      {t('student.actions.delete')}
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              )}
                             </TableCell>
                           </TableRow>
                         )
@@ -292,6 +407,63 @@ export function StudentsList() {
         studentName={selectedStudent?.user.name || ''}
         isLoading={deleteStudent.isPending}
       />
+
+      {/* Restore Dialog */}
+      <AlertDialog open={restoreDialogOpen} onOpenChange={setRestoreDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t('student.dialogs.restoreTitle') || 'Restore Student'}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('student.dialogs.restoreMessage', { name: selectedStudent?.user?.name || selectedStudent?.student_id }) ||
+                `Are you sure you want to restore "${selectedStudent?.user?.name || selectedStudent?.student_id}"? This will restore the student and their user account.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={restoreStudent.isPending}>
+              {t('common.actions.cancel') || 'Cancel'}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleRestoreConfirm}
+              disabled={restoreStudent.isPending}
+            >
+              {restoreStudent.isPending
+                ? t('student.messages.restoring') || 'Restoring...'
+                : t('student.actions.restore') || 'Restore'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Force Delete Dialog */}
+      <AlertDialog open={forceDeleteDialogOpen} onOpenChange={setForceDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t('student.dialogs.forceDeleteTitle') || 'Permanently Delete Student'}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('student.dialogs.forceDeleteMessage', { name: selectedStudent?.user?.name || selectedStudent?.student_id }) ||
+                `Are you sure you want to permanently delete "${selectedStudent?.user?.name || selectedStudent?.student_id}"? This action cannot be undone and will permanently remove the student, their user account, and all related data (enrollments, payments, etc.).`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={forceDeleteStudent.isPending}>
+              {t('common.actions.cancel') || 'Cancel'}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleForceDeleteConfirm}
+              disabled={forceDeleteStudent.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {forceDeleteStudent.isPending
+                ? t('student.messages.forceDeleting') || 'Deleting...'
+                : t('student.actions.forceDelete') || 'Permanent Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }

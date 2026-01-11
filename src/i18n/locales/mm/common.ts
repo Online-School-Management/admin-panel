@@ -88,6 +88,10 @@ export const common = {
     male: "ယောကျ်ားလေး",
     female: "မိန်းကလေး",
     other: "အခြား..."
+  },
+
+  actions: {
+    cancel: "Cancel",
   }
 }
 

@@ -6,6 +6,8 @@ import {
   createStudent,
   updateStudent,
   deleteStudent,
+  restoreStudent,
+  forceDeleteStudent,
 } from '../services/student.service'
 import {
   showCreateSuccessToast,
@@ -14,6 +16,10 @@ import {
   showCreateErrorToast,
   showUpdateErrorToast,
   showDeleteErrorToast,
+  showRestoreSuccessToast,
+  showRestoreErrorToast,
+  showForceDeleteSuccessToast,
+  showForceDeleteErrorToast,
 } from '@/utils/toast'
 import type {
   CreateStudentInput,
@@ -42,6 +48,7 @@ export function useStudents(params?: {
   search?: string
   sort_by?: string
   sort_order?: string
+  trashed?: boolean
 }) {
   return useQuery({
     queryKey: studentKeys.list(params),
@@ -129,6 +136,46 @@ export function useDeleteStudent() {
     },
     onError: (error: unknown) => {
       showDeleteErrorToast('student', error)
+    },
+  })
+}
+
+/**
+ * Hook to restore a soft-deleted student
+ */
+export function useRestoreStudent() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (slug: string) => restoreStudent(slug),
+    onSuccess: () => {
+      // Invalidate and refetch list queries to ensure the restored student appears
+      queryClient.invalidateQueries({ queryKey: studentKeys.lists() })
+      queryClient.refetchQueries({ queryKey: studentKeys.lists() })
+      showRestoreSuccessToast('student')
+    },
+    onError: (error: unknown) => {
+      showRestoreErrorToast('student', error)
+    },
+  })
+}
+
+/**
+ * Hook to permanently delete a soft-deleted student (force delete)
+ */
+export function useForceDeleteStudent() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (slug: string) => forceDeleteStudent(slug),
+    onSuccess: () => {
+      // Invalidate and refetch list queries to ensure the permanently deleted student is removed
+      queryClient.invalidateQueries({ queryKey: studentKeys.lists() })
+      queryClient.refetchQueries({ queryKey: studentKeys.lists() })
+      showForceDeleteSuccessToast('student')
+    },
+    onError: (error: unknown) => {
+      showForceDeleteErrorToast('student', error)
     },
   })
 }

@@ -20,7 +20,7 @@ export interface Student {
   id: number
   student_id: string
   slug: string
-  user: StudentUser
+  user: StudentUser | null
   guardian_phone?: string | null
   age?: number | null
   status: 'active' | 'inactive'
@@ -40,7 +40,7 @@ export interface StudentCollectionItem {
     phone: string | null
     status: string
     profile_image: string | null
-  }
+  } | null
   guardian_phone: string | null
   age: number | null
   status: string

@@ -73,6 +73,8 @@ export const student = {
     updating: 'Updating...',
     studentNotFound: 'Student not found',
     backToStudents: 'Back to Students',
+    restoring: 'Restoring...',
+    forceDeleting: 'Deleting...',
   },
 
   // Detail page sections
@@ -102,6 +104,14 @@ export const student = {
     deleting: 'Deleting...',
   },
 
+  // Dialogs
+  dialogs: {
+    restoreTitle: 'Restore Student',
+    restoreMessage: 'Are you sure you want to restore "{{name}}"? This will restore the student and their user account.',
+    forceDeleteTitle: 'Permanently Delete Student',
+    forceDeleteMessage: 'Are you sure you want to permanently delete "{{name}}"? This action cannot be undone and will permanently remove the student, their user account, and all related data (enrollments, payments, etc.).',
+  },
+
   // Form actions
   actions: {
     create: 'Create Student',
@@ -112,6 +122,13 @@ export const student = {
     edit: 'Edit',
     delete: 'Delete',
     clear: 'Clear',
+    restore: 'Restore',
+    forceDelete: 'Permanent Delete',
+  },
+
+  tabs: {
+    active: 'Active Students',
+    trashed: 'Deleted Students',
   },
 }
 

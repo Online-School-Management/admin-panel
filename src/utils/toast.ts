@@ -150,3 +150,73 @@ export function showDeleteErrorToast(itemName: string, error?: Error | string | 
   )
 }
 
+/**
+ * Show a success toast for restore operations
+ */
+export function showRestoreSuccessToast(itemName: string, itemLabel?: string) {
+  showSuccessToast(
+    itemLabel || `${itemName} restored successfully`,
+    {
+      title: 'Restored',
+      description: itemLabel || `The ${itemName.toLowerCase()} has been restored successfully.`,
+    }
+  )
+}
+
+/**
+ * Show an error toast for restore operations
+ * Extracts error message from API response
+ */
+export function showRestoreErrorToast(itemName: string, error?: Error | string | unknown) {
+  const errorMessage = typeof error === 'string' 
+    ? error 
+    : error instanceof Error 
+      ? getApiErrorMessage(error)
+      : error 
+        ? getApiErrorMessage(error)
+        : `Failed to restore ${itemName.toLowerCase()}`
+  
+  showErrorToast(
+    errorMessage,
+    {
+      title: 'Restore Failed',
+      description: errorMessage,
+    }
+  )
+}
+
+/**
+ * Show a success toast for force delete operations
+ */
+export function showForceDeleteSuccessToast(itemName: string, itemLabel?: string) {
+  showSuccessToast(
+    itemLabel || `${itemName} permanently deleted successfully`,
+    {
+      title: 'Permanently Deleted',
+      description: itemLabel || `The ${itemName.toLowerCase()} has been permanently deleted. This action cannot be undone.`,
+    }
+  )
+}
+
+/**
+ * Show an error toast for force delete operations
+ * Extracts error message from API response
+ */
+export function showForceDeleteErrorToast(itemName: string, error?: Error | string | unknown) {
+  const errorMessage = typeof error === 'string' 
+    ? error 
+    : error instanceof Error 
+      ? getApiErrorMessage(error)
+      : error 
+        ? getApiErrorMessage(error)
+        : `Failed to permanently delete ${itemName.toLowerCase()}`
+  
+  showErrorToast(
+    errorMessage,
+    {
+      title: 'Permanent Delete Failed',
+      description: errorMessage,
+    }
+  )
+}
+

@@ -238,12 +238,16 @@ export function EnrollmentsList() {
                             {rowNumber}
                           </TableCell>
                           <TableCell>
-                            <div>
-                              <div className="font-medium">{enrollment.student.name}</div>
-                              <div className="text-sm text-muted-foreground">
-                                {enrollment.student.student_id}
+                            {enrollment.student ? (
+                              <div>
+                                <div className="font-medium">{enrollment.student.name}</div>
+                                <div className="text-sm text-muted-foreground">
+                                  {enrollment.student.student_id}
+                                </div>
                               </div>
-                            </div>
+                            ) : (
+                              <span className="text-muted-foreground italic">Student deleted</span>
+                            )}
                           </TableCell>
                           <TableCell>
                             <div>

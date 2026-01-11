@@ -104,45 +104,51 @@ export function EnrollmentDetail({ enrollmentId }: EnrollmentDetailProps) {
               <CardTitle>{t('enrollment.detail.studentInformation')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    {t('enrollment.detail.studentId')}
-                  </p>
-                  <p className="text-base font-semibold">{enrollment.student.student_id}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    {t('enrollment.detail.studentName')}
-                  </p>
-                  <p className="text-base font-semibold">{enrollment.student.name}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                    <Mail className="h-4 w-4" />
-                    {t('common.labels.email')}
-                  </p>
-                  <p className="text-base">{enrollment.student.email}</p>
-                </div>
-                {enrollment.student.phone && (
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                      <Phone className="h-4 w-4" />
-                      {t('common.labels.phone')}
-                    </p>
-                    <p className="text-base">{enrollment.student.phone}</p>
+              {enrollment.student ? (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">
+                        {t('enrollment.detail.studentId')}
+                      </p>
+                      <p className="text-base font-semibold">{enrollment.student.student_id}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">
+                        {t('enrollment.detail.studentName')}
+                      </p>
+                      <p className="text-base font-semibold">{enrollment.student.name}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                        <Mail className="h-4 w-4" />
+                        {t('common.labels.email')}
+                      </p>
+                      <p className="text-base">{enrollment.student.email || '-'}</p>
+                    </div>
+                    {enrollment.student.phone && (
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                          <Phone className="h-4 w-4" />
+                          {t('common.labels.phone')}
+                        </p>
+                        <p className="text-base">{enrollment.student.phone}</p>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-              <Separator />
-              <div>
-                <Link
-                  to={`/students/${enrollment.student.slug}`}
-                  className="text-sm text-primary hover:underline"
-                >
-                  {t('enrollment.detail.viewStudent')} →
-                </Link>
-              </div>
+                  <Separator />
+                  <div>
+                    <Link
+                      to={`/students/${enrollment.student.slug}`}
+                      className="text-sm text-primary hover:underline"
+                    >
+                      {t('enrollment.detail.viewStudent')} →
+                    </Link>
+                  </div>
+                </>
+              ) : (
+                <p className="text-muted-foreground italic">Student has been deleted</p>
+              )}
             </CardContent>
           </Card>
 

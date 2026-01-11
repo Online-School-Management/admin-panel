@@ -7,7 +7,7 @@ export interface EnrollmentStudent {
   slug: string
   student_id: string
   name: string
-  email: string
+  email: string | null
   phone: string | null
   status: string
 }
@@ -25,7 +25,7 @@ export interface EnrollmentCourse {
 
 export interface Enrollment {
   id: number
-  student: EnrollmentStudent
+  student: EnrollmentStudent | null
   course: EnrollmentCourse
   enrolled_at: string
   status: 'active' | 'dropped' | 'completed'
@@ -41,8 +41,8 @@ export interface EnrollmentCollectionItem {
     slug: string
     student_id: string
     name: string
-    email: string
-  }
+    email: string | null
+  } | null
   course: {
     id: number
     slug: string

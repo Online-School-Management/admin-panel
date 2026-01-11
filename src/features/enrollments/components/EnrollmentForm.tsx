@@ -119,6 +119,14 @@ export function EnrollmentForm({ enrollmentId }: EnrollmentFormProps) {
     const enrollment = enrollmentData.data
 
     // Reset form with all values at once using reset()
+    // Handle case where student might be deleted
+    if (!enrollment.student) {
+      // If student is deleted, we can't edit the enrollment
+      // This should ideally be handled by the backend, but we'll show an error
+      console.error('Cannot edit enrollment: student has been deleted')
+      return
+    }
+
     reset({
       student_id: enrollment.student.id,
       course_id: enrollment.course.id,

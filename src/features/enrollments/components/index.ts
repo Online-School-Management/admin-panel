@@ -3,4 +3,6 @@ export { EnrollmentForm } from './EnrollmentForm'
 export { EnrollmentDetail } from './EnrollmentDetail'
 export { DeleteEnrollmentDialog } from './DeleteEnrollmentDialog'
 export { EnrollmentCoursesGrid } from './EnrollmentCoursesGrid'
+export { AddEnrollmentModal } from './AddEnrollmentModal'
+export { EditEnrollmentModal } from './EditEnrollmentModal'
 

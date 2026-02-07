@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { AddEnrollmentModal, EditEnrollmentModal } from '@/features/enrollments/components'
 import { Search, Edit, Trash2, Eye, MoreVertical, RefreshCw, UserPlus, BookOpen, Calendar, Users } from 'lucide-react'
 import format from 'date-fns/format'
 import { Button } from '@/components/ui/button'
@@ -54,6 +55,8 @@ function CourseEnrollmentsPage() {
   const perPage = PAGINATION.DEFAULT_PER_PAGE
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedEnrollment, setSelectedEnrollment] = useState<EnrollmentCollectionItem | null>(null)
+  const [addModalOpen, setAddModalOpen] = useState(false)
+  const [editEnrollmentId, setEditEnrollmentId] = useState<number | null>(null)
 
   // Fetch course data to display summary
   const { data: coursesData, isLoading: isLoadingCourse } = useCourses({ per_page: 100 })
@@ -73,6 +76,10 @@ function CourseEnrollmentsPage() {
   const handleDeleteClick = (enrollment: EnrollmentCollectionItem) => {
     setSelectedEnrollment(enrollment)
     setDeleteDialogOpen(true)
+  }
+
+  const handleEditClick = (enrollmentId: number) => {
+    setEditEnrollmentId(enrollmentId)
   }
 
   const handleDeleteConfirm = () => {
@@ -134,11 +141,9 @@ function CourseEnrollmentsPage() {
         backTo="/enrollments"
         backLabel={t('enrollment.courseEnrollments.backToCourses')}
         action={
-          <Button asChild>
-            <Link to="/enrollments/new" state={{ courseId: courseIdNum }}>
-              <UserPlus className="h-4 w-4 mr-2" />
-              {t('enrollment.courseEnrollments.addEnrollment')}
-            </Link>
+          <Button onClick={() => setAddModalOpen(true)}>
+            <UserPlus className="h-4 w-4 mr-2" />
+            {t('enrollment.courseEnrollments.addEnrollment')}
           </Button>
         }
       />
@@ -282,11 +287,9 @@ function CourseEnrollmentsPage() {
                       : t('enrollment.courseEnrollments.noEnrollments')}
                   </p>
                   {!search && statusFilter === 'all' && (
-                    <Button asChild variant="outline" className="mt-4">
-                      <Link to="/enrollments/new" state={{ courseId: courseIdNum }}>
-                        <UserPlus className="h-4 w-4 mr-2" />
-                        {t('enrollment.courseEnrollments.addEnrollment')}
-                      </Link>
+                    <Button variant="outline" className="mt-4" onClick={() => setAddModalOpen(true)}>
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      {t('enrollment.courseEnrollments.addEnrollment')}
                     </Button>
                   )}
                 </div>
@@ -355,11 +358,9 @@ function CourseEnrollmentsPage() {
                                       {t('enrollment.actions.view')}
                                     </Link>
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem asChild>
-                                    <Link to={`/enrollments/${enrollment.id}/edit`}>
-                                      <Edit className="h-4 w-4 mr-2" />
-                                      {t('enrollment.actions.edit')}
-                                    </Link>
+                                  <DropdownMenuItem onClick={() => handleEditClick(enrollment.id)}>
+                                    <Edit className="h-4 w-4 mr-2" />
+                                    {t('enrollment.actions.edit')}
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     onClick={() => handleDeleteClick(enrollment)}
@@ -390,6 +391,21 @@ function CourseEnrollmentsPage() {
           </div>
         )}
       </div>
+
+      {/* Add Enrollment Modal */}
+      <AddEnrollmentModal
+        open={addModalOpen}
+        onOpenChange={setAddModalOpen}
+        courseId={courseIdNum}
+        courseTitle={course?.title}
+      />
+
+      {/* Edit Enrollment Modal */}
+      <EditEnrollmentModal
+        open={editEnrollmentId != null}
+        onOpenChange={(open) => { if (!open) setEditEnrollmentId(null) }}
+        enrollmentId={editEnrollmentId}
+      />
 
       {/* Delete Dialog */}
       <DeleteEnrollmentDialog

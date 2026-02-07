@@ -98,9 +98,9 @@ export function useEnrollmentsByCourse(courseId: number) {
 
 /**
  * Hook to create a new enrollment
- * @param redirectTo - Optional URL to navigate to after success (defaults to '/enrollments')
+ * @param redirectTo - URL to navigate to after success; pass null to skip navigation (e.g. when using a modal)
  */
-export function useCreateEnrollment(redirectTo?: string) {
+export function useCreateEnrollment(redirectTo?: string | null) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
@@ -114,7 +114,9 @@ export function useCreateEnrollment(redirectTo?: string) {
       // Also invalidate by-course queries so the course-enrollments page refreshes
       queryClient.invalidateQueries({ queryKey: enrollmentKeys.all })
       showCreateSuccessToast('enrollment', 'Enrollment created successfully')
-      navigate(redirectTo || '/enrollments')
+      if (redirectTo !== null) {
+        navigate(redirectTo ?? '/enrollments')
+      }
     },
     onError: (error: unknown) => {
       showCreateErrorToast('enrollment', error)
@@ -124,8 +126,9 @@ export function useCreateEnrollment(redirectTo?: string) {
 
 /**
  * Hook to update an existing enrollment
+ * @param redirectTo - URL to navigate to after success; pass null to skip navigation (e.g. when using a modal)
  */
-export function useUpdateEnrollment() {
+export function useUpdateEnrollment(redirectTo?: string | null) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
@@ -140,7 +143,9 @@ export function useUpdateEnrollment() {
       queryClient.invalidateQueries({ queryKey: enrollmentKeys.detail(variables.id) })
       queryClient.refetchQueries({ queryKey: enrollmentKeys.detail(variables.id) })
       showUpdateSuccessToast('enrollment', 'Enrollment updated successfully')
-      navigate('/enrollments')
+      if (redirectTo !== null) {
+        navigate(redirectTo ?? '/enrollments')
+      }
     },
     onError: (error: unknown) => {
       showUpdateErrorToast('enrollment', error)

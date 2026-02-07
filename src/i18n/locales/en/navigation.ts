@@ -14,6 +14,7 @@ export const navigation = {
   closeSidebar: 'Close sidebar',
   courses: 'Courses',
   enrollments: 'Enrollment',
+  'class-sessions': 'Class Sessions',
   'student-payments': 'Student Payments',
 }
 

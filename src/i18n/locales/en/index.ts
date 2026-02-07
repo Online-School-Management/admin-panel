@@ -18,6 +18,7 @@ import { course } from './course'
 import { courseTeacher } from './course-teacher'
 import { schedule } from './schedule'
 import { enrollment } from './enrollment'
+import { classSession } from './class-session'
 import { studentPayment } from './student-payment'
 
 export const en = {
@@ -36,6 +37,7 @@ export const en = {
   courseTeacher,
   schedule,
   enrollment,
+  classSession,
   studentPayment,
 }
 

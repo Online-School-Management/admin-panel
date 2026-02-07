@@ -404,7 +404,7 @@ export function StudentsList() {
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleDeleteConfirm}
-        studentName={selectedStudent?.user.name || ''}
+        studentName={selectedStudent?.user?.name ?? ''}
         isLoading={deleteStudent.isPending}
       />
 
@@ -416,8 +416,8 @@ export function StudentsList() {
               {t('student.dialogs.restoreTitle') || 'Restore Student'}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {t('student.dialogs.restoreMessage', { name: selectedStudent?.user?.name || selectedStudent?.student_id }) ||
-                `Are you sure you want to restore "${selectedStudent?.user?.name || selectedStudent?.student_id}"? This will restore the student and their user account.`}
+              {t('student.dialogs.restoreMessage', { name: selectedStudent?.user?.name ?? selectedStudent?.student_id ?? '' }) ||
+                `Are you sure you want to restore "${selectedStudent?.user?.name ?? selectedStudent?.student_id ?? ''}"? This will restore the student and their user account.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -444,8 +444,8 @@ export function StudentsList() {
               {t('student.dialogs.forceDeleteTitle') || 'Permanently Delete Student'}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {t('student.dialogs.forceDeleteMessage', { name: selectedStudent?.user?.name || selectedStudent?.student_id }) ||
-                `Are you sure you want to permanently delete "${selectedStudent?.user?.name || selectedStudent?.student_id}"? This action cannot be undone and will permanently remove the student, their user account, and all related data (enrollments, payments, etc.).`}
+              {t('student.dialogs.forceDeleteMessage', { name: selectedStudent?.user?.name ?? selectedStudent?.student_id ?? '' }) ||
+                `Are you sure you want to permanently delete "${selectedStudent?.user?.name ?? selectedStudent?.student_id ?? ''}"? This action cannot be undone and will permanently remove the student, their user account, and all related data (enrollments, payments, etc.).`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

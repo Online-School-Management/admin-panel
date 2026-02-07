@@ -84,6 +84,7 @@ export interface CourseCollectionItem {
     name: string
     commission_rate: number | null
   } | null
+  enrollments_count: number
   created_at: string
 }
 

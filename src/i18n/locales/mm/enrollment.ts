@@ -93,6 +93,27 @@ export const enrollment = {
     viewCourse: 'သင်တန်း ကြည့်ရန်',
   },
 
+  // Course grid (enrollment list page)
+  courseGrid: {
+    title: 'သင်တန်း ရွေးချယ်ရန်',
+    description: 'စာရင်းသွင်းမှုများကို စီမံခန့်ခွဲရန် သင်တန်းတစ်ခု ရွေးချယ်ပါ',
+    noCourses: 'ဤအခြေအနေအတွက် သင်တန်းများ မရှိပါ',
+    courses: 'သင်တန်းများ',
+    students: 'ကျောင်းသားများ',
+    startDate: 'စတင်ရက်',
+    viewEnrollments: 'စာရင်းသွင်းမှုများ ကြည့်ရန်',
+  },
+
+  // Course enrollments page
+  courseEnrollments: {
+    title: 'သင်တန်း စာရင်းသွင်းမှုများ',
+    description: 'ဤသင်တန်းအတွက် စာရင်းသွင်းမှုများကို စီမံခန့်ခွဲရန်',
+    addEnrollment: 'စာရင်းသွင်းမှု ထည့်ရန်',
+    courseInfo: 'သင်တန်း အချက်အလက်',
+    noEnrollments: 'ဤသင်တန်းအတွက် စာရင်းသွင်းမှု မရှိသေးပါ',
+    backToCourses: 'သင်တန်းများသို့ ပြန်သွားရန်',
+  },
+
   // Delete dialog
   delete: {
     title: 'စာရင်းသွင်းမှု ဖျက်ရန်',

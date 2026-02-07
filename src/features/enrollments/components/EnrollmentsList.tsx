@@ -158,7 +158,7 @@ export function EnrollmentsList() {
               <SelectItem value="all">{t('enrollment.filters.allStudents')}</SelectItem>
               {studentsData?.data.map((student) => (
                 <SelectItem key={student.id} value={String(student.id)}>
-                  {student.user.name} ({student.student_id})
+                  {student.user?.name ?? ''} ({student.student_id})
                 </SelectItem>
               ))}
             </SelectContent>
@@ -328,7 +328,7 @@ export function EnrollmentsList() {
         onConfirm={handleDeleteConfirm}
         enrollmentInfo={
           selectedEnrollment
-            ? `${selectedEnrollment.student.name} - ${selectedEnrollment.course.title}`
+            ? `${selectedEnrollment.student?.name ?? ''} - ${selectedEnrollment.course.title}`
             : ''
         }
         isLoading={deleteEnrollment.isPending}

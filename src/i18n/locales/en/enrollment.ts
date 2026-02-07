@@ -93,6 +93,27 @@ export const enrollment = {
     viewCourse: 'View Course',
   },
 
+  // Course grid (enrollment list page)
+  courseGrid: {
+    title: 'Select a Course',
+    description: 'Choose a course to manage its enrollments',
+    noCourses: 'No courses available for this status',
+    courses: 'courses',
+    students: 'students',
+    startDate: 'Starts',
+    viewEnrollments: 'View Enrollments',
+  },
+
+  // Course enrollments page
+  courseEnrollments: {
+    title: 'Course Enrollments',
+    description: 'Manage enrollments for this course',
+    addEnrollment: 'Add Enrollment',
+    courseInfo: 'Course Information',
+    noEnrollments: 'No enrollments for this course yet',
+    backToCourses: 'Back to Courses',
+  },
+
   // Delete dialog
   delete: {
     title: 'Delete Enrollment',

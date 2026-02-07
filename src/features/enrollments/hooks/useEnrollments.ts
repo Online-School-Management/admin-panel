@@ -98,8 +98,9 @@ export function useEnrollmentsByCourse(courseId: number) {
 
 /**
  * Hook to create a new enrollment
+ * @param redirectTo - Optional URL to navigate to after success (defaults to '/enrollments')
  */
-export function useCreateEnrollment() {
+export function useCreateEnrollment(redirectTo?: string) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
@@ -110,8 +111,10 @@ export function useCreateEnrollment() {
       queryClient.invalidateQueries({ queryKey: enrollmentKeys.lists() })
       // Also refetch to ensure the list is updated immediately
       queryClient.refetchQueries({ queryKey: enrollmentKeys.lists() })
+      // Also invalidate by-course queries so the course-enrollments page refreshes
+      queryClient.invalidateQueries({ queryKey: enrollmentKeys.all })
       showCreateSuccessToast('enrollment', 'Enrollment created successfully')
-      navigate('/enrollments')
+      navigate(redirectTo || '/enrollments')
     },
     onError: (error: unknown) => {
       showCreateErrorToast('enrollment', error)

@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useEffect, useMemo, useRef } from 'react'
 import { ArrowLeft, Loader2, UserPlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -38,7 +38,11 @@ interface EnrollmentFormProps {
 export function EnrollmentForm({ enrollmentId }: EnrollmentFormProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const location = useLocation()
   const isEditMode = !!enrollmentId
+
+  // Pre-fill course_id from navigation state (when coming from course-enrollments page)
+  const prefilledCourseId = (location.state as { courseId?: number } | null)?.courseId
 
   const {
     data: enrollmentData,
@@ -47,7 +51,8 @@ export function EnrollmentForm({ enrollmentId }: EnrollmentFormProps) {
     dataUpdatedAt: enrollmentDataUpdatedAt,
   } = useEnrollment(enrollmentId || 0)
 
-  const createEnrollment = useCreateEnrollment()
+  const createRedirectTo = prefilledCourseId ? `/enrollments/course/${prefilledCourseId}` : undefined
+  const createEnrollment = useCreateEnrollment(createRedirectTo)
   const updateEnrollment = useUpdateEnrollment()
 
   // Fetch students and courses for dropdowns
@@ -58,7 +63,7 @@ export function EnrollmentForm({ enrollmentId }: EnrollmentFormProps) {
   const studentOptions = useMemo(() => {
     return studentsData?.data.map((student) => ({
       value: String(student.id),
-      label: `${student.user.name} (${student.student_id})`,
+      label: `${student.user?.name ?? ''} (${student.student_id})`,
     })) || []
   }, [studentsData?.data])
 
@@ -88,7 +93,7 @@ export function EnrollmentForm({ enrollmentId }: EnrollmentFormProps) {
     resolver: zodResolver(enrollmentFormSchema),
     defaultValues: {
       student_id: undefined,
-      course_id: undefined,
+      course_id: prefilledCourseId || undefined,
       enrolled_at: undefined,
       status: 'active',
     },
@@ -238,7 +243,7 @@ export function EnrollmentForm({ enrollmentId }: EnrollmentFormProps) {
                   placeholder={t('enrollment.form.selectCourse')}
                   searchPlaceholder={t('enrollment.form.searchCourse')}
                   emptyText={t('enrollment.form.noCoursesFound')}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !!prefilledCourseId}
                 />
                 {errors.course_id && (
                   <p className="text-sm text-destructive">{errors.course_id.message}</p>
@@ -274,7 +279,7 @@ export function EnrollmentForm({ enrollmentId }: EnrollmentFormProps) {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate('/enrollments')}
+              onClick={() => navigate(prefilledCourseId ? `/enrollments/course/${prefilledCourseId}` : '/enrollments')}
               disabled={isSubmitting || createEnrollment.isPending || updateEnrollment.isPending}
             >
               <ArrowLeft className="h-4 w-4 mr-2" />

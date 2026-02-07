@@ -85,7 +85,7 @@ export function useCreateStudent() {
       queryClient.invalidateQueries({ queryKey: studentKeys.lists() })
       // Also refetch to ensure the list is updated immediately
       queryClient.refetchQueries({ queryKey: studentKeys.lists() })
-      showCreateSuccessToast('student', `${response.data.user.name} has been added`)
+      showCreateSuccessToast('student', `${response.data.user?.name ?? 'Student'} has been added`)
       navigate('/students')
     },
     onError: (error: unknown) => {
@@ -111,7 +111,7 @@ export function useUpdateStudent() {
       // Invalidate and refetch detail query
       queryClient.invalidateQueries({ queryKey: studentKeys.detail(variables.slug) })
       queryClient.refetchQueries({ queryKey: studentKeys.detail(variables.slug) })
-      showUpdateSuccessToast('student', `${response.data.user.name} has been updated`)
+      showUpdateSuccessToast('student', `${response.data.user?.name ?? 'Student'} has been updated`)
       navigate('/students')
     },
     onError: (error: unknown) => {

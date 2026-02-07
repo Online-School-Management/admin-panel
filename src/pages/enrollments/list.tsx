@@ -1,9 +1,10 @@
-import { EnrollmentsList } from '@/features/enrollments/components/EnrollmentsList'
+import { EnrollmentCoursesGrid } from '@/features/enrollments/components/EnrollmentCoursesGrid'
 import { PageHeader } from '@/components/common/PageHeader'
 import { useTranslation } from '@/i18n/context'
 
 /**
- * Enrollments List Page - Displays a list of all enrollments
+ * Enrollments List Page - Displays upcoming/in-progress courses in a grid.
+ * Clicking a course navigates to its enrollment management page.
  */
 function EnrollmentsListPage() {
   const { t } = useTranslation()
@@ -11,12 +12,10 @@ function EnrollmentsListPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={t('enrollment.pages.list')}
-        description={t('enrollment.descriptions.list')}
-        addTo="/enrollments/new"
-        addLabel={t('enrollment.actions.create')}
+        title={t('enrollment.courseGrid.title')}
+        description={t('enrollment.courseGrid.description')}
       />
-      <EnrollmentsList />
+      <EnrollmentCoursesGrid />
     </div>
   )
 }

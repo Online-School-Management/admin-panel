@@ -51,6 +51,10 @@ export interface TeacherCollectionItem {
   department: string | null
   subject: string | null
   employment_type: string
+  commission_type: 'monthly_percent' | 'monthly_salary' | 'per_session'
+  commission_rate: number | null
+  monthly_salary_amount: number | null
+  per_session_amount: number | null
   status: string
   created_at: string
 }

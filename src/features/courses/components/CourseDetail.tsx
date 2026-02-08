@@ -229,7 +229,17 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
                     </p>
                     <p className="text-base">{course.assigned_teacher.email}</p>
                   </div>
-                  {course.assigned_teacher.commission_rate !== null && (
+                  <Separator />
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <DollarSign className="h-4 w-4" />
+                      {t('course.detail.compensationType')}
+                    </p>
+                    <Badge variant="outline">
+                      {t(`teacher.commissionType.${course.assigned_teacher.commission_type || 'monthly_percent'}`)}
+                    </Badge>
+                  </div>
+                  {course.assigned_teacher.commission_type === 'monthly_percent' && course.assigned_teacher.commission_rate != null && (
                     <>
                       <Separator />
                       <div className="space-y-1">
@@ -239,6 +249,34 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
                         </p>
                         <p className="text-base">
                           {course.assigned_teacher.commission_rate.toFixed(2)}%
+                        </p>
+                      </div>
+                    </>
+                  )}
+                  {course.assigned_teacher.commission_type === 'monthly_salary' && course.assigned_teacher.monthly_salary_amount != null && (
+                    <>
+                      <Separator />
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                          <DollarSign className="h-4 w-4" />
+                          {t('course.detail.monthlySalaryAmount')}
+                        </p>
+                        <p className="text-base">
+                          {Number(course.assigned_teacher.monthly_salary_amount).toLocaleString()} MMK
+                        </p>
+                      </div>
+                    </>
+                  )}
+                  {course.assigned_teacher.commission_type === 'per_session' && course.assigned_teacher.per_session_amount != null && (
+                    <>
+                      <Separator />
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                          <DollarSign className="h-4 w-4" />
+                          {t('course.detail.perSessionAmount')}
+                        </p>
+                        <p className="text-base">
+                          {Number(course.assigned_teacher.per_session_amount).toLocaleString()} MMK
                         </p>
                       </div>
                     </>

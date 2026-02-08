@@ -51,7 +51,10 @@ export interface Course {
     id: number
     name: string
     email: string
+    commission_type: 'monthly_percent' | 'monthly_salary' | 'per_session' | null
     commission_rate: number | null
+    monthly_salary_amount: number | null
+    per_session_amount: number | null
   } | null
   schedules: CourseSchedule[]
   class_sessions: ClassSession[]
@@ -82,7 +85,10 @@ export interface CourseCollectionItem {
   assigned_teacher: {
     id: number
     name: string
+    commission_type: 'monthly_percent' | 'monthly_salary' | 'per_session' | null
     commission_rate: number | null
+    monthly_salary_amount: number | null
+    per_session_amount: number | null
   } | null
   enrollments_count: number
   created_at: string

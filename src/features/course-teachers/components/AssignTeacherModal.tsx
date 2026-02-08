@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
+import { Checkbox } from '@/components/ui/checkbox'
 import { useTeachers } from '@/features/teachers/hooks/useTeachers'
 import {
   useCourseTeachersByCourse,
@@ -29,13 +30,27 @@ import {
   useDeleteCourseTeacher,
 } from '../hooks/useCourseTeachers'
 import { useTranslation } from '@/i18n/context'
+import type { TeacherCollectionItem } from '@/features/teachers/types/teacher.types'
 
 const assignTeacherSchema = z.object({
   teacher_id: z.number().int().positive('Please select a teacher'),
+  commission_type: z.enum(['monthly_percent', 'monthly_salary', 'per_session']).optional(),
   commission_rate: z
     .number()
     .min(0, 'Commission rate must be at least 0')
     .max(99, 'Commission rate cannot exceed 99')
+    .nullable()
+    .optional()
+    .or(z.null()),
+  monthly_salary_amount: z
+    .number()
+    .min(0, 'Monthly salary must be at least 0')
+    .nullable()
+    .optional()
+    .or(z.null()),
+  per_session_amount: z
+    .number()
+    .min(0, 'Per session amount must be at least 0')
     .nullable()
     .optional()
     .or(z.null()),
@@ -51,6 +66,34 @@ interface AssignTeacherModalProps {
 }
 
 /**
+ * Helper to get a human-readable compensation summary for a teacher or assignment
+ */
+function getCompensationSummary(
+  commissionType: string | null | undefined,
+  commissionRate: number | null | undefined,
+  monthlySalaryAmount: number | null | undefined,
+  perSessionAmount: number | null | undefined,
+  tFn: (key: string) => string,
+): string | null {
+  switch (commissionType) {
+    case 'monthly_percent':
+      return commissionRate != null
+        ? `${tFn('teacher.commissionType.monthly_percent')}: ${commissionRate.toFixed(2)}%`
+        : tFn('teacher.commissionType.monthly_percent')
+    case 'monthly_salary':
+      return monthlySalaryAmount != null
+        ? `${tFn('teacher.commissionType.monthly_salary')}: ${Number(monthlySalaryAmount).toLocaleString()} MMK`
+        : tFn('teacher.commissionType.monthly_salary')
+    case 'per_session':
+      return perSessionAmount != null
+        ? `${tFn('teacher.commissionType.per_session')}: ${Number(perSessionAmount).toLocaleString()} MMK`
+        : tFn('teacher.commissionType.per_session')
+    default:
+      return null
+  }
+}
+
+/**
  * AssignTeacherModal component - modal for assigning teachers to courses
  */
 export function AssignTeacherModal({
@@ -61,6 +104,7 @@ export function AssignTeacherModal({
 }: AssignTeacherModalProps) {
   const { t } = useTranslation()
   const [editingId, setEditingId] = useState<number | null>(null)
+  const [useDefault, setUseDefault] = useState(true)
 
   // Fetch teachers for dropdown
   const { data: teachersData, isLoading: isLoadingTeachers } = useTeachers({
@@ -87,80 +131,118 @@ export function AssignTeacherModal({
     resolver: zodResolver(assignTeacherSchema),
     defaultValues: {
       teacher_id: undefined as any,
+      commission_type: 'monthly_percent',
       commission_rate: null,
+      monthly_salary_amount: null,
+      per_session_amount: null,
     },
   })
 
   const selectedTeacherId = watch('teacher_id')
+  const selectedCommissionType = watch('commission_type')
   const teachers = teachersData?.data || []
   const assignments = assignmentsData?.data || []
-  
+
   // Check if a teacher is already assigned to this course (only one allowed)
   const hasExistingAssignment = assignments.length > 0
   const existingAssignment = assignments[0] || null
+
+  // Find the selected teacher's data to show defaults
+  const selectedTeacher: TeacherCollectionItem | undefined = useMemo(() => {
+    if (!selectedTeacherId) return undefined
+    return teachers.find((t) => t.id === selectedTeacherId)
+  }, [selectedTeacherId, teachers])
+
+  // Get the selected teacher's default compensation display
+  const teacherDefaultDisplay = useMemo(() => {
+    if (!selectedTeacher) return null
+    return getCompensationSummary(
+      selectedTeacher.commission_type,
+      selectedTeacher.commission_rate,
+      selectedTeacher.monthly_salary_amount,
+      selectedTeacher.per_session_amount,
+      t,
+    )
+  }, [selectedTeacher, t])
 
   // Reset form when modal opens/closes or when editing changes
   useEffect(() => {
     if (!open) {
       reset()
       setEditingId(null)
+      setUseDefault(true)
     } else {
-      // When modal opens, refetch assignments to ensure fresh data
       refetchAssignments()
       if (editingId && existingAssignment) {
-        // When editing, populate form with existing assignment data
         setValue('teacher_id', existingAssignment.teacher.id)
-        setValue('commission_rate', existingAssignment.commission_rate || undefined)
+        setValue('commission_type', existingAssignment.commission_type || 'monthly_percent')
+        setValue('commission_rate', existingAssignment.commission_rate ?? null)
+        setValue('monthly_salary_amount', existingAssignment.monthly_salary_amount ?? null)
+        setValue('per_session_amount', existingAssignment.per_session_amount ?? null)
+        // In edit mode, default to "use default" = true (admin can uncheck to override)
+        setUseDefault(true)
       } else {
         reset()
+        setUseDefault(true)
       }
     }
   }, [open, editingId, existingAssignment, reset, setValue, refetchAssignments])
 
   const onSubmit = async (data: AssignTeacherFormData) => {
+    // If "use default" is checked, don't send compensation fields – backend will copy teacher defaults
+    const compensationPayload: Record<string, any> = {}
+
+    if (!useDefault) {
+      const commissionType = data.commission_type || 'monthly_percent'
+      compensationPayload.commission_type = commissionType
+      switch (commissionType) {
+        case 'monthly_percent':
+          compensationPayload.commission_rate = data.commission_rate ?? null
+          compensationPayload.monthly_salary_amount = null
+          compensationPayload.per_session_amount = null
+          break
+        case 'monthly_salary':
+          compensationPayload.commission_rate = null
+          compensationPayload.monthly_salary_amount = data.monthly_salary_amount ?? null
+          compensationPayload.per_session_amount = null
+          break
+        case 'per_session':
+          compensationPayload.commission_rate = null
+          compensationPayload.monthly_salary_amount = null
+          compensationPayload.per_session_amount = data.per_session_amount ?? null
+          break
+      }
+    }
+
     if (editingId) {
-      // Update existing assignment (can change teacher or commission rate)
-      const updateData: any = {
-        teacher_id: data.teacher_id,
-      }
-      // Only include commission_rate if it's provided (not null/undefined)
-      if (data.commission_rate !== null && data.commission_rate !== undefined) {
-        updateData.commission_rate = data.commission_rate
-      } else {
-        // If not provided, set to null so backend can use teacher's default
-        updateData.commission_rate = null
-      }
-      
       updateAssignment.mutate(
         {
           id: editingId,
-          data: updateData,
+          data: {
+            teacher_id: data.teacher_id,
+            ...compensationPayload,
+          },
         },
         {
           onSuccess: () => {
             reset()
             setEditingId(null)
+            setUseDefault(true)
           },
         }
       )
     } else {
-      // Create new assignment (only if no teacher is assigned)
       if (!hasExistingAssignment) {
-        const createData: any = {
-          course_id: courseId,
-          teacher_id: data.teacher_id,
-        }
-        // Only include commission_rate if it's provided (not null/undefined)
-        if (data.commission_rate !== null && data.commission_rate !== undefined) {
-          createData.commission_rate = data.commission_rate
-        }
-        // If not provided, don't send it - backend will use teacher's default
-        
         createAssignment.mutate(
-          createData,
+          {
+            course_id: courseId,
+            teacher_id: data.teacher_id,
+            ...compensationPayload,
+          },
           {
             onSuccess: () => {
               reset()
+              setUseDefault(true)
             },
           }
         )
@@ -174,6 +256,7 @@ export function AssignTeacherModal({
 
   const handleCancelEdit = () => {
     setEditingId(null)
+    setUseDefault(true)
     reset()
   }
 
@@ -181,12 +264,151 @@ export function AssignTeacherModal({
     if (window.confirm(t('courseTeacher.modal.confirmDelete'))) {
       deleteAssignment.mutate(assignmentId, {
         onSuccess: () => {
-          // Refetch the course-specific assignments to ensure fresh data
           refetchAssignments()
         },
       })
     }
   }
+
+  // Shared compensation section: shows default info or editable override fields
+  const renderCompensationSection = (idPrefix: string) => (
+    <div className="space-y-4">
+      {/* Teacher's Default Compensation Display (only when a teacher is selected) */}
+      {selectedTeacher && (
+        <div className="rounded-lg border bg-muted/50 p-3 space-y-1">
+          <p className="text-sm font-medium">{t('courseTeacher.modal.teacherDefault')}</p>
+          <Badge variant="secondary">
+            {teacherDefaultDisplay || t('courseTeacher.modal.noDefaultSet')}
+          </Badge>
+        </div>
+      )}
+
+      {/* Use Default Toggle */}
+      {selectedTeacher && (
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id={`${idPrefix}_use_default`}
+            checked={useDefault}
+            onCheckedChange={(checked) => {
+              setUseDefault(checked === true)
+              // When switching to override, pre-fill with teacher's current defaults
+              if (checked === false && selectedTeacher) {
+                setValue('commission_type', selectedTeacher.commission_type || 'monthly_percent')
+                setValue('commission_rate', selectedTeacher.commission_rate ?? null)
+                setValue('monthly_salary_amount', selectedTeacher.monthly_salary_amount ?? null)
+                setValue('per_session_amount', selectedTeacher.per_session_amount ?? null)
+              }
+            }}
+            disabled={isSubmitting}
+          />
+          <Label
+            htmlFor={`${idPrefix}_use_default`}
+            className="text-sm font-medium leading-none cursor-pointer"
+          >
+            {t('courseTeacher.modal.useDefault')}
+          </Label>
+        </div>
+      )}
+
+      {/* Override Fields (only when useDefault is unchecked and teacher selected) */}
+      {selectedTeacher && !useDefault && (
+        <div className="space-y-4 pl-1 border-l-2 border-primary/20 ml-1">
+          <div className="pl-3 space-y-4">
+            {/* Commission Type */}
+            <div className="space-y-2">
+              <Label htmlFor={`${idPrefix}_commission_type`}>
+                {t('courseTeacher.modal.commissionType')}
+              </Label>
+              <Select
+                value={selectedCommissionType || 'monthly_percent'}
+                onValueChange={(value) => setValue('commission_type', value as any)}
+                disabled={isSubmitting}
+              >
+                <SelectTrigger id={`${idPrefix}_commission_type`}>
+                  <SelectValue placeholder={t('courseTeacher.modal.selectCommissionType')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="monthly_percent">{t('teacher.commissionType.monthly_percent')}</SelectItem>
+                  <SelectItem value="monthly_salary">{t('teacher.commissionType.monthly_salary')}</SelectItem>
+                  <SelectItem value="per_session">{t('teacher.commissionType.per_session')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Commission Rate (only for monthly_percent) */}
+            {selectedCommissionType === 'monthly_percent' && (
+              <div className="space-y-2">
+                <Label htmlFor={`${idPrefix}_commission_rate`}>
+                  {t('courseTeacher.modal.commissionRate')} (%)
+                </Label>
+                <Input
+                  id={`${idPrefix}_commission_rate`}
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  max="99"
+                  {...register('commission_rate', {
+                    setValueAs: (v) => v === '' || v === null || v === undefined ? null : (isNaN(Number(v)) ? null : Number(v))
+                  })}
+                  placeholder={t('courseTeacher.modal.enterCommissionRate')}
+                  disabled={isSubmitting}
+                />
+                {errors.commission_rate && (
+                  <p className="text-sm text-destructive">{errors.commission_rate.message}</p>
+                )}
+              </div>
+            )}
+
+            {/* Monthly Salary Amount (only for monthly_salary) */}
+            {selectedCommissionType === 'monthly_salary' && (
+              <div className="space-y-2">
+                <Label htmlFor={`${idPrefix}_monthly_salary_amount`}>
+                  {t('courseTeacher.modal.monthlySalaryAmount')}
+                </Label>
+                <Input
+                  id={`${idPrefix}_monthly_salary_amount`}
+                  type="number"
+                  step="1"
+                  min="0"
+                  {...register('monthly_salary_amount', {
+                    setValueAs: (v) => v === '' || v === null || v === undefined ? null : (isNaN(Number(v)) ? null : Number(v))
+                  })}
+                  placeholder={t('courseTeacher.modal.enterMonthlySalaryAmount')}
+                  disabled={isSubmitting}
+                />
+                {errors.monthly_salary_amount && (
+                  <p className="text-sm text-destructive">{errors.monthly_salary_amount.message}</p>
+                )}
+              </div>
+            )}
+
+            {/* Per Session Amount (only for per_session) */}
+            {selectedCommissionType === 'per_session' && (
+              <div className="space-y-2">
+                <Label htmlFor={`${idPrefix}_per_session_amount`}>
+                  {t('courseTeacher.modal.perSessionAmount')}
+                </Label>
+                <Input
+                  id={`${idPrefix}_per_session_amount`}
+                  type="number"
+                  step="1"
+                  min="0"
+                  {...register('per_session_amount', {
+                    setValueAs: (v) => v === '' || v === null || v === undefined ? null : (isNaN(Number(v)) ? null : Number(v))
+                  })}
+                  placeholder={t('courseTeacher.modal.enterPerSessionAmount')}
+                  disabled={isSubmitting}
+                />
+                {errors.per_session_amount && (
+                  <p className="text-sm text-destructive">{errors.per_session_amount.message}</p>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  )
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -216,10 +438,21 @@ export function AssignTeacherModal({
                         <p className="text-sm text-muted-foreground">
                           {existingAssignment.teacher.user.email}
                         </p>
-                        {existingAssignment.commission_rate !== null && (
+                        {getCompensationSummary(
+                          existingAssignment.commission_type,
+                          existingAssignment.commission_rate,
+                          existingAssignment.monthly_salary_amount,
+                          existingAssignment.per_session_amount,
+                          t,
+                        ) && (
                           <Badge variant="outline" className="mt-1">
-                            {t('courseTeacher.modal.commissionRate')}:{' '}
-                            {existingAssignment.commission_rate.toFixed(2)}%
+                            {getCompensationSummary(
+                              existingAssignment.commission_type,
+                              existingAssignment.commission_rate,
+                              existingAssignment.monthly_salary_amount,
+                              existingAssignment.per_session_amount,
+                              t,
+                            )}
                           </Badge>
                         )}
                       </div>
@@ -260,6 +493,7 @@ export function AssignTeacherModal({
                   value={selectedTeacherId ? String(selectedTeacherId) : ''}
                   onValueChange={(value) => {
                     setValue('teacher_id', Number(value), { shouldValidate: true })
+                    setUseDefault(true)
                   }}
                   disabled={isSubmitting || isLoadingTeachers}
                 >
@@ -279,34 +513,7 @@ export function AssignTeacherModal({
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="commission_rate">
-                  {t('courseTeacher.modal.commissionRate')} (%)
-                  <span className="text-muted-foreground text-sm ml-2">
-                    ({t('courseTeacher.modal.optional')})
-                  </span>
-                </Label>
-                <Input
-                  id="commission_rate"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  max="99"
-                  {...register('commission_rate', { 
-                    setValueAs: (v) => v === '' || v === null || v === undefined ? null : (isNaN(Number(v)) ? null : Number(v))
-                  })}
-                  placeholder={t('courseTeacher.modal.enterCommissionRate')}
-                  disabled={isSubmitting}
-                />
-                <p className="text-xs text-muted-foreground">
-                  {t('courseTeacher.modal.commissionHint')}
-                </p>
-                {errors.commission_rate && (
-                  <p className="text-sm text-destructive">
-                    {errors.commission_rate.message}
-                  </p>
-                )}
-              </div>
+              {renderCompensationSection('create')}
 
               <div className="flex justify-end gap-2 pt-4">
                 <Button
@@ -316,6 +523,7 @@ export function AssignTeacherModal({
                     onOpenChange(false)
                     reset()
                     setEditingId(null)
+                    setUseDefault(true)
                   }}
                   disabled={isSubmitting}
                 >
@@ -350,6 +558,7 @@ export function AssignTeacherModal({
                   value={selectedTeacherId ? String(selectedTeacherId) : ''}
                   onValueChange={(value) => {
                     setValue('teacher_id', Number(value), { shouldValidate: true })
+                    setUseDefault(true)
                   }}
                   disabled={isSubmitting || isLoadingTeachers}
                 >
@@ -369,34 +578,7 @@ export function AssignTeacherModal({
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="edit_commission_rate">
-                  {t('courseTeacher.modal.commissionRate')} (%)
-                  <span className="text-muted-foreground text-sm ml-2">
-                    ({t('courseTeacher.modal.optional')})
-                  </span>
-                </Label>
-                <Input
-                  id="edit_commission_rate"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  max="99"
-                  {...register('commission_rate', { 
-                    setValueAs: (v) => v === '' || v === null || v === undefined ? null : (isNaN(Number(v)) ? null : Number(v))
-                  })}
-                  placeholder={t('courseTeacher.modal.enterCommissionRate')}
-                  disabled={isSubmitting}
-                />
-                <p className="text-xs text-muted-foreground">
-                  {t('courseTeacher.modal.commissionHint')}
-                </p>
-                {errors.commission_rate && (
-                  <p className="text-sm text-destructive">
-                    {errors.commission_rate.message}
-                  </p>
-                )}
-              </div>
+              {renderCompensationSection('edit')}
 
               <div className="flex justify-end gap-2 pt-4">
                 <Button
@@ -425,4 +607,3 @@ export function AssignTeacherModal({
     </Dialog>
   )
 }
-

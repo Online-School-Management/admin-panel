@@ -122,10 +122,28 @@ export function TeacherDetail({ teacherSlug }: TeacherDetailProps) {
                     {getEmploymentTypeLabel(teacher.employment_type)}
                   </Badge>
                 </div>
-                {teacher.commission_rate && (
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">{t('teacher.detail.commissionType')}</p>
+                  <Badge variant="outline">
+                    {t(`teacher.commissionType.${teacher.commission_type || 'monthly_percent'}`)}
+                  </Badge>
+                </div>
+                {teacher.commission_type === 'monthly_percent' && teacher.commission_rate != null && (
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-muted-foreground">{t('teacher.detail.commissionRate')}</p>
                     <p className="text-base">{teacher.commission_rate.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</p>
+                  </div>
+                )}
+                {teacher.commission_type === 'monthly_salary' && teacher.monthly_salary_amount != null && (
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">{t('teacher.detail.monthlySalaryAmount')}</p>
+                    <p className="text-base">{Number(teacher.monthly_salary_amount).toLocaleString()} MMK</p>
+                  </div>
+                )}
+                {teacher.commission_type === 'per_session' && teacher.per_session_amount != null && (
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">{t('teacher.detail.perSessionAmount')}</p>
+                    <p className="text-base">{Number(teacher.per_session_amount).toLocaleString()} MMK</p>
                   </div>
                 )}
               </div>

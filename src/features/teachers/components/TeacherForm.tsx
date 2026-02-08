@@ -77,7 +77,10 @@ export function TeacherForm({ teacherSlug }: TeacherFormProps) {
       department: '',
       subject: '',
       employment_type: EMPLOYMENT_TYPE.FULL_TIME,
+      commission_type: 'monthly_percent',
       commission_rate: undefined,
+      monthly_salary_amount: undefined,
+      per_session_amount: undefined,
       password: '',
       password_confirmation: '',
     },
@@ -125,7 +128,10 @@ export function TeacherForm({ teacherSlug }: TeacherFormProps) {
       department: departmentValue,
       subject: subjectValue,
       employment_type: teacher.employment_type || EMPLOYMENT_TYPE.FULL_TIME,
+      commission_type: teacher.commission_type || 'monthly_percent',
       commission_rate: teacher.commission_rate || undefined,
+      monthly_salary_amount: teacher.monthly_salary_amount || undefined,
+      per_session_amount: teacher.per_session_amount || undefined,
       password: '',
       password_confirmation: '',
     }, {
@@ -147,7 +153,10 @@ export function TeacherForm({ teacherSlug }: TeacherFormProps) {
         department: data.department || undefined,
         subject: data.subject || undefined,
         employment_type: data.employment_type,
-        commission_rate: data.commission_rate || undefined,
+        commission_type: data.commission_type || 'monthly_percent',
+        commission_rate: data.commission_type === 'monthly_percent' ? (data.commission_rate ?? undefined) : undefined,
+        monthly_salary_amount: data.commission_type === 'monthly_salary' ? (data.monthly_salary_amount ?? null) : null,
+        per_session_amount: data.commission_type === 'per_session' ? (data.per_session_amount ?? null) : null,
       }
       
       // Include email if provided and not empty
@@ -171,7 +180,10 @@ export function TeacherForm({ teacherSlug }: TeacherFormProps) {
         department: data.department,
         subject: data.subject,
         employment_type: data.employment_type,
-        commission_rate: data.commission_rate ?? undefined,
+        commission_type: data.commission_type || 'monthly_percent',
+        commission_rate: data.commission_type === 'monthly_percent' ? (data.commission_rate ?? undefined) : undefined,
+        monthly_salary_amount: data.commission_type === 'monthly_salary' ? (data.monthly_salary_amount ?? null) : null,
+        per_session_amount: data.commission_type === 'per_session' ? (data.per_session_amount ?? null) : null,
       }
       createTeacher.mutate(createData)
     }
@@ -348,23 +360,88 @@ export function TeacherForm({ teacherSlug }: TeacherFormProps) {
                 )}
               </div>
 
-              {/* Commission Rate */}
+              {/* Commission Type */}
               <div className="space-y-2">
-                <Label htmlFor="commission_rate">{t('teacher.form.commissionRate')}</Label>
-                <Input
-                  id="commission_rate"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  max="99"
-                  {...register('commission_rate', { valueAsNumber: true })}
-                  placeholder={t('teacher.form.enterCommissionRate')}
+                <Label htmlFor="commission_type">{t('teacher.form.commissionType')}</Label>
+                <Select
+                  value={watch('commission_type') || 'monthly_percent'}
+                  onValueChange={(value) => setValue('commission_type', value as any)}
                   disabled={isSubmitting}
-                />
-                {errors.commission_rate && (
-                  <p className="text-sm text-destructive">{errors.commission_rate.message}</p>
+                >
+                  <SelectTrigger id="commission_type">
+                    <SelectValue placeholder={t('teacher.form.selectCommissionType')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="monthly_percent">{t('teacher.commissionType.monthly_percent')}</SelectItem>
+                    <SelectItem value="monthly_salary">{t('teacher.commissionType.monthly_salary')}</SelectItem>
+                    <SelectItem value="per_session">{t('teacher.commissionType.per_session')}</SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.commission_type && (
+                  <p className="text-sm text-destructive">{errors.commission_type.message}</p>
                 )}
               </div>
+
+              {/* Commission Rate (only for monthly_percent) */}
+              {watch('commission_type') === 'monthly_percent' && (
+                <div className="space-y-2">
+                  <Label htmlFor="commission_rate">{t('teacher.form.commissionRate')}</Label>
+                  <Input
+                    id="commission_rate"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    max="99"
+                    {...register('commission_rate', { valueAsNumber: true })}
+                    placeholder={t('teacher.form.enterCommissionRate')}
+                    disabled={isSubmitting}
+                  />
+                  <p className="text-xs text-muted-foreground">{t('teacher.form.commissionRateHint')}</p>
+                  {errors.commission_rate && (
+                    <p className="text-sm text-destructive">{errors.commission_rate.message}</p>
+                  )}
+                </div>
+              )}
+
+              {/* Monthly Salary Amount (only for monthly_salary) */}
+              {watch('commission_type') === 'monthly_salary' && (
+                <div className="space-y-2">
+                  <Label htmlFor="monthly_salary_amount">{t('teacher.form.monthlySalaryAmount')}</Label>
+                  <Input
+                    id="monthly_salary_amount"
+                    type="number"
+                    step="1"
+                    min="0"
+                    {...register('monthly_salary_amount', { valueAsNumber: true })}
+                    placeholder={t('teacher.form.enterMonthlySalaryAmount')}
+                    disabled={isSubmitting}
+                  />
+                  <p className="text-xs text-muted-foreground">{t('teacher.form.monthlySalaryHint')}</p>
+                  {errors.monthly_salary_amount && (
+                    <p className="text-sm text-destructive">{errors.monthly_salary_amount.message}</p>
+                  )}
+                </div>
+              )}
+
+              {/* Per Session Amount (only for per_session) */}
+              {watch('commission_type') === 'per_session' && (
+                <div className="space-y-2">
+                  <Label htmlFor="per_session_amount">{t('teacher.form.perSessionAmount')}</Label>
+                  <Input
+                    id="per_session_amount"
+                    type="number"
+                    step="1"
+                    min="0"
+                    {...register('per_session_amount', { valueAsNumber: true })}
+                    placeholder={t('teacher.form.enterPerSessionAmount')}
+                    disabled={isSubmitting}
+                  />
+                  <p className="text-xs text-muted-foreground">{t('teacher.form.perSessionHint')}</p>
+                  {errors.per_session_amount && (
+                    <p className="text-sm text-destructive">{errors.per_session_amount.message}</p>
+                  )}
+                </div>
+              )}
 
               {/* Status */}
               <div className="space-y-2">

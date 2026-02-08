@@ -25,7 +25,10 @@ export interface Teacher {
   department?: string | null
   subject?: string | null
   employment_type: 'full-time' | 'part-time' | 'contract'
+  commission_type?: 'monthly_percent' | 'monthly_salary' | 'per_session'
   commission_rate?: number | null
+  monthly_salary_amount?: number | null
+  per_session_amount?: number | null
   status: 'active' | 'inactive' | 'suspended'
   notes?: string | null
   created_at?: string
@@ -68,7 +71,10 @@ export interface CreateTeacherInput {
   department?: string
   subject?: string
   employment_type?: 'full-time' | 'part-time' | 'contract'
+  commission_type?: 'monthly_percent' | 'monthly_salary' | 'per_session'
   commission_rate?: number
+  monthly_salary_amount?: number | null
+  per_session_amount?: number | null
   notes?: string
 }
 
@@ -88,7 +94,10 @@ export interface UpdateTeacherInput {
   department?: string
   subject?: string
   employment_type?: 'full-time' | 'part-time' | 'contract'
+  commission_type?: 'monthly_percent' | 'monthly_salary' | 'per_session'
   commission_rate?: number
+  monthly_salary_amount?: number | null
+  per_session_amount?: number | null
   notes?: string
 }
 

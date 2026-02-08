@@ -16,7 +16,10 @@ const teacherFormBaseSchema = z.object({
   department: z.string().optional(),
   subject: z.string().optional(),
   employment_type: z.enum([EMPLOYMENT_TYPE.FULL_TIME, EMPLOYMENT_TYPE.PART_TIME, EMPLOYMENT_TYPE.CONTRACT]).optional(),
+  commission_type: z.enum(['monthly_percent', 'monthly_salary', 'per_session']).optional(),
   commission_rate: z.number().min(0).max(99).optional().nullable(),
+  monthly_salary_amount: z.number().min(0).optional().nullable(),
+  per_session_amount: z.number().min(0).optional().nullable(),
 })
 
 /**

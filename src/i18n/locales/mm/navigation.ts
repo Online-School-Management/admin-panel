@@ -16,6 +16,7 @@ export const navigation = {
   enrollments: 'စာရင်းသွင်းမှုများ',
   'class-sessions': 'အတန်းချိန်များ',
   'student-payments': 'ကျောင်းသားငွေပေးချေမှုများ',
+  'teacher-payouts': 'ဆရာပေးချေမှုများ',
 }
 
 

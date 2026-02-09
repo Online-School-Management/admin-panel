@@ -16,6 +16,7 @@ export const navigation = {
   enrollments: 'Enrollment',
   'class-sessions': 'Class Sessions',
   'student-payments': 'Student Payments',
+  'teacher-payouts': 'Teacher Payouts',
 }
 
 

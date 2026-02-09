@@ -4,7 +4,7 @@ import { NavItem } from './NavItem'
 import { useUIStore } from '@/store/uiStore'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { mainNavigation, adminNavigation, subjectNavigation } from '@/constants/navigation'
+import { classNavigation, mainNavigation, adminNavigation, subjectNavigation } from '@/constants/navigation'
 import { useTranslation } from '@/i18n/context'
 
 export const Sidebar = memo(function Sidebar() {
@@ -13,6 +13,11 @@ export const Sidebar = memo(function Sidebar() {
   const { t } = useTranslation()
   
   // Map navigation items with translations
+  const translatedClassNav = classNavigation.map(item => ({
+    ...item,
+    label: t(`navigation.${item.to.replace('/', '')}`) || item.label
+  }))
+
   const translatedMainNav = mainNavigation.map(item => ({
     ...item,
     label: t(`navigation.${item.to.replace('/', '')}`) || item.label
@@ -79,6 +84,28 @@ export const Sidebar = memo(function Sidebar() {
           'flex-1 space-y-1 overflow-y-auto overflow-x-hidden',
           sidebarOpen ? 'p-4' : 'p-2'
         )}>
+
+          {translatedClassNav.map((item) => (
+            <NavItem
+              key={item.to}
+              to={item.to}
+              icon={item.icon}
+              label={item.label}
+              collapsed={!sidebarOpen}
+              onClick={() => {
+                // Close sidebar on mobile when item is clicked
+                if (window.innerWidth < 1024) {
+                  setSidebarOpen(false)
+                }
+              }}
+            />
+          ))}
+
+          {/* Separator */}
+          <div className={cn('my-2', !sidebarOpen && 'px-2')}>
+            <hr className="border-0 h-px bg-border" />
+          </div>
+
           {/* Main Navigation */}
           {translatedMainNav.map((item) => (
             <NavItem

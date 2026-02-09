@@ -20,6 +20,7 @@ import { schedule } from './schedule'
 import { enrollment } from './enrollment'
 import { classSession } from './class-session'
 import { studentPayment } from './student-payment'
+import { teacherPayout } from './teacher-payout'
 
 export const mm = {
   common,
@@ -39,6 +40,7 @@ export const mm = {
   enrollment,
   classSession,
   studentPayment,
+  teacherPayout,
 }
 
 

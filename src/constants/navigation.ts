@@ -1,4 +1,4 @@
-import { Home, Shield, UserCog, Key, GraduationCap, Users, BookOpen, BookText, CreditCard, CalendarDays, LucideIcon } from 'lucide-react'
+import { Shield, UserCog, Key, GraduationCap, Users, BookOpen, BookText, CreditCard, CalendarDays, Wallet, LucideIcon } from 'lucide-react'
 
 export interface NavigationItem {
   to: string
@@ -6,18 +6,24 @@ export interface NavigationItem {
   label: string
 }
 
+export const classNavigation: NavigationItem[] = [
+  { to: '/class-sessions', icon: CalendarDays, label: 'Class Sessions' },
+  // { to: '/dashboard', icon: Home, label: 'Dashboard' },
+]
+
 export const mainNavigation: NavigationItem[] = [
-  { to: '/dashboard', icon: Home, label: 'Dashboard' },
+  // { to: '/class-sessions', icon: CalendarDays, label: 'Class Sessions' },
+  // { to: '/dashboard', icon: Home, label: 'Dashboard' },
   { to: '/students', icon: Users, label: 'Students' },
   { to: '/enrollments', icon: BookText, label: 'Enrollments' },
-  { to: '/class-sessions', icon: CalendarDays, label: 'Class Sessions' },
   { to: '/student-payments', icon: CreditCard, label: 'Student Payments' },
+  { to: '/teacher-payouts', icon: Wallet, label: 'Teacher Payouts' },
 ]
 
 export const subjectNavigation: NavigationItem[] = [
-  { to: '/teachers', icon: GraduationCap, label: 'Teachers' },
   { to: '/subjects', icon: BookOpen, label: 'Subjects' },
   { to: '/courses', icon: BookText, label: 'Courses' },
+  { to: '/teachers', icon: GraduationCap, label: 'Teachers' },
 ]
 
 export const adminNavigation: NavigationItem[] = [

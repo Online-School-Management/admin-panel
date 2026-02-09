@@ -10,12 +10,10 @@ export const teacherPayout = {
   period: {
     custom: 'စိတ်ကြိုက်ကာလ',
   },
-  stats: {
-    total: 'စုစုပေါင်း',
-    pending: 'ဆိုင်းငံ့',
-    paid: 'ပေးပြီး',
-    totalAmount: 'စုစုပေါင်းငွေ',
-    pendingAmount: 'ဆိုင်းငံ့ငွေ',
+  summary: {
+    fromStudents: 'ကျောင်းသားများထံမှ',
+    toTeachers: 'ဆရာများသို့',
+    netBalance: 'လက်ကျန်',
   },
   status: {
     pending: 'ဆိုင်းငံ့',

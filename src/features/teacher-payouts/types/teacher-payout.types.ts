@@ -98,6 +98,10 @@ export interface TeacherPayoutsResponse {
       from: number | null
       to: number | null
     }
+    period_totals?: {
+      total_from_students: number
+      total_to_teachers: number
+    }
   }
 }
 

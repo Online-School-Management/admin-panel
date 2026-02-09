@@ -10,12 +10,10 @@ export const teacherPayout = {
   period: {
     custom: 'Custom Range',
   },
-  stats: {
-    total: 'Total Payouts',
-    pending: 'Pending',
-    paid: 'Paid',
-    totalAmount: 'Total Amount',
-    pendingAmount: 'Pending Amount',
+  summary: {
+    fromStudents: 'From students',
+    toTeachers: 'To teachers',
+    netBalance: 'Balance',
   },
   status: {
     pending: 'Pending',

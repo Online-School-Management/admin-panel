@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { Calculator, CheckCircle2, Search, RefreshCw, DollarSign, Users, CalendarRange } from 'lucide-react'
+import { Calculator, CheckCircle2, Search, RefreshCw, CalendarRange } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -20,7 +20,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import {
   useTeacherPayouts,
   useCalculatePayouts,
@@ -139,17 +139,7 @@ export function TeacherPayoutsList() {
 
   const payouts = Array.isArray(data?.data) ? data.data : []
   const pagination = data?.meta?.pagination
-
-  // Summary stats
-  const stats = useMemo(() => {
-    const total = payouts.length
-    const pendingCount = payouts.filter(p => p.status === 'pending').length
-    const paidCount = payouts.filter(p => p.status === 'paid').length
-    const totalAmount = payouts.reduce((sum, p) => sum + (p.payout_amount || 0), 0)
-    const pendingAmount = payouts.filter(p => p.status === 'pending').reduce((sum, p) => sum + (p.payout_amount || 0), 0)
-
-    return { total, pendingCount, paidCount, totalAmount, pendingAmount }
-  }, [payouts])
+  const periodTotals = data?.meta?.period_totals
 
   // Handlers
   const handleCalculate = () => {
@@ -354,8 +344,8 @@ export function TeacherPayoutsList() {
           )}
         </div>
 
-        {/* Action bar: Calculate + Bulk Mark Paid */}
-        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+        {/* Action bar: Calculate + Period Totals + Bulk Mark Paid */}
+        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center flex-wrap">
           <Button
             onClick={handleCalculate}
             disabled={calculatePayouts.isPending || (periodMode === 'custom' && (!customStart || !customEnd))}
@@ -366,74 +356,45 @@ export function TeacherPayoutsList() {
               : t('teacherPayout.actions.calculate')}
           </Button>
 
+          {/* Period totals inline */}
+          {periodTotals && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm">
+                <span className="text-muted-foreground">{t('teacherPayout.summary.fromStudents')}:</span>
+                <span className="font-semibold text-green-600">{formatCurrency(periodTotals.total_from_students)}</span>
+              </div>
+              <span className="text-muted-foreground font-medium">−</span>
+              <div className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm">
+                <span className="text-muted-foreground">{t('teacherPayout.summary.toTeachers')}:</span>
+                <span className="font-semibold text-orange-600">{formatCurrency(periodTotals.total_to_teachers)}</span>
+              </div>
+              <span className="text-muted-foreground font-medium">=</span>
+              <div className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm">
+                <span className="text-muted-foreground">{t('teacherPayout.summary.netBalance')}:</span>
+                <span className={cn(
+                  'font-semibold',
+                  periodTotals.total_from_students - periodTotals.total_to_teachers >= 0
+                    ? 'text-blue-600'
+                    : 'text-red-600'
+                )}>
+                  {formatCurrency(periodTotals.total_from_students - periodTotals.total_to_teachers)}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Bulk mark paid - pushed to right */}
           {pendingSelectedCount > 0 && (
             <Button
               variant="default"
               onClick={handleBulkMarkPaid}
+              className="sm:ml-auto"
             >
               <CheckCircle2 className="h-4 w-4 mr-2" />
               {t('teacherPayout.actions.markSelectedPaid', { count: String(pendingSelectedCount) })}
             </Button>
           )}
         </div>
-
-        {/* Summary Cards */}
-        {!isLoading && payouts.length > 0 && (
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-            <Card className="p-3">
-              <CardHeader className="p-0 pb-2">
-                <CardTitle className="text-xs font-medium text-muted-foreground">
-                  {t('teacherPayout.stats.total')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <p className="text-xl font-bold">{stats.total}</p>
-              </CardContent>
-            </Card>
-            <Card className="p-3">
-              <CardHeader className="p-0 pb-2">
-                <CardTitle className="text-xs font-medium text-muted-foreground">
-                  {t('teacherPayout.stats.pending')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <p className="text-xl font-bold text-orange-600">{stats.pendingCount}</p>
-              </CardContent>
-            </Card>
-            <Card className="p-3">
-              <CardHeader className="p-0 pb-2">
-                <CardTitle className="text-xs font-medium text-muted-foreground">
-                  {t('teacherPayout.stats.paid')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <p className="text-xl font-bold text-green-600">{stats.paidCount}</p>
-              </CardContent>
-            </Card>
-            <Card className="p-3">
-              <CardHeader className="p-0 pb-2">
-                <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-                  <DollarSign className="h-3 w-3" />
-                  {t('teacherPayout.stats.totalAmount')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <p className="text-lg font-bold">{formatCurrency(stats.totalAmount)}</p>
-              </CardContent>
-            </Card>
-            <Card className="p-3">
-              <CardHeader className="p-0 pb-2">
-                <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-                  <Users className="h-3 w-3" />
-                  {t('teacherPayout.stats.pendingAmount')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <p className="text-lg font-bold text-orange-600">{formatCurrency(stats.pendingAmount)}</p>
-              </CardContent>
-            </Card>
-          </div>
-        )}
 
         {/* Search and Filters */}
         <div className="flex flex-col sm:flex-row gap-4">

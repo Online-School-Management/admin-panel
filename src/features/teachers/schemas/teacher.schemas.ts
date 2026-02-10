@@ -6,6 +6,23 @@ import { VALIDATION, VALIDATION_MESSAGES, TEACHER_STATUS, EMPLOYMENT_TYPE } from
  * Separate schemas for create and update operations
  */
 
+// Coerce empty number input (NaN from valueAsNumber) to undefined so optional fields don't fail validation
+const optionalNumber = (min = 0, max?: number) => {
+  const num = max !== undefined
+    ? z.number().min(min).max(max)
+    : z.number().min(min)
+  return z.preprocess(
+    (val) =>
+      val === undefined ||
+      val === null ||
+      val === '' ||
+      (typeof val === 'number' && Number.isNaN(val))
+        ? undefined
+        : val,
+    num.optional().nullable()
+  )
+}
+
 // Base schema shared by both create and update
 const teacherFormBaseSchema = z.object({
   name: z
@@ -17,9 +34,9 @@ const teacherFormBaseSchema = z.object({
   subject: z.string().optional(),
   employment_type: z.enum([EMPLOYMENT_TYPE.FULL_TIME, EMPLOYMENT_TYPE.PART_TIME, EMPLOYMENT_TYPE.CONTRACT]).optional(),
   commission_type: z.enum(['monthly_percent', 'monthly_salary', 'per_session']).optional(),
-  commission_rate: z.number().min(0).max(99).optional().nullable(),
-  monthly_salary_amount: z.number().min(0).optional().nullable(),
-  per_session_amount: z.number().min(0).optional().nullable(),
+  commission_rate: optionalNumber(0, 99),
+  monthly_salary_amount: optionalNumber(0),
+  per_session_amount: optionalNumber(0),
 })
 
 /**

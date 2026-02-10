@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form'
+import { useForm, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useMemo, useRef } from 'react'
@@ -20,6 +20,7 @@ import { useCreateTeacher, useUpdateTeacher, useTeacher } from '../hooks/useTeac
 import type { CreateTeacherInput, UpdateTeacherInput } from '../types/teacher.types'
 import { createTeacherSchema, updateTeacherSchema, type CreateTeacherFormData, type UpdateTeacherFormData } from '../schemas/teacher.schemas'
 import { useTranslation } from '@/i18n/context'
+import { showErrorToast } from '@/utils/toast'
 
 interface TeacherFormProps {
   teacherSlug?: string
@@ -69,7 +70,7 @@ export function TeacherForm({ teacherSlug }: TeacherFormProps) {
     reset,
     formState: { errors, isSubmitting },
   } = useForm<TeacherFormData>({
-    resolver: zodResolver(teacherFormSchema),
+    resolver: zodResolver(teacherFormSchema) as Resolver<TeacherFormData>,
     defaultValues: {
       name: '',
       email: '',
@@ -201,7 +202,9 @@ export function TeacherForm({ teacherSlug }: TeacherFormProps) {
       <CardContent>
         <form 
           key={isEditMode ? `teacher-form-${teacherSlug}` : 'teacher-form-create'}
-          onSubmit={handleSubmit(onSubmit)} 
+          onSubmit={handleSubmit(onSubmit, () => {
+            showErrorToast('Please fix the errors in the form.', { title: 'Validation error' })
+          })} 
           className="space-y-6"
         >
           {/* Form fields */}
@@ -365,7 +368,13 @@ export function TeacherForm({ teacherSlug }: TeacherFormProps) {
                 <Label htmlFor="commission_type">{t('teacher.form.commissionType')}</Label>
                 <Select
                   value={watch('commission_type') || 'monthly_percent'}
-                  onValueChange={(value) => setValue('commission_type', value as any)}
+                  onValueChange={(value) => {
+                    setValue('commission_type', value as any)
+                    // Clear other commission fields so hidden fields don't hold NaN/stale values
+                    setValue('commission_rate', undefined)
+                    setValue('monthly_salary_amount', undefined)
+                    setValue('per_session_amount', undefined)
+                  }}
                   disabled={isSubmitting}
                 >
                   <SelectTrigger id="commission_type">

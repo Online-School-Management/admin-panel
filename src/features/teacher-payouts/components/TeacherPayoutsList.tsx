@@ -564,23 +564,35 @@ export function TeacherPayoutsList() {
                           </TableCell>
                           <TableCell>{getStatusBadge(payout.status)}</TableCell>
                           <TableCell className="text-right">
-                            {payout.status === 'pending' ? (
+                            <div className="flex items-center justify-end gap-2">
                               <Button
-                                variant="default"
+                                variant="outline"
                                 size="sm"
-                                onClick={() => handleMarkPaidClick(payout)}
+                                asChild
                                 className="h-8"
                               >
-                                <CheckCircle2 className="h-4 w-4 mr-1" />
-                                {t('teacherPayout.actions.markPaid')}
+                                <Link to={`/teacher-payouts/${payout.id}`}>
+                                  {t('teacherPayout.actions.view')}
+                                </Link>
                               </Button>
-                            ) : (
-                              <span className="text-sm text-muted-foreground">
-                                {payout.paid_at
-                                  ? format(new Date(payout.paid_at), 'MMM dd, yyyy')
-                                  : '-'}
-                              </span>
-                            )}
+                              {payout.status === 'pending' ? (
+                                <Button
+                                  variant="default"
+                                  size="sm"
+                                  onClick={() => handleMarkPaidClick(payout)}
+                                  className="h-8"
+                                >
+                                  <CheckCircle2 className="h-4 w-4 mr-1" />
+                                  {t('teacherPayout.actions.markPaid')}
+                                </Button>
+                              ) : (
+                                <span className="text-sm text-muted-foreground">
+                                  {payout.paid_at
+                                    ? format(new Date(payout.paid_at), 'MMM dd, yyyy')
+                                    : '-'}
+                                </span>
+                              )}
+                            </div>
                           </TableCell>
                         </TableRow>
                       )

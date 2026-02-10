@@ -15,6 +15,36 @@ export interface PayoutCourse {
   id: number
   title: string
   slug: string
+  monthly_fee?: number | null
+  total_fee?: number | null
+}
+
+export interface PayoutSession {
+  id: number
+  session_date: string
+  status: string
+  topic_covered: string | null
+  start_time: string | null
+  end_time: string | null
+}
+
+export interface TeacherPayoutDetail {
+  id: number
+  teacher_id: number
+  course_id: number | null
+  commission_type: string
+  period_start: string
+  period_end: string
+  payout_month: string | null
+  total_collected: number
+  commission_rate: number | null
+  sessions_count: number
+  per_session_rate: number | null
+  salary_amount: number | null
+  payout_amount: number
+  status: string
+  course?: PayoutCourse | null
+  sessions?: PayoutSession[]
 }
 
 export interface PayoutItem {
@@ -33,6 +63,7 @@ export interface PayoutItem {
   teacher?: PayoutTeacher
   courses_count?: number
   courses?: PayoutCourse[]
+  teacher_payouts?: TeacherPayoutDetail[]
   created_at: string
   updated_at?: string
 }

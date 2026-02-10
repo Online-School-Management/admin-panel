@@ -70,10 +70,11 @@ export function useMarkPayoutAsPaid() {
 
   return useMutation({
     mutationFn: (id: number) => markPayoutAsPaid(id),
-    onSuccess: () => {
+    onSuccess: (_data, id) => {
       queryClient.invalidateQueries({ queryKey: payoutKeys.lists() })
       queryClient.refetchQueries({ queryKey: payoutKeys.lists() })
-      // Also invalidate teacher-payouts since they get synced
+      queryClient.invalidateQueries({ queryKey: payoutKeys.detail(id) })
+      queryClient.refetchQueries({ queryKey: payoutKeys.detail(id) })
       queryClient.invalidateQueries({ queryKey: TEACHER_PAYOUTS_LIST_KEY })
       showSuccessToast('Payout marked as paid', { title: 'Paid' })
     },

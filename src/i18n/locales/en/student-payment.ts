@@ -118,6 +118,8 @@ export const studentPayment = {
     markAsPaidDescription: 'Are you sure you want to mark the payment for',
     markAsPaidDescriptionEnd: 'as paid?',
     markAsPaidDescriptionDefault: 'Are you sure you want to mark this payment as paid?',
+    paymentDate: 'Payment Date',
+    paymentDateHint: 'Leave as today or select the actual payment date.',
   },
 
   // Helper text

@@ -40,6 +40,7 @@ export const teacherPayout = {
   },
   filters: {
     search: 'Search teacher or course...',
+    searchTeacher: 'Search teacher...',
     status: 'Payment Status',
     allStatus: 'All Status',
     type: 'Commission Type',

@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -8,18 +9,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { Input } from '@/components/ui/input'
 import { useTranslation } from '@/i18n/context'
 
 interface MarkAsPaidDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onConfirm: () => void
+  onConfirm: (paymentDate: string) => void
   studentName?: string
   isLoading?: boolean
 }
 
 /**
  * MarkAsPaidDialog component - confirmation dialog for marking a payment as paid
+ * Includes an optional payment_date picker (defaults to today)
  */
 export function MarkAsPaidDialog({
   open,
@@ -29,6 +32,19 @@ export function MarkAsPaidDialog({
   isLoading = false,
 }: MarkAsPaidDialogProps) {
   const { t } = useTranslation()
+  const today = new Date().toISOString().split('T')[0]
+  const [paymentDate, setPaymentDate] = useState(today)
+
+  // Reset to today when dialog opens
+  useEffect(() => {
+    if (open) {
+      setPaymentDate(new Date().toISOString().split('T')[0])
+    }
+  }, [open])
+
+  const handleConfirm = () => {
+    onConfirm(paymentDate || new Date().toISOString().split('T')[0])
+  }
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -47,12 +63,29 @@ export function MarkAsPaidDialog({
             )}
           </AlertDialogDescription>
         </AlertDialogHeader>
+
+        {/* Payment Date Picker */}
+        <div className="py-2">
+          <label className="text-sm font-medium text-foreground mb-1.5 block">
+            {t('studentPayment.dialog.paymentDate')}
+          </label>
+          <Input
+            type="date"
+            value={paymentDate}
+            onChange={(e) => setPaymentDate(e.target.value)}
+            className="w-full sm:w-auto"
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            {t('studentPayment.dialog.paymentDateHint')}
+          </p>
+        </div>
+
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isLoading}>
             {t('studentPayment.actions.cancel')}
           </AlertDialogCancel>
           <AlertDialogAction
-            onClick={onConfirm}
+            onClick={handleConfirm}
             disabled={isLoading}
             className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
@@ -63,6 +96,3 @@ export function MarkAsPaidDialog({
     </AlertDialog>
   )
 }
-
-
-

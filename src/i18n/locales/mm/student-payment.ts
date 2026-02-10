@@ -118,6 +118,8 @@ export const studentPayment = {
     markAsPaidDescription: '',
     markAsPaidDescriptionEnd: 'အတွက် ပေးချေမှုကို ပေးချေပြီးဟု အမှတ်အသားပြုရန် သေချာပါသလား?',
     markAsPaidDescriptionDefault: 'ဤပေးချေမှုကို ပေးချေပြီးဟု အမှတ်အသားပြုရန် သေချာပါသလား?',
+    paymentDate: 'ပေးချေသည့်ရက်',
+    paymentDateHint: 'ယနေ့အတိုင်း ထားပါ သို့မဟုတ် အမှန်တကယ် ပေးချေသည့်ရက်ကို ရွေးပါ။',
   },
 
   // Helper text

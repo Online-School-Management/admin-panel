@@ -13,7 +13,7 @@ export const TOAST_DURATION = {
 // Pagination defaults
 export const PAGINATION = {
   DEFAULT_PAGE: 1,
-  DEFAULT_PER_PAGE: 15,
+  DEFAULT_PER_PAGE: 10,
   PER_PAGE_OPTIONS: [10, 15, 25, 50, 100] as const,
   ROLES_PER_PAGE: 100, // For dropdowns/selects
 } as const

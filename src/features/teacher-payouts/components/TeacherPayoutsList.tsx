@@ -24,9 +24,12 @@ import { Card, CardContent } from '@/components/ui/card'
 import {
   useTeacherPayouts,
   useCalculatePayouts,
+} from '../hooks/useTeacherPayouts'
+import {
+  usePayouts,
   useMarkPayoutAsPaid,
   useMarkPayoutsAsPaidBulk,
-} from '../hooks/useTeacherPayouts'
+} from '@/features/payouts/hooks/usePayouts'
 import { MarkPayoutAsPaidDialog } from './MarkPayoutAsPaidDialog'
 import { Pagination } from '@/components/common/Pagination'
 import { TableSkeleton } from '@/components/common/skeletons/TableSkeleton'
@@ -34,12 +37,14 @@ import { PAGINATION } from '@/constants'
 import format from 'date-fns/format'
 import startOfMonth from 'date-fns/startOfMonth'
 import endOfMonth from 'date-fns/endOfMonth'
-import type { TeacherPayoutCollectionItem } from '../types/teacher-payout.types'
+import type { PayoutItem } from '@/features/payouts/types/payout.types'
 import { useTranslation } from '@/i18n/context'
 import { cn } from '@/lib/utils'
 
 /**
  * TeacherPayoutsList - main component for teacher payout management
+ * Now reads from payouts table (one row per teacher per period)
+ * Calculate still uses teacher-payouts endpoint which syncs to payouts
  */
 export function TeacherPayoutsList() {
   const { t } = useTranslation()
@@ -58,11 +63,10 @@ export function TeacherPayoutsList() {
   // Filters
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
-  const [typeFilter, setTypeFilter] = useState<string>('all')
 
   // Mark as paid dialogs
   const [markPaidDialogOpen, setMarkPaidDialogOpen] = useState(false)
-  const [selectedPayout, setSelectedPayout] = useState<TeacherPayoutCollectionItem | null>(null)
+  const [selectedPayout, setSelectedPayout] = useState<PayoutItem | null>(null)
   const [bulkMarkPaidDialogOpen, setBulkMarkPaidDialogOpen] = useState(false)
   const [selectedIds, setSelectedIds] = useState<number[]>([])
 
@@ -121,15 +125,23 @@ export function TeacherPayoutsList() {
     return options
   }, [])
 
-  // Fetch payouts
-  const { data, isLoading, error } = useTeacherPayouts({
+  // Fetch from payouts table (one row per teacher per period)
+  const { data, isLoading, error } = usePayouts({
     page,
     per_page: perPage,
+    recipient_type: 'teacher',
     period_start: periodStart,
     period_end: periodEnd,
     status: statusFilter !== 'all' ? statusFilter : undefined,
-    commission_type: typeFilter !== 'all' ? typeFilter : undefined,
     search: search || undefined,
+  })
+
+  // Also fetch teacher-payouts period totals (from students)
+  const { data: teacherPayoutsData } = useTeacherPayouts({
+    page: 1,
+    per_page: 1,
+    period_start: periodStart,
+    period_end: periodEnd,
   })
 
   // Mutations
@@ -140,6 +152,7 @@ export function TeacherPayoutsList() {
   const payouts = Array.isArray(data?.data) ? data.data : []
   const pagination = data?.meta?.pagination
   const periodTotals = data?.meta?.period_totals
+  const teacherPeriodTotals = teacherPayoutsData?.meta?.period_totals
 
   // Handlers
   const handleCalculate = () => {
@@ -150,7 +163,7 @@ export function TeacherPayoutsList() {
     })
   }
 
-  const handleMarkPaidClick = (payout: TeacherPayoutCollectionItem) => {
+  const handleMarkPaidClick = (payout: PayoutItem) => {
     setSelectedPayout(payout)
     setMarkPaidDialogOpen(true)
   }
@@ -215,12 +228,11 @@ export function TeacherPayoutsList() {
   const handleReset = () => {
     setSearch('')
     setStatusFilter('all')
-    setTypeFilter('all')
     setPage(1)
     setSelectedIds([])
   }
 
-  const hasActiveFilters = search !== '' || statusFilter !== 'all' || typeFilter !== 'all'
+  const hasActiveFilters = search !== '' || statusFilter !== 'all'
 
   const formatCurrency = (amount: number) =>
     new Intl.NumberFormat('en-US', {
@@ -237,32 +249,6 @@ export function TeacherPayoutsList() {
         return <Badge variant="warning">{t('teacherPayout.status.pending')}</Badge>
       default:
         return <Badge variant="secondary">{status}</Badge>
-    }
-  }
-
-  const getTypeBadge = (type: string) => {
-    switch (type) {
-      case 'monthly_percent':
-        return <Badge variant="outline">{t('teacherPayout.type.monthlyPercent')}</Badge>
-      case 'monthly_salary':
-        return <Badge variant="outline">{t('teacherPayout.type.monthlySalary')}</Badge>
-      case 'per_session':
-        return <Badge variant="outline">{t('teacherPayout.type.perSession')}</Badge>
-      default:
-        return <Badge variant="outline">{type}</Badge>
-    }
-  }
-
-  const getPayoutDetail = (payout: TeacherPayoutCollectionItem) => {
-    switch (payout.commission_type) {
-      case 'monthly_percent':
-        return `${formatCurrency(payout.total_collected)} - ${payout.commission_rate ?? 0}%`
-      case 'per_session':
-        return `${payout.sessions_count} sessions - ${formatCurrency(payout.per_session_rate ?? 0)}`
-      case 'monthly_salary':
-        return t('teacherPayout.detail.fixedSalary')
-      default:
-        return '-'
     }
   }
 
@@ -357,29 +343,39 @@ export function TeacherPayoutsList() {
           </Button>
 
           {/* Period totals inline */}
-          {periodTotals && (
+          {(teacherPeriodTotals || periodTotals) && (
             <div className="flex items-center gap-2 flex-wrap">
-              <div className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm">
-                <span className="text-muted-foreground">{t('teacherPayout.summary.fromStudents')}:</span>
-                <span className="font-semibold text-green-600">{formatCurrency(periodTotals.total_from_students)}</span>
-              </div>
-              <span className="text-muted-foreground font-medium">−</span>
-              <div className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm">
-                <span className="text-muted-foreground">{t('teacherPayout.summary.toTeachers')}:</span>
-                <span className="font-semibold text-orange-600">{formatCurrency(periodTotals.total_to_teachers)}</span>
-              </div>
-              <span className="text-muted-foreground font-medium">=</span>
-              <div className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm">
-                <span className="text-muted-foreground">{t('teacherPayout.summary.netBalance')}:</span>
-                <span className={cn(
-                  'font-semibold',
-                  periodTotals.total_from_students - periodTotals.total_to_teachers >= 0
-                    ? 'text-blue-600'
-                    : 'text-red-600'
-                )}>
-                  {formatCurrency(periodTotals.total_from_students - periodTotals.total_to_teachers)}
-                </span>
-              </div>
+              {teacherPeriodTotals && (
+                <div className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm">
+                  <span className="text-muted-foreground">{t('teacherPayout.summary.fromStudents')}:</span>
+                  <span className="font-semibold text-green-600">{formatCurrency(teacherPeriodTotals.total_from_students)}</span>
+                </div>
+              )}
+              {teacherPeriodTotals && periodTotals && (
+                <span className="text-muted-foreground font-medium">−</span>
+              )}
+              {periodTotals && (
+                <div className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm">
+                  <span className="text-muted-foreground">{t('teacherPayout.summary.toTeachers')}:</span>
+                  <span className="font-semibold text-orange-600">{formatCurrency(periodTotals.total_to_pay)}</span>
+                </div>
+              )}
+              {teacherPeriodTotals && periodTotals && (
+                <>
+                  <span className="text-muted-foreground font-medium">=</span>
+                  <div className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm">
+                    <span className="text-muted-foreground">{t('teacherPayout.summary.netBalance')}:</span>
+                    <span className={cn(
+                      'font-semibold',
+                      teacherPeriodTotals.total_from_students - periodTotals.total_to_pay >= 0
+                        ? 'text-blue-600'
+                        : 'text-red-600'
+                    )}>
+                      {formatCurrency(teacherPeriodTotals.total_from_students - periodTotals.total_to_pay)}
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
           )}
 
@@ -401,7 +397,7 @@ export function TeacherPayoutsList() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
-              placeholder={t('teacherPayout.filters.search')}
+              placeholder={t('teacherPayout.filters.searchTeacher')}
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1) }}
               className="pl-10"
@@ -418,20 +414,6 @@ export function TeacherPayoutsList() {
               <SelectItem value="all">{t('teacherPayout.filters.allStatus')}</SelectItem>
               <SelectItem value="pending">{t('teacherPayout.status.pending')}</SelectItem>
               <SelectItem value="paid">{t('teacherPayout.status.paid')}</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select
-            value={typeFilter}
-            onValueChange={(value) => { setTypeFilter(value); setPage(1) }}
-          >
-            <SelectTrigger className="w-full sm:w-[200px]">
-              <SelectValue placeholder={t('teacherPayout.filters.type')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('teacherPayout.filters.allTypes')}</SelectItem>
-              <SelectItem value="monthly_percent">{t('teacherPayout.type.monthlyPercent')}</SelectItem>
-              <SelectItem value="monthly_salary">{t('teacherPayout.type.monthlySalary')}</SelectItem>
-              <SelectItem value="per_session">{t('teacherPayout.type.perSession')}</SelectItem>
             </SelectContent>
           </Select>
           <Button
@@ -454,9 +436,6 @@ export function TeacherPayoutsList() {
                   { width: 'w-8', className: 'w-10' },
                   { width: 'w-8', className: 'w-16' },
                   { width: 'w-32' },
-                  { width: 'w-32' },
-                  { width: 'w-24' },
-                  { width: 'w-40' },
                   { width: 'w-24' },
                   { width: 'w-24' },
                   { width: 'w-16' },
@@ -491,9 +470,6 @@ export function TeacherPayoutsList() {
                       </TableHead>
                       <TableHead className="w-16 font-bold">{t('teacherPayout.table.no')}</TableHead>
                       <TableHead className="font-bold">{t('teacherPayout.table.teacher')}</TableHead>
-                      <TableHead className="font-bold">{t('teacherPayout.table.course')}</TableHead>
-                      <TableHead className="font-bold">{t('teacherPayout.table.type')}</TableHead>
-                      <TableHead className="font-bold">{t('teacherPayout.table.detail')}</TableHead>
                       <TableHead className="font-bold">{t('teacherPayout.table.amount')}</TableHead>
                       <TableHead className="font-bold">{t('teacherPayout.table.status')}</TableHead>
                       <TableHead className="text-right font-bold">{t('teacherPayout.table.actions')}</TableHead>
@@ -536,29 +512,11 @@ export function TeacherPayoutsList() {
                                 </div>
                               </div>
                             ) : (
-                              '-'
+                              <span>{payout.recipient_name ?? '-'}</span>
                             )}
-                          </TableCell>
-                          <TableCell>
-                            {payout.course ? (
-                              <Link
-                                to={`/courses/${payout.course.slug}`}
-                                className="text-primary hover:underline"
-                              >
-                                {payout.course.title}
-                              </Link>
-                            ) : (
-                              <span className="text-muted-foreground italic">
-                                {t('teacherPayout.detail.allCourses')}
-                              </span>
-                            )}
-                          </TableCell>
-                          <TableCell>{getTypeBadge(payout.commission_type)}</TableCell>
-                          <TableCell className="text-sm text-muted-foreground">
-                            {getPayoutDetail(payout)}
                           </TableCell>
                           <TableCell className="font-semibold">
-                            {formatCurrency(payout.payout_amount)}
+                            {formatCurrency(payout.total_amount)}
                           </TableCell>
                           <TableCell>{getStatusBadge(payout.status)}</TableCell>
                           <TableCell className="text-right">
@@ -605,8 +563,8 @@ export function TeacherPayoutsList() {
         open={markPaidDialogOpen}
         onOpenChange={setMarkPaidDialogOpen}
         onConfirm={handleMarkPaidConfirm}
-        teacherName={selectedPayout?.teacher?.name}
-        amount={selectedPayout?.payout_amount}
+        teacherName={selectedPayout?.teacher?.name ?? selectedPayout?.recipient_name}
+        amount={selectedPayout?.total_amount}
         isLoading={markAsPaid.isPending}
       />
 

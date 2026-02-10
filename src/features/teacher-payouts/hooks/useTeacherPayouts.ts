@@ -14,6 +14,7 @@ import type {
   CalculatePayoutInput,
   MarkAsPaidBulkInput,
 } from '../types/teacher-payout.types'
+import { payoutKeys } from '@/features/payouts/hooks/usePayouts'
 
 /**
  * Query keys for teacher payout-related queries
@@ -73,6 +74,9 @@ export function useCalculatePayouts() {
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: teacherPayoutKeys.lists() })
       queryClient.refetchQueries({ queryKey: teacherPayoutKeys.lists() })
+      // Also invalidate payouts table (since calculate syncs to payouts)
+      queryClient.invalidateQueries({ queryKey: payoutKeys.lists() })
+      queryClient.refetchQueries({ queryKey: payoutKeys.lists() })
       showSuccessToast(
         `${response.data.created_count} payouts calculated. Total: ${Number(response.data.total_amount).toLocaleString()} MMK`,
         { title: 'Payouts Calculated' }

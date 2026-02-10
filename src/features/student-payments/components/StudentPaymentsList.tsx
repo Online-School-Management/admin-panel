@@ -151,11 +151,11 @@ export function StudentPaymentsList() {
     setMarkAsPaidDialogOpen(true)
   }
 
-  const handleMarkAsPaidConfirm = () => {
+  const handleMarkAsPaidConfirm = (paymentDate: string) => {
     if (selectedPaymentForMarkPaid) {
       const updateData: UpdateStudentPaymentInput = {
         status: PAYMENT_STATUS.PAID,
-        payment_date: new Date().toISOString().split('T')[0],
+        payment_date: paymentDate,
         paid_at: new Date().toISOString(),
         payment_method: (selectedPaymentForMarkPaid.payment_method as 'kbz_pay' | 'aya_pay' | 'kbz_mobile_banking' | 'wave_money') || PAYMENT_METHOD.KBZ_PAY,
         // Keep existing amount_paid if available

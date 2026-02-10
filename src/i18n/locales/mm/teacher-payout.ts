@@ -40,6 +40,7 @@ export const teacherPayout = {
   },
   filters: {
     search: 'ဆရာ သို့ သင်တန်းရှာရန်...',
+    searchTeacher: 'ဆရာရှာရန်...',
     status: 'ပေးချေမှုအခြေအနေ',
     allStatus: 'အားလုံး',
     type: 'ကော်မရှင်အမျိုးအစား',

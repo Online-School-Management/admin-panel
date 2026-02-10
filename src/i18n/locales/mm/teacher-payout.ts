@@ -28,6 +28,7 @@ export const teacherPayout = {
     no: '#',
     teacher: 'ဆရာ/ဆရာမ',
     course: 'သင်တန်း',
+    courses: 'သင်တန်းများ',
     type: 'အမျိုးအစား',
     detail: 'အသေးစိတ်',
     amount: 'ငွေပမာဏ',
@@ -35,6 +36,8 @@ export const teacherPayout = {
     actions: 'လုပ်ဆောင်ချက်',
   },
   detail: {
+    course: 'သင်တန်း',
+    courses: 'သင်တန်းများ',
     fixedSalary: 'လစဉ်လစာ',
     allCourses: 'လစာ (သင်တန်းအားလုံး)',
   },
@@ -61,6 +64,10 @@ export const teacherPayout = {
     markPaidDescription: 'ဤပေးချေမှုကို ပေးပြီးအဖြစ်မှတ်ရန် သေချာပါသလား',
     markBulkTitle: 'ရွေးထားသည်များ ပေးပြီးမှတ်ရန်',
     markBulkDescription: 'ရွေးထားသော {{count}} ခုကို ပေးပြီးအဖြစ်မှတ်ရန် သေချာပါသလား',
+  },
+  list: {
+    collectedFromStudent: 'ကျောင်းသားထံမှ ရရှိငွေ',
+    toTeacher: 'ဆရာသို့ ပေးချေရမည့်ငွေ',
   },
   messages: {
     noPayouts: 'ဤကာလအတွက် ပေးချေမှုမရှိပါ',

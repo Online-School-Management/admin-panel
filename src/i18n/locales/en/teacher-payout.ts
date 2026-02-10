@@ -28,6 +28,7 @@ export const teacherPayout = {
     no: '#',
     teacher: 'Teacher',
     course: 'Course',
+    courses: 'Courses',
     type: 'Type',
     detail: 'Detail',
     amount: 'Amount',
@@ -35,6 +36,8 @@ export const teacherPayout = {
     actions: 'Actions',
   },
   detail: {
+    course: 'course',
+    courses: 'courses',
     fixedSalary: 'Fixed monthly salary',
     allCourses: 'Salary (all courses)',
   },
@@ -61,6 +64,10 @@ export const teacherPayout = {
     markPaidDescription: 'Are you sure you want to mark this payout as paid for',
     markBulkTitle: 'Mark Selected as Paid',
     markBulkDescription: 'Are you sure you want to mark {{count}} selected payouts as paid?',
+  },
+  list: {
+    collectedFromStudent: 'collected from student',
+    toTeacher: 'to teacher',
   },
   messages: {
     noPayouts: 'No payouts found for this period',

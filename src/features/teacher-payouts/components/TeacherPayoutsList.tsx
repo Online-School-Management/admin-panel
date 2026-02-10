@@ -436,6 +436,7 @@ export function TeacherPayoutsList() {
                   { width: 'w-8', className: 'w-10' },
                   { width: 'w-8', className: 'w-16' },
                   { width: 'w-32' },
+                  { width: 'w-40' },
                   { width: 'w-24' },
                   { width: 'w-24' },
                   { width: 'w-16' },
@@ -470,6 +471,7 @@ export function TeacherPayoutsList() {
                       </TableHead>
                       <TableHead className="w-16 font-bold">{t('teacherPayout.table.no')}</TableHead>
                       <TableHead className="font-bold">{t('teacherPayout.table.teacher')}</TableHead>
+                      <TableHead className="font-bold">{t('teacherPayout.table.courses')}</TableHead>
                       <TableHead className="font-bold">{t('teacherPayout.table.amount')}</TableHead>
                       <TableHead className="font-bold">{t('teacherPayout.table.status')}</TableHead>
                       <TableHead className="text-right font-bold">{t('teacherPayout.table.actions')}</TableHead>
@@ -515,8 +517,50 @@ export function TeacherPayoutsList() {
                               <span>{payout.recipient_name ?? '-'}</span>
                             )}
                           </TableCell>
-                          <TableCell className="font-semibold">
-                            {formatCurrency(payout.total_amount)}
+                          <TableCell>
+                            <div className="text-sm">
+                              {payout.courses_count != null && payout.courses_count > 0 ? (
+                                <>
+                                  <span className="font-medium">{payout.courses_count}</span>
+                                  <span className="text-muted-foreground ml-1">
+                                    {payout.courses_count === 1 ? t('teacherPayout.detail.course') : t('teacherPayout.detail.courses')}
+                                  </span>
+                                  {payout.courses && payout.courses.length > 0 && (
+                                    <div className="mt-1 text-xs">
+                                      {payout.courses.map((c, i) => (
+                                        <span key={c.id}>
+                                          {i > 0 && ', '}
+                                          <Link
+                                            to={`/courses/${c.slug}`}
+                                            className="text-primary hover:underline"
+                                          >
+                                            {c.title}
+                                          </Link>
+                                        </span>
+                                      ))}
+                                    </div>
+                                  )}
+                                </>
+                              ) : (
+                                <span className="text-muted-foreground">—</span>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-sm space-y-0.5">
+                              <div>
+                                <span className="font-medium">{formatCurrency(payout.total_collected ?? 0)}</span>
+                                <span className="text-muted-foreground text-xs ml-1">
+                                  ({t('teacherPayout.list.collectedFromStudent')})
+                                </span>
+                              </div>
+                              <div>
+                                <span className="font-semibold">{formatCurrency(payout.total_amount)}</span>
+                                <span className="text-muted-foreground text-xs ml-1">
+                                  ({t('teacherPayout.list.toTeacher')})
+                                </span>
+                              </div>
+                            </div>
                           </TableCell>
                           <TableCell>{getStatusBadge(payout.status)}</TableCell>
                           <TableCell className="text-right">

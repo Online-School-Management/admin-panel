@@ -11,6 +11,12 @@ export interface PayoutTeacher {
   teacher_id: string
 }
 
+export interface PayoutCourse {
+  id: number
+  title: string
+  slug: string
+}
+
 export interface PayoutItem {
   id: number
   recipient_type: string
@@ -20,10 +26,13 @@ export interface PayoutItem {
   period_end: string
   payout_month: string | null
   total_amount: number
+  total_collected?: number
   status: 'pending' | 'paid'
   paid_at: string | null
   notes: string | null
   teacher?: PayoutTeacher
+  courses_count?: number
+  courses?: PayoutCourse[]
   created_at: string
   updated_at?: string
 }

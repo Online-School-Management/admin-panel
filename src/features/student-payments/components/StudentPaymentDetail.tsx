@@ -6,6 +6,7 @@ import { useStudentPayment } from '../hooks/useStudentPayments'
 import format from 'date-fns/format'
 import type { StudentPayment } from '../types/student-payment.types'
 import { useTranslation } from '@/i18n/context'
+import { formatCurrency } from '@/utils/format'
 
 interface StudentPaymentDetailProps {
   paymentId: number
@@ -93,11 +94,7 @@ export function StudentPaymentDetail({ paymentId }: StudentPaymentDetailProps) {
                   </p>
                   <p className="text-base font-semibold">
                     {payment.amount_paid
-                      ? new Intl.NumberFormat('en-US', {
-                          style: 'currency',
-                          currency: 'MMK',
-                          minimumFractionDigits: 0,
-                        }).format(payment.amount_paid)
+                      ? formatCurrency(payment.amount_paid)
                       : '-'}
                   </p>
                 </div>

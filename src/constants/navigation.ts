@@ -1,4 +1,4 @@
-import { Shield, UserCog, Key, GraduationCap, Users, BookOpen, BookText, CreditCard, CalendarDays, Wallet, LucideIcon } from 'lucide-react'
+import { Shield, UserCog, Key, GraduationCap, Users, BookOpen, BookText, CreditCard, CalendarDays, Wallet, ClipboardList, LucideIcon } from 'lucide-react'
 
 export interface NavigationItem {
   to: string
@@ -18,6 +18,7 @@ export const mainNavigation: NavigationItem[] = [
   { to: '/enrollments', icon: BookText, label: 'Enrollments' },
   { to: '/student-payments', icon: CreditCard, label: 'Student Payments' },
   { to: '/teacher-payouts', icon: Wallet, label: 'Teacher Payouts' },
+  { to: '/monthly-closing', icon: ClipboardList, label: 'Monthly closing' },
 ]
 
 export const subjectNavigation: NavigationItem[] = [

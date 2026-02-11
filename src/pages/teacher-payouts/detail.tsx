@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge'
 import { useTranslation } from '@/i18n/context'
 import { usePayout, useMarkPayoutAsPaid } from '@/features/payouts/hooks/usePayouts'
 import { MarkPayoutAsPaidDialog } from '@/features/teacher-payouts/components/MarkPayoutAsPaidDialog'
+import { formatCurrency } from '@/utils/format'
 import format from 'date-fns/format'
 import type { PayoutSession, TeacherPayoutDetail } from '@/features/payouts/types/payout.types'
 
@@ -23,14 +24,6 @@ import type { PayoutSession, TeacherPayoutDetail } from '@/features/payouts/type
 interface FlatSession extends PayoutSession {
   course_name: string
   teacher_name: string
-}
-
-function formatCurrency(amount: number) {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'MMK',
-    minimumFractionDigits: 0,
-  }).format(amount)
 }
 
 function getCommissionLabel(tp: TeacherPayoutDetail, t: (key: string) => string): string {

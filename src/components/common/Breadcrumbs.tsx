@@ -2,6 +2,7 @@ import { memo } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useTranslation } from '@/i18n/context'
 
 interface BreadcrumbItem {
   label: string
@@ -13,6 +14,7 @@ const routeLabels: Record<string, string> = {
   admins: 'Admins',
   roles: 'Roles',
   permissions: 'Permissions',
+  'monthly-closing': 'Monthly closing',
   new: 'Create',
   edit: 'Edit',
   login: 'Login',
@@ -20,6 +22,7 @@ const routeLabels: Record<string, string> = {
 
 export const Breadcrumbs = memo(function Breadcrumbs() {
   const location = useLocation()
+  const { t } = useTranslation()
   const pathnames = location.pathname.split('/').filter((x) => x)
 
   if (pathnames.length === 0) {
@@ -32,32 +35,28 @@ export const Breadcrumbs = memo(function Breadcrumbs() {
   for (let i = 0; i < pathnames.length; i++) {
     const pathname = pathnames[i]
     
-    // Skip ID segments (UUIDs or long alphanumeric strings)
-    if (pathname.length > 10 && /^[a-zA-Z0-9-]+$/.test(pathname)) {
-      // Check if it's between 'admins' and 'edit'
+    // Skip only actual ID segments: numeric IDs or UUIDs (not route names like "monthly-closing")
+    const isNumericId = /^\d+$/.test(pathname)
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(pathname)
+    if (isNumericId || isUuid) {
       if (i > 0 && pathnames[i - 1] === 'admins' && pathnames[i + 1] === 'edit') {
-        // Add "Edit Admin" instead of the ID
-        breadcrumbs.push({
-          label: 'Edit Admin',
-          to: undefined,
-        })
-        i++ // Skip the 'edit' part as we've already handled it
+        breadcrumbs.push({ label: 'Edit Admin', to: undefined })
+        i++
         continue
       }
-      // Check if it's a detail page (admins/:id or roles/:id)
-      if (i > 0 && (pathnames[i - 1] === 'admins' || pathnames[i - 1] === 'roles')) {
-        // Skip the ID, the parent route label is enough
-        continue
-      }
-      // Otherwise, skip this ID segment
+      // Skip ID in detail pages (admins/:id, roles/:id, etc.)
       continue
     }
     
     const to = `/${pathnames.slice(0, i + 1).join('/')}`
     const isLast = i === pathnames.length - 1
-    
+    const label =
+      routeLabels[pathname] ||
+      t(`navigation.${pathname}`) ||
+      pathname.charAt(0).toUpperCase() + pathname.slice(1).replace(/-/g, ' ')
+
     breadcrumbs.push({
-      label: routeLabels[pathname] || pathname.charAt(0).toUpperCase() + pathname.slice(1),
+      label,
       to: isLast ? undefined : to,
     })
   }
@@ -67,7 +66,7 @@ export const Breadcrumbs = memo(function Breadcrumbs() {
   }
 
   return (
-    <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
+    <nav className="flex items-center space-x-2 text-base text-muted-foreground">
       {breadcrumbs.map((crumb, index) => {
         const isLast = index === breadcrumbs.length - 1
 
@@ -82,7 +81,11 @@ export const Breadcrumbs = memo(function Breadcrumbs() {
                 {crumb.label}
               </Link>
             ) : (
-              <span className={cn(isLast && 'text-primary font-medium')}>
+              <span
+                className={cn(
+                  isLast && 'text-primary text-lg font-bold'
+                )}
+              >
                 {crumb.label}
               </span>
             )}

@@ -4,6 +4,8 @@ import type {
   PayoutResponse,
   MarkPayoutsPaidBulkInput,
   MarkPayoutsPaidBulkResponse,
+  MonthlyClosingSummary,
+  CreatePayoutInput,
 } from '../types/payout.types'
 
 /**
@@ -51,5 +53,27 @@ export async function markPayoutAsPaid(id: number): Promise<PayoutResponse> {
  */
 export async function markPayoutsAsPaidBulk(data: MarkPayoutsPaidBulkInput): Promise<MarkPayoutsPaidBulkResponse> {
   const response = await apiClient.put<MarkPayoutsPaidBulkResponse>('/payouts/mark-paid-bulk', data)
+  return response.data
+}
+
+/**
+ * Get monthly closing summary for a period
+ */
+export async function getMonthlyClosingSummary(periodStart: string, periodEnd: string): Promise<{
+  success: boolean
+  data: MonthlyClosingSummary
+}> {
+  const response = await apiClient.get<{ success: boolean; data: MonthlyClosingSummary }>(
+    '/payouts/monthly-closing-summary',
+    { params: { period_start: periodStart, period_end: periodEnd } }
+  )
+  return response.data
+}
+
+/**
+ * Create a payout (non-teacher: admin, server, facebook, domain, content_writer)
+ */
+export async function createPayout(data: CreatePayoutInput): Promise<PayoutResponse> {
+  const response = await apiClient.post<PayoutResponse>('/payouts', data)
   return response.data
 }

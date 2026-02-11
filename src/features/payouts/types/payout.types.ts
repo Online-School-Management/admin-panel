@@ -112,3 +112,31 @@ export interface MarkPayoutsPaidBulkResponse {
   message?: string
   data: MarkPayoutsPaidBulkResult
 }
+
+/** Monthly closing summary (totals by type, from_students, balance) */
+export interface MonthlyClosingSummary {
+  summary: {
+    teacher: number
+    admin: number
+    server: number
+    facebook: number
+    domain: number
+    content_writer: number
+    other: number
+  }
+  from_students: number
+  total_to_pay: number
+  balance: number
+}
+
+export interface CreatePayoutInput {
+  recipient_type: 'admin' | 'server' | 'facebook' | 'domain' | 'content_writer' | 'other'
+  recipient_id?: number
+  recipient_name?: string
+  period_start: string
+  period_end: string
+  payout_month?: string | null
+  total_amount: number
+  status?: 'pending' | 'paid'
+  notes?: string | null
+}

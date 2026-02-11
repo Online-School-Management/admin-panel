@@ -17,6 +17,7 @@ export const navigation = {
   'class-sessions': 'အတန်းချိန်များ',
   'student-payments': 'ကျောင်းသားငွေပေးချေမှုများ',
   'teacher-payouts': 'ဆရာပေးချေမှုများ',
+  'monthly-closing': 'လစဉ်ပိတ်သိမ်းမှု',
 }
 
 

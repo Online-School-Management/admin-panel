@@ -23,6 +23,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useTeachers } from '@/features/teachers/hooks/useTeachers'
+import { formatCurrency } from '@/utils/format'
 import {
   useCourseTeachersByCourse,
   useCreateCourseTeacher,
@@ -82,11 +83,11 @@ function getCompensationSummary(
         : tFn('teacher.commissionType.monthly_percent')
     case 'monthly_salary':
       return monthlySalaryAmount != null
-        ? `${tFn('teacher.commissionType.monthly_salary')}: ${Number(monthlySalaryAmount).toLocaleString()} MMK`
+        ? `${tFn('teacher.commissionType.monthly_salary')}: ${formatCurrency(Number(monthlySalaryAmount))}`
         : tFn('teacher.commissionType.monthly_salary')
     case 'per_session':
       return perSessionAmount != null
-        ? `${tFn('teacher.commissionType.per_session')}: ${Number(perSessionAmount).toLocaleString()} MMK`
+        ? `${tFn('teacher.commissionType.per_session')}: ${formatCurrency(Number(perSessionAmount))}`
         : tFn('teacher.commissionType.per_session')
     default:
       return null

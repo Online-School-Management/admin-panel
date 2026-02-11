@@ -40,6 +40,7 @@ import endOfMonth from 'date-fns/endOfMonth'
 import type { PayoutItem } from '@/features/payouts/types/payout.types'
 import { useTranslation } from '@/i18n/context'
 import { cn } from '@/lib/utils'
+import { formatCurrency } from '@/utils/format'
 
 /**
  * TeacherPayoutsList - main component for teacher payout management
@@ -233,13 +234,6 @@ export function TeacherPayoutsList() {
   }
 
   const hasActiveFilters = search !== '' || statusFilter !== 'all'
-
-  const formatCurrency = (amount: number) =>
-    new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'MMK',
-      minimumFractionDigits: 0,
-    }).format(amount)
 
   const getStatusBadge = (status: string) => {
     switch (status) {

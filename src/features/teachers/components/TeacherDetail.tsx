@@ -7,6 +7,7 @@ import { useTeacher } from '../hooks/useTeachers'
 import format from 'date-fns/format'
 import type { Teacher } from '../types/teacher.types'
 import { useTranslation } from '@/i18n/context'
+import { formatCurrency } from '@/utils/format'
 
 interface TeacherDetailProps {
   teacherSlug: string
@@ -137,13 +138,13 @@ export function TeacherDetail({ teacherSlug }: TeacherDetailProps) {
                 {teacher.commission_type === 'monthly_salary' && teacher.monthly_salary_amount != null && (
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-muted-foreground">{t('teacher.detail.monthlySalaryAmount')}</p>
-                    <p className="text-base">{Number(teacher.monthly_salary_amount).toLocaleString()} MMK</p>
+                    <p className="text-base">{formatCurrency(Number(teacher.monthly_salary_amount))}</p>
                   </div>
                 )}
                 {teacher.commission_type === 'per_session' && teacher.per_session_amount != null && (
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-muted-foreground">{t('teacher.detail.perSessionAmount')}</p>
-                    <p className="text-base">{Number(teacher.per_session_amount).toLocaleString()} MMK</p>
+                    <p className="text-base">{formatCurrency(Number(teacher.per_session_amount))}</p>
                   </div>
                 )}
               </div>

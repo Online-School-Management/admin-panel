@@ -10,6 +10,7 @@ import {
   showSuccessToast,
   showErrorToast,
 } from '@/utils/toast'
+import { formatCurrency } from '@/utils/format'
 import type {
   CalculatePayoutInput,
   MarkAsPaidBulkInput,
@@ -78,7 +79,7 @@ export function useCalculatePayouts() {
       queryClient.invalidateQueries({ queryKey: payoutKeys.lists() })
       queryClient.refetchQueries({ queryKey: payoutKeys.lists() })
       showSuccessToast(
-        `${response.data.created_count} payouts calculated. Total: ${Number(response.data.total_amount).toLocaleString()} MMK`,
+        `${response.data.created_count} payouts calculated. Total: ${formatCurrency(Number(response.data.total_amount))}`,
         { title: 'Payouts Calculated' }
       )
     },

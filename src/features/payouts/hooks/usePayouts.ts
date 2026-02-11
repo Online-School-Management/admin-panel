@@ -4,13 +4,18 @@ import {
   getPayoutById,
   markPayoutAsPaid,
   markPayoutsAsPaidBulk,
+  getMonthlyClosingSummary,
+  createPayout,
 } from '../services/payout.service'
 import {
   showSuccessToast,
   showErrorToast,
+  showCreateSuccessToast,
+  showCreateErrorToast,
 } from '@/utils/toast'
 import type {
   MarkPayoutsPaidBulkInput,
+  CreatePayoutInput,
 } from '../types/payout.types'
 
 // Teacher payout query key (inline to avoid circular dependency)
@@ -76,6 +81,7 @@ export function useMarkPayoutAsPaid() {
       queryClient.invalidateQueries({ queryKey: payoutKeys.detail(id) })
       queryClient.refetchQueries({ queryKey: payoutKeys.detail(id) })
       queryClient.invalidateQueries({ queryKey: TEACHER_PAYOUTS_LIST_KEY })
+      queryClient.invalidateQueries({ queryKey: MONTHLY_CLOSING_SUMMARY_KEY })
       showSuccessToast('Payout marked as paid', { title: 'Paid' })
     },
     onError: (error: unknown) => {
@@ -96,6 +102,7 @@ export function useMarkPayoutsAsPaidBulk() {
       queryClient.invalidateQueries({ queryKey: payoutKeys.lists() })
       queryClient.refetchQueries({ queryKey: payoutKeys.lists() })
       queryClient.invalidateQueries({ queryKey: TEACHER_PAYOUTS_LIST_KEY })
+      queryClient.invalidateQueries({ queryKey: MONTHLY_CLOSING_SUMMARY_KEY })
       showSuccessToast(
         `${response.data.updated_count} payouts marked as paid`,
         { title: 'Bulk Update' }
@@ -103,6 +110,39 @@ export function useMarkPayoutsAsPaidBulk() {
     },
     onError: (error: unknown) => {
       showErrorToast(error, { title: 'Bulk update failed' })
+    },
+  })
+}
+
+const MONTHLY_CLOSING_SUMMARY_KEY = ['payouts', 'monthly-closing-summary'] as const
+
+/**
+ * Hook to fetch monthly closing summary for a period
+ */
+export function useMonthlyClosingSummary(periodStart: string, periodEnd: string) {
+  return useQuery({
+    queryKey: [...MONTHLY_CLOSING_SUMMARY_KEY, periodStart, periodEnd],
+    queryFn: () => getMonthlyClosingSummary(periodStart, periodEnd),
+    enabled: !!periodStart && !!periodEnd,
+    staleTime: 1000 * 60,
+  })
+}
+
+/**
+ * Hook to create a payout (non-teacher types)
+ */
+export function useCreatePayout() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: CreatePayoutInput) => createPayout(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: payoutKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: MONTHLY_CLOSING_SUMMARY_KEY })
+      showCreateSuccessToast('Payout')
+    },
+    onError: (error: unknown) => {
+      showCreateErrorToast('Payout', error)
     },
   })
 }

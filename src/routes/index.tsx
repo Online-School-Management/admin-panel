@@ -60,6 +60,9 @@ const ClassSessionsListPage = lazy(() => import('@/pages/class-sessions/list'))
 const TeacherPayoutsListPage = lazy(() => import('@/pages/teacher-payouts/list'))
 const TeacherPayoutDetailPage = lazy(() => import('@/pages/teacher-payouts/detail'))
 
+// Monthly closing page
+const MonthlyClosingListPage = lazy(() => import('@/pages/monthly-closing/list'))
+
 // Student Payment pages
 const StudentPaymentsListPage = lazy(() => import('@/pages/student-payments/list'))
 const EditStudentPaymentPage = lazy(() => import('@/pages/student-payments/edit'))
@@ -210,6 +213,10 @@ export const router = createBrowserRouter([
   {
     path: '/teacher-payouts/:id',
     element: <ProtectedRoute><TeacherPayoutDetailPage /></ProtectedRoute>,
+  },
+  {
+    path: '/monthly-closing',
+    element: <ProtectedRoute><MonthlyClosingListPage /></ProtectedRoute>,
   },
   {
     path: '/student-payments',

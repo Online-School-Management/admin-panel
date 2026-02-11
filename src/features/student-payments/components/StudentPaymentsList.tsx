@@ -33,6 +33,7 @@ import { DeleteStudentPaymentDialog } from './DeleteStudentPaymentDialog'
 import { MarkAsPaidDialog } from './MarkAsPaidDialog'
 import { Pagination } from '@/components/common/Pagination'
 import { TableSkeleton } from '@/components/common/skeletons/TableSkeleton'
+import { formatCurrency } from '@/utils/format'
 import { PAGINATION, PAYMENT_STATUS, PAYMENT_METHOD } from '@/constants'
 import format from 'date-fns/format'
 import type { StudentPaymentCollectionItem, UpdateStudentPaymentInput } from '../types/student-payment.types'
@@ -341,11 +342,7 @@ export function StudentPaymentsList() {
                 </CardHeader>
                 <CardContent className="p-0">
                   <p className="text-lg font-bold">
-                    {new Intl.NumberFormat('en-US', {
-                      style: 'currency',
-                      currency: 'MMK',
-                      minimumFractionDigits: 0,
-                    }).format(monthlyStats.paidAmount)}
+                    {formatCurrency(monthlyStats.paidAmount)}
                   </p>
                 </CardContent>
               </Card>
@@ -522,11 +519,7 @@ export function StudentPaymentsList() {
                             </TableCell>
                             <TableCell>
                               {payment.amount_paid
-                                ? new Intl.NumberFormat('en-US', {
-                                    style: 'currency',
-                                    currency: 'MMK',
-                                    minimumFractionDigits: 0,
-                                  }).format(payment.amount_paid)
+                                ? formatCurrency(payment.amount_paid)
                                 : '-'}
                             </TableCell>
                             <TableCell className="text-sm text-muted-foreground">

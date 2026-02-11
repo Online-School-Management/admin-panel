@@ -17,6 +17,7 @@ export const navigation = {
   'class-sessions': 'Class Sessions',
   'student-payments': 'Student Payments',
   'teacher-payouts': 'Teacher Payouts',
+  'monthly-closing': 'Monthly closing',
 }
 
 

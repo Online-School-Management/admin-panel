@@ -12,6 +12,7 @@ import { ClassSessionsCard } from './ClassSessionsCard'
 import format from 'date-fns/format'
 import type { Course } from '../types/course.types'
 import { useTranslation } from '@/i18n/context'
+import { formatCurrency } from '@/utils/format'
 
 interface CourseDetailProps {
   courseSlug: string
@@ -262,7 +263,7 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
                           {t('course.detail.monthlySalaryAmount')}
                         </p>
                         <p className="text-base">
-                          {Number(course.assigned_teacher.monthly_salary_amount).toLocaleString()} MMK
+                          {formatCurrency(Number(course.assigned_teacher.monthly_salary_amount))}
                         </p>
                       </div>
                     </>
@@ -276,7 +277,7 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
                           {t('course.detail.perSessionAmount')}
                         </p>
                         <p className="text-base">
-                          {Number(course.assigned_teacher.per_session_amount).toLocaleString()} MMK
+                          {formatCurrency(Number(course.assigned_teacher.per_session_amount))}
                         </p>
                       </div>
                     </>

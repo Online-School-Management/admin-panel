@@ -9,6 +9,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { useTranslation } from '@/i18n/context'
+import { formatCurrency } from '@/utils/format'
 
 interface MarkPayoutAsPaidDialogProps {
   open: boolean
@@ -55,13 +56,7 @@ export function MarkPayoutAsPaidDialog({
                 {amount != null && (
                   <>
                     {' — '}
-                    <strong>
-                      {new Intl.NumberFormat('en-US', {
-                        style: 'currency',
-                        currency: 'MMK',
-                        minimumFractionDigits: 0,
-                      }).format(amount)}
-                    </strong>
+                    <strong>{formatCurrency(amount)}</strong>
                   </>
                 )}
               </>

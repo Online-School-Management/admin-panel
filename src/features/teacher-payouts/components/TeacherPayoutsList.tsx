@@ -154,6 +154,7 @@ export function TeacherPayoutsList() {
   const pagination = data?.meta?.pagination
   const periodTotals = data?.meta?.period_totals
   const teacherPeriodTotals = teacherPayoutsData?.meta?.period_totals
+  const hasTeacherPayoutsForPeriod = (pagination?.total ?? 0) > 0
 
   // Handlers
   const handleCalculate = () => {
@@ -333,7 +334,9 @@ export function TeacherPayoutsList() {
             <Calculator className="h-4 w-4 mr-2" />
             {calculatePayouts.isPending
               ? t('teacherPayout.actions.calculating')
-              : t('teacherPayout.actions.calculate')}
+              : hasTeacherPayoutsForPeriod
+                ? t('teacherPayout.actions.reCalculate')
+                : t('teacherPayout.actions.calculate')}
           </Button>
 
           {/* Period totals inline */}

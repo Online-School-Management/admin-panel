@@ -52,6 +52,7 @@ export const teacherPayout = {
   actions: {
     view: 'ကြည့်ရန်',
     calculate: 'ပေးချေမှုတွက်ချက်ရန်',
+    reCalculate: 'ပြန်တွက်ချက်ပါ',
     calculating: 'တွက်ချက်နေသည်...',
     markPaid: 'ပေးပြီးမှတ်ရန်',
     markSelectedPaid: '{{count}} ခု ပေးပြီးမှတ်ရန်',

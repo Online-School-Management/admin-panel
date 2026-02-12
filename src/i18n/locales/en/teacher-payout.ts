@@ -52,6 +52,7 @@ export const teacherPayout = {
   actions: {
     view: 'View',
     calculate: 'Calculate Payouts',
+    reCalculate: 'Re-calculate',
     calculating: 'Calculating...',
     markPaid: 'Mark Paid',
     markSelectedPaid: 'Mark {{count}} Paid',

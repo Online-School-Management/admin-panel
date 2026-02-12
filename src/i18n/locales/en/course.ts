@@ -110,6 +110,7 @@ export const course = {
     courseStatus: 'Course Status',
     schedules: 'Schedules',
     noSchedules: 'No schedules defined for this course',
+    noClassSessions: 'No class sessions yet.',
     classSessions: 'Class Sessions',
     moreSessions: '+{{count}} more sessions',
     timestamps: 'Timestamps',
@@ -140,6 +141,7 @@ export const course = {
     clear: 'Clear',
     assignTeacher: 'Assign Teacher',
     manageSchedule: 'Manage Schedule',
+    addSession: 'Add Session',
   },
 }
 

@@ -8,6 +8,8 @@ import { useTranslation } from '@/i18n/context'
 interface ClassSessionsCardProps {
   classSessions: ClassSession[]
   maxDisplay?: number
+  /** Optional action (e.g. "Add Session" button) shown in the card header */
+  headerAction?: React.ReactNode
 }
 
 function formatTimeTo12Hour(time24: string): string {
@@ -41,28 +43,34 @@ function getStatusVariant(status: string): 'destructive' | 'secondary' {
   }
 }
 
-export function ClassSessionsCard({ 
-  classSessions, 
-  maxDisplay = 28 
+export function ClassSessionsCard({
+  classSessions,
+  maxDisplay = 28,
+  headerAction,
 }: ClassSessionsCardProps) {
   const { t } = useTranslation()
 
-  if (!classSessions || classSessions.length === 0) {
-    return null
-  }
-
-  const displayedSessions = classSessions.slice(0, maxDisplay)
+  const displayedSessions = (classSessions ?? []).slice(0, maxDisplay)
   const today = new Date()
+  const hasSessions = displayedSessions.length > 0
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <CalendarDays className="h-5 w-5" />
-          {t('course.detail.classSessions')}
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <CalendarDays className="h-5 w-5" />
+            {t('course.detail.classSessions')}
+          </CardTitle>
+          {headerAction}
+        </div>
       </CardHeader>
       <CardContent>
+        {!hasSessions ? (
+          <p className="text-sm text-muted-foreground py-4 text-center">
+            {t('course.detail.noClassSessions')}
+          </p>
+        ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3">
           {displayedSessions.map((session) => {
             const sessionDate = new Date(session.session_date)
@@ -113,9 +121,10 @@ export function ClassSessionsCard({
             )
           })}
         </div>
-        {classSessions.length > maxDisplay && (
+        )}
+        {(classSessions?.length ?? 0) > maxDisplay && (
           <p className="text-sm text-muted-foreground text-center mt-4">
-            {t('course.detail.moreSessions', { count: classSessions.length - maxDisplay })}
+            {t('course.detail.moreSessions', { count: (classSessions?.length ?? 0) - maxDisplay })}
           </p>
         )}
       </CardContent>

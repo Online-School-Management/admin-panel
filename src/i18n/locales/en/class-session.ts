@@ -3,6 +3,19 @@
  */
 
 export const classSession = {
+  create: {
+    title: 'Add Class Session',
+    description: 'Create a session manually (e.g. to adjust for teacher availability or add extra time).',
+    schedule: 'Schedule',
+    selectSchedule: 'Select schedule',
+    sessionDate: 'Session Date',
+    topicCovered: 'Topic (optional)',
+    topicCoveredPlaceholder: 'What will be covered',
+    status: 'Status',
+    cancel: 'Cancel',
+    create: 'Create Session',
+    creating: 'Creating…',
+  },
   page: {
     title: 'Class Sessions',
     description: 'View and track class sessions by date',

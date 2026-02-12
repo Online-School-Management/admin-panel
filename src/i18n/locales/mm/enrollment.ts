@@ -85,6 +85,7 @@ export const enrollment = {
     courseInformation: 'သင်တန်း အချက်အလက်',
     status: 'အခြေအနေ',
     enrolledAt: 'စာရင်းသွင်းသည့်ရက်စွဲ',
+    droppedAt: 'ထွက်ပြေးသည့်ရက်စွဲ',
     studentId: 'ကျောင်းသား ID',
     studentName: 'ကျောင်းသား အမည်',
     courseTitle: 'သင်တန်း ခေါင်းစဉ်',

@@ -110,6 +110,7 @@ export const course = {
     courseStatus: 'သင်တန်း အခြေအနေ',
     schedules: 'သင်တန်းချိန်ဇယားများ',
     noSchedules: 'ဤသင်တန်းအတွက် သင်တန်းချိန်ဇယား မသတ်မှတ်ရသေးပါ',
+    noClassSessions: 'အတန်းချိန် မရှိသေးပါ။',
     classSessions: 'သင်တန်းခန်းများ',
     moreSessions: '+{{count}} ခန်း ပိုရှိပါသည်',
     timestamps: 'အချိန်မှတ်တမ်းများ',
@@ -140,6 +141,7 @@ export const course = {
     clear: 'ရှင်းလင်းရန်',
     assignTeacher: 'ဆရာ ခန့်အပ်ရန်',
     manageSchedule: 'သင်တန်းချိန်ဇယား စီမံခန့်ခွဲရန်',
+    addSession: 'အတန်းချိန် ထည့်ရန်',
   },
 }
 

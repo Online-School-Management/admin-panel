@@ -4,6 +4,7 @@ import type {
   ClassSessionDetailResponse,
   ClassSessionListItem,
   UpdateClassSessionInput,
+  CreateClassSessionInput,
 } from '../types/class-session.types'
 
 /**
@@ -26,6 +27,20 @@ export async function getClassSessionsByDate(date: string): Promise<ClassSession
  */
 export async function getClassSession(id: number): Promise<ClassSessionDetailResponse> {
   const response = await apiClient.get<ClassSessionDetailResponse>(`/class-sessions/${id}`)
+  return response.data
+}
+
+/**
+ * Create a class session manually (e.g. for teacher adjustments or extra sessions)
+ */
+export async function createClassSession(
+  data: CreateClassSessionInput
+): Promise<{ success: boolean; message?: string; data: ClassSessionListItem }> {
+  const response = await apiClient.post<{
+    success: boolean
+    message?: string
+    data: ClassSessionListItem
+  }>('/class-sessions', data)
   return response.data
 }
 

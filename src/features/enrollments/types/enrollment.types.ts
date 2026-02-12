@@ -29,6 +29,7 @@ export interface Enrollment {
   course: EnrollmentCourse
   enrolled_at: string
   status: 'active' | 'dropped' | 'completed'
+  dropped_at?: string | null
   created_at?: string
   updated_at?: string
 }
@@ -54,6 +55,7 @@ export interface EnrollmentCollectionItem {
   }
   enrolled_at: string
   status: 'active' | 'dropped' | 'completed'
+  dropped_at?: string | null
   created_at: string
 }
 

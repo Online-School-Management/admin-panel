@@ -61,3 +61,10 @@ export interface UpdateClassSessionInput {
   room_or_link?: string | null
   teacher_id?: number | null
 }
+
+export interface CreateClassSessionInput {
+  schedule_id: number
+  session_date: string
+  status?: 'scheduled' | 'completed' | 'cancelled'
+  topic_covered?: string | null
+}

@@ -94,6 +94,17 @@ export function EnrollmentDetail({ enrollmentId }: EnrollmentDetailProps) {
                       : '-'}
                   </p>
                 </div>
+                {enrollment.status === 'dropped' && enrollment.dropped_at && (
+                  <div className="space-y-1 md:col-span-2">
+                    <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      {t('enrollment.detail.droppedAt')}
+                    </p>
+                    <p className="text-base">
+                      {format(new Date(enrollment.dropped_at), 'MMM dd, yyyy')}
+                    </p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

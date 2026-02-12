@@ -85,6 +85,7 @@ export const enrollment = {
     courseInformation: 'Course Information',
     status: 'Status',
     enrolledAt: 'Enrolled At',
+    droppedAt: 'Dropped On',
     studentId: 'Student ID',
     studentName: 'Student Name',
     courseTitle: 'Course Title',

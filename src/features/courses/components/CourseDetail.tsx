@@ -8,6 +8,7 @@ import { DetailSkeleton } from '@/components/common/skeletons/DetailSkeleton'
 import { useCourse } from '../hooks/useCourses'
 import { AssignTeacherModal } from '@/features/course-teachers/components/AssignTeacherModal'
 import { ScheduleModal } from '@/features/schedules/components/ScheduleModal'
+import { CreateClassSessionModal } from '@/features/class-sessions/components/CreateClassSessionModal'
 import { ClassSessionsCard } from './ClassSessionsCard'
 import format from 'date-fns/format'
 import type { Course } from '../types/course.types'
@@ -25,6 +26,7 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
   const { t } = useTranslation()
   const [assignTeacherModalOpen, setAssignTeacherModalOpen] = useState(false)
   const [scheduleModalOpen, setScheduleModalOpen] = useState(false)
+  const [createSessionModalOpen, setCreateSessionModalOpen] = useState(false)
   const { data: courseData, isLoading, error } = useCourse(courseSlug)
 
   if (isLoading) {
@@ -187,9 +189,21 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
           </Card>
 
           {/* Class Sessions */}
-          <ClassSessionsCard 
-            classSessions={course.class_sessions} 
+          <ClassSessionsCard
+            classSessions={course.class_sessions ?? []}
             maxDisplay={28}
+            headerAction={
+              course.schedules && course.schedules.length > 0 ? (
+                <Button
+                  onClick={() => setCreateSessionModalOpen(true)}
+                  variant="default"
+                  size="sm"
+                >
+                  <Calendar className="h-4 w-4 mr-2" />
+                  {t('course.actions.addSession')}
+                </Button>
+              ) : undefined
+            }
           />
         </div>
 
@@ -437,6 +451,14 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
             courseTitle={courseData.data.title}
             assignedTeacher={courseData.data.assigned_teacher}
           />
+          {courseData.data.schedules && courseData.data.schedules.length > 0 && (
+            <CreateClassSessionModal
+              open={createSessionModalOpen}
+              onOpenChange={setCreateSessionModalOpen}
+              courseSlug={courseData.data.slug}
+              schedules={courseData.data.schedules}
+            />
+          )}
         </>
       )}
     </div>

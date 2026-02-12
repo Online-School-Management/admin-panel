@@ -335,9 +335,16 @@ function CourseEnrollmentsPage() {
                                 : '-'}
                             </TableCell>
                             <TableCell>
-                              <Badge variant={getStatusBadgeVariant(enrollment.status)}>
-                                {getStatusLabel(enrollment.status)}
-                              </Badge>
+                              <div className="flex flex-col gap-0.5 w-fit">
+                                <Badge variant={getStatusBadgeVariant(enrollment.status)} className="w-fit">
+                                  {getStatusLabel(enrollment.status)}
+                                </Badge>
+                                {enrollment.status === 'dropped' && enrollment.dropped_at && (
+                                  <span className="text-xs text-muted-foreground">
+                                    {format(new Date(enrollment.dropped_at), 'MMM dd, yyyy')}
+                                  </span>
+                                )}
+                              </div>
                             </TableCell>
                             <TableCell className="text-sm text-muted-foreground hidden lg:table-cell">
                               {enrollment.created_at

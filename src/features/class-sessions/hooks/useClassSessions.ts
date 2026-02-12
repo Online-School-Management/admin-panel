@@ -2,10 +2,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   getClassSessionsByDate,
   getClassSession,
+  createClassSession,
   updateClassSession,
 } from '../services/class-session.service'
-import type { UpdateClassSessionInput } from '../types/class-session.types'
-import { showUpdateSuccessToast, showUpdateErrorToast } from '@/utils/toast'
+import type { CreateClassSessionInput, UpdateClassSessionInput } from '../types/class-session.types'
+import { showCreateSuccessToast, showUpdateSuccessToast, showCreateErrorToast, showUpdateErrorToast } from '@/utils/toast'
+import { courseKeys } from '@/features/courses/hooks/useCourses'
 
 /**
  * Query keys for class-session queries
@@ -38,6 +40,29 @@ export function useClassSession(id: number | null) {
     queryFn: () => getClassSession(id as number),
     enabled: id != null && id > 0,
     staleTime: 0,
+  })
+}
+
+/**
+ * Hook to create a class session manually
+ * @param courseSlug - optional; when provided, invalidates course detail so class_sessions list refreshes
+ */
+export function useCreateClassSession(courseSlug?: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: CreateClassSessionInput) => createClassSession(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: classSessionKeys.all })
+      if (courseSlug) {
+        queryClient.invalidateQueries({ queryKey: courseKeys.detail(courseSlug) })
+        queryClient.refetchQueries({ queryKey: courseKeys.detail(courseSlug) })
+      }
+      showCreateSuccessToast('classSession', 'Class session created')
+    },
+    onError: (error: unknown) => {
+      showCreateErrorToast('classSession', error)
+    },
   })
 }
 

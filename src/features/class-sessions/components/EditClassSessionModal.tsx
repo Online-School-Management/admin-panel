@@ -38,6 +38,8 @@ interface EditClassSessionModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   sessionId: number | null
+  /** When provided (e.g. when opened from course detail), invalidates course after update */
+  courseSlug?: string
 }
 
 /**
@@ -47,9 +49,10 @@ export function EditClassSessionModal({
   open,
   onOpenChange,
   sessionId,
+  courseSlug,
 }: EditClassSessionModalProps) {
   const { t } = useTranslation()
-  const updateSession = useUpdateClassSession()
+  const updateSession = useUpdateClassSession(courseSlug)
   const lastPopulatedRef = useRef<{ sessionId: number; timestamp: number } | null>(null)
 
   const {

@@ -37,6 +37,13 @@ export const classSession = {
       teacher_training: 'Teacher Training',
     },
   },
+  delete: {
+    title: 'Delete Class Session',
+    description: 'Are you sure you want to delete this session? This action cannot be undone.',
+    cancel: 'Cancel',
+    delete: 'Delete',
+    deleting: 'Deleting…',
+  },
   edit: {
     title: 'Edit Class Session',
     description: 'Update status, teacher, room/link, and topic for this session.',

@@ -1,7 +1,14 @@
 import { format } from 'date-fns'
-import { CalendarDays } from 'lucide-react'
+import { CalendarDays, MoreVertical, Pencil, Trash2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import type { ClassSession } from '../types/course.types'
 import { useTranslation } from '@/i18n/context'
 
@@ -10,6 +17,10 @@ interface ClassSessionsCardProps {
   maxDisplay?: number
   /** Optional action (e.g. "Add Session" button) shown in the card header */
   headerAction?: React.ReactNode
+  /** When provided, show Edit on each session card */
+  onEditSession?: (sessionId: number) => void
+  /** When provided, show Delete on each session card */
+  onDeleteSession?: (sessionId: number) => void
 }
 
 function formatTimeTo12Hour(time24: string): string {
@@ -47,8 +58,11 @@ export function ClassSessionsCard({
   classSessions,
   maxDisplay = 28,
   headerAction,
+  onEditSession,
+  onDeleteSession,
 }: ClassSessionsCardProps) {
   const { t } = useTranslation()
+  const showSessionActions = onEditSession != null || onDeleteSession != null
 
   const displayedSessions = (classSessions ?? []).slice(0, maxDisplay)
   const today = new Date()
@@ -86,19 +100,47 @@ export function ClassSessionsCard({
                   isToday ? 'border-primary bg-primary/5' : ''
                 } ${isPast ? 'opacity-60' : ''}`}
               >
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-1">
                   <p className="text-xs font-medium text-muted-foreground">
                     {format(sessionDate, 'MMM dd')}
                   </p>
-                  {statusIcon ? (
-                    <span className="text-base" title={t(`common.status.${session.status}`)}>
-                      {statusIcon}
-                    </span>
-                  ) : (
-                    <Badge variant={getStatusVariant(session.status)} className="text-xs">
-                      {t(`common.status.${session.status}`)}
-                    </Badge>
-                  )}
+                  <div className="flex items-center gap-0.5">
+                    {statusIcon ? (
+                      <span className="text-base" title={t(`common.status.${session.status}`)}>
+                        {statusIcon}
+                      </span>
+                    ) : (
+                      <Badge variant={getStatusVariant(session.status)} className="text-xs">
+                        {t(`common.status.${session.status}`)}
+                      </Badge>
+                    )}
+                    {showSessionActions && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-7 w-7">
+                            <MoreVertical className="h-3.5 w-3.5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          {onEditSession && (
+                            <DropdownMenuItem onClick={() => onEditSession(session.id)}>
+                              <Pencil className="h-4 w-4 mr-2" />
+                              {t('enrollment.actions.edit')}
+                            </DropdownMenuItem>
+                          )}
+                          {onDeleteSession && (
+                            <DropdownMenuItem
+                              onClick={() => onDeleteSession(session.id)}
+                              className="text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              {t('enrollment.actions.delete')}
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                  </div>
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm font-semibold">

@@ -58,3 +58,11 @@ export async function updateClassSession(
   }>(`/class-sessions/${id}`, data)
   return response.data
 }
+
+/**
+ * Delete a class session (soft delete)
+ */
+export async function deleteClassSession(id: number): Promise<{ success: boolean; message?: string }> {
+  const response = await apiClient.delete<{ success: boolean; message?: string }>(`/class-sessions/${id}`)
+  return response.data
+}

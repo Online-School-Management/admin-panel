@@ -8,8 +8,9 @@ import { DetailSkeleton } from '@/components/common/skeletons/DetailSkeleton'
 import { useCourse } from '../hooks/useCourses'
 import { AssignTeacherModal } from '@/features/course-teachers/components/AssignTeacherModal'
 import { ScheduleModal } from '@/features/schedules/components/ScheduleModal'
-import { CreateClassSessionModal } from '@/features/class-sessions/components/CreateClassSessionModal'
+import { CreateClassSessionModal, EditClassSessionModal, DeleteClassSessionDialog } from '@/features/class-sessions/components'
 import { ClassSessionsCard } from './ClassSessionsCard'
+import { useDeleteClassSession } from '@/features/class-sessions/hooks/useClassSessions'
 import format from 'date-fns/format'
 import type { Course } from '../types/course.types'
 import { useTranslation } from '@/i18n/context'
@@ -27,7 +28,10 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
   const [assignTeacherModalOpen, setAssignTeacherModalOpen] = useState(false)
   const [scheduleModalOpen, setScheduleModalOpen] = useState(false)
   const [createSessionModalOpen, setCreateSessionModalOpen] = useState(false)
+  const [editSessionId, setEditSessionId] = useState<number | null>(null)
+  const [deleteSessionId, setDeleteSessionId] = useState<number | null>(null)
   const { data: courseData, isLoading, error } = useCourse(courseSlug)
+  const deleteSession = useDeleteClassSession(courseData?.data?.slug)
 
   if (isLoading) {
     return <DetailSkeleton />
@@ -204,6 +208,8 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
                 </Button>
               ) : undefined
             }
+            onEditSession={(id) => setEditSessionId(id)}
+            onDeleteSession={(id) => setDeleteSessionId(id)}
           />
         </div>
 
@@ -459,6 +465,24 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
               schedules={courseData.data.schedules}
             />
           )}
+          <EditClassSessionModal
+            open={editSessionId != null}
+            onOpenChange={(open) => { if (!open) setEditSessionId(null) }}
+            sessionId={editSessionId}
+            courseSlug={courseData.data.slug}
+          />
+          <DeleteClassSessionDialog
+            open={deleteSessionId != null}
+            onOpenChange={(open) => { if (!open) setDeleteSessionId(null) }}
+            onConfirm={() => {
+              if (deleteSessionId != null) {
+                deleteSession.mutate(deleteSessionId, {
+                  onSuccess: () => setDeleteSessionId(null),
+                })
+              }
+            }}
+            isLoading={deleteSession.isPending}
+          />
         </>
       )}
     </div>

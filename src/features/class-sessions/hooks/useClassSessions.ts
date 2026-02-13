@@ -4,9 +4,10 @@ import {
   getClassSession,
   createClassSession,
   updateClassSession,
+  deleteClassSession,
 } from '../services/class-session.service'
 import type { CreateClassSessionInput, UpdateClassSessionInput } from '../types/class-session.types'
-import { showCreateSuccessToast, showUpdateSuccessToast, showCreateErrorToast, showUpdateErrorToast } from '@/utils/toast'
+import { showCreateSuccessToast, showUpdateSuccessToast, showDeleteSuccessToast, showCreateErrorToast, showUpdateErrorToast, showDeleteErrorToast } from '@/utils/toast'
 import { courseKeys } from '@/features/courses/hooks/useCourses'
 
 /**
@@ -68,8 +69,9 @@ export function useCreateClassSession(courseSlug?: string) {
 
 /**
  * Hook to update a class session
+ * @param courseSlug - optional; when provided, invalidates course detail so class_sessions list refreshes
  */
-export function useUpdateClassSession() {
+export function useUpdateClassSession(courseSlug?: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -77,10 +79,37 @@ export function useUpdateClassSession() {
       updateClassSession(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: classSessionKeys.all })
+      if (courseSlug) {
+        queryClient.invalidateQueries({ queryKey: courseKeys.detail(courseSlug) })
+        queryClient.refetchQueries({ queryKey: courseKeys.detail(courseSlug) })
+      }
       showUpdateSuccessToast('classSession', 'Class session updated')
     },
     onError: (error: unknown) => {
       showUpdateErrorToast('classSession', error)
+    },
+  })
+}
+
+/**
+ * Hook to delete a class session
+ * @param courseSlug - optional; when provided, invalidates course detail so class_sessions list refreshes
+ */
+export function useDeleteClassSession(courseSlug?: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: number) => deleteClassSession(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: classSessionKeys.all })
+      if (courseSlug) {
+        queryClient.invalidateQueries({ queryKey: courseKeys.detail(courseSlug) })
+        queryClient.refetchQueries({ queryKey: courseKeys.detail(courseSlug) })
+      }
+      showDeleteSuccessToast('classSession')
+    },
+    onError: (error: unknown) => {
+      showDeleteErrorToast('classSession', error)
     },
   })
 }

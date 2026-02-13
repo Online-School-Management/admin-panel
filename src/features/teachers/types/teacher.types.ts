@@ -31,6 +31,7 @@ export interface Teacher {
   per_session_amount?: number | null
   status: 'active' | 'inactive' | 'suspended'
   notes?: string | null
+  bank_account?: string | null
   created_at?: string
   updated_at?: string
 }
@@ -56,6 +57,7 @@ export interface TeacherCollectionItem {
   monthly_salary_amount: number | null
   per_session_amount: number | null
   status: string
+  bank_account?: string | null
   created_at: string
 }
 
@@ -80,6 +82,7 @@ export interface CreateTeacherInput {
   monthly_salary_amount?: number | null
   per_session_amount?: number | null
   notes?: string
+  bank_account?: string | null
 }
 
 export interface UpdateTeacherInput {
@@ -103,6 +106,7 @@ export interface UpdateTeacherInput {
   monthly_salary_amount?: number | null
   per_session_amount?: number | null
   notes?: string
+  bank_account?: string | null
 }
 
 export interface TeachersResponse {

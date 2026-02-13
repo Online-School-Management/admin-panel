@@ -82,6 +82,7 @@ export function TeacherForm({ teacherSlug }: TeacherFormProps) {
       commission_rate: undefined,
       monthly_salary_amount: undefined,
       per_session_amount: undefined,
+      bank_account: '',
       password: '',
       password_confirmation: '',
     },
@@ -133,6 +134,7 @@ export function TeacherForm({ teacherSlug }: TeacherFormProps) {
       commission_rate: teacher.commission_rate || undefined,
       monthly_salary_amount: teacher.monthly_salary_amount || undefined,
       per_session_amount: teacher.per_session_amount || undefined,
+      bank_account: teacher.bank_account || '',
       password: '',
       password_confirmation: '',
     }, {
@@ -158,6 +160,7 @@ export function TeacherForm({ teacherSlug }: TeacherFormProps) {
         commission_rate: data.commission_type === 'monthly_percent' ? (data.commission_rate ?? undefined) : undefined,
         monthly_salary_amount: data.commission_type === 'monthly_salary' ? (data.monthly_salary_amount ?? null) : null,
         per_session_amount: data.commission_type === 'per_session' ? (data.per_session_amount ?? null) : null,
+        bank_account: data.bank_account?.trim() || undefined,
       }
       
       // Include email if provided and not empty
@@ -185,6 +188,7 @@ export function TeacherForm({ teacherSlug }: TeacherFormProps) {
         commission_rate: data.commission_type === 'monthly_percent' ? (data.commission_rate ?? undefined) : undefined,
         monthly_salary_amount: data.commission_type === 'monthly_salary' ? (data.monthly_salary_amount ?? null) : null,
         per_session_amount: data.commission_type === 'per_session' ? (data.per_session_amount ?? null) : null,
+        bank_account: data.bank_account?.trim() || undefined,
       }
       createTeacher.mutate(createData)
     }
@@ -451,6 +455,20 @@ export function TeacherForm({ teacherSlug }: TeacherFormProps) {
                   )}
                 </div>
               )}
+
+              {/* Bank Account */}
+              <div className="space-y-2">
+                <Label htmlFor="bank_account">{t('teacher.form.bankAccount')}</Label>
+                <Input
+                  id="bank_account"
+                  {...register('bank_account')}
+                  placeholder={t('teacher.form.enterBankAccount')}
+                  disabled={isSubmitting}
+                />
+                {errors.bank_account && (
+                  <p className="text-sm text-destructive">{errors.bank_account.message}</p>
+                )}
+              </div>
 
               {/* Status */}
               <div className="space-y-2">

@@ -37,6 +37,7 @@ const teacherFormBaseSchema = z.object({
   commission_rate: optionalNumber(0, 99),
   monthly_salary_amount: optionalNumber(0),
   per_session_amount: optionalNumber(0),
+  bank_account: z.string().max(255).optional().nullable(),
 })
 
 /**

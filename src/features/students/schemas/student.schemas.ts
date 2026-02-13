@@ -20,39 +20,55 @@ const studentFormBaseSchema = z.object({
   phone: z.string().optional(),
   status: z.enum(['active', 'inactive', 'suspended']).optional(),
   date_of_birth: z.string().optional().nullable(),
+  education: z.string().max(100).optional().nullable(),
+  school_type: z.enum(['government', 'international', 'private', 'other']).optional().nullable(),
+  school_other: z.string().max(100).optional().nullable(),
+  class: z.string().max(50).optional().nullable(),
+  facebook_link: z.string().max(500).optional().nullable(),
 })
+
+// Refinement: when school_type is "other", school_other must be provided
+const schoolOtherRefinement = (data: { school_type?: string | null; school_other?: string | null }) => {
+  if (data.school_type === 'other') {
+    return !!data.school_other?.trim()
+  }
+  return true
+}
+const schoolOtherRefinementOptions = { message: 'Please specify school when "Other" is selected', path: ['school_other'] }
 
 /**
  * Schema for creating a new student
  * Password is NOT required (default password is set on backend)
  */
-export const createStudentSchema = studentFormBaseSchema
+export const createStudentSchema = studentFormBaseSchema.refine(schoolOtherRefinement, schoolOtherRefinementOptions)
 
 /**
  * Schema for updating an existing student
  * All mandatory fields are required (name, email, guardian_phone, age, gender, address)
  * Password is optional (only validate if provided)
  */
-export const updateStudentSchema = studentFormBaseSchema.extend({
-  password: z
-    .string()
-    .min(VALIDATION.MIN_PASSWORD_LENGTH, VALIDATION_MESSAGES.MIN_LENGTH('Password', VALIDATION.MIN_PASSWORD_LENGTH))
-    .optional()
-    .or(z.literal('')),
-  password_confirmation: z.string().optional(),
-}).refine(
-  (data) => {
-    // If password is provided, confirmation must match
-    if (data.password && data.password.length > 0) {
-      return data.password === data.password_confirmation
+export const updateStudentSchema = studentFormBaseSchema
+  .extend({
+    password: z
+      .string()
+      .min(VALIDATION.MIN_PASSWORD_LENGTH, VALIDATION_MESSAGES.MIN_LENGTH('Password', VALIDATION.MIN_PASSWORD_LENGTH))
+      .optional()
+      .or(z.literal('')),
+    password_confirmation: z.string().optional(),
+  })
+  .refine(schoolOtherRefinement, schoolOtherRefinementOptions)
+  .refine(
+    (data) => {
+      if (data.password && data.password.length > 0) {
+        return data.password === data.password_confirmation
+      }
+      return true
+    },
+    {
+      message: VALIDATION_MESSAGES.PASSWORD_MISMATCH,
+      path: ['password_confirmation'],
     }
-    return true
-  },
-  {
-    message: VALIDATION_MESSAGES.PASSWORD_MISMATCH,
-    path: ['password_confirmation'],
-  }
-)
+  )
 
 // Export types
 export type CreateStudentFormData = z.infer<typeof createStudentSchema>

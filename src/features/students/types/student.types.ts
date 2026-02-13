@@ -16,6 +16,8 @@ export interface StudentUser {
   last_login_at?: string | null
 }
 
+export type StudentSchoolType = 'government' | 'international' | 'private' | 'other'
+
 export interface Student {
   id: number
   student_id: string
@@ -23,6 +25,11 @@ export interface Student {
   user: StudentUser | null
   guardian_phone?: string | null
   age?: number | null
+  education?: string | null
+  school_type?: StudentSchoolType | null
+  school_other?: string | null
+  class?: string | null
+  facebook_link?: string | null
   status: 'active' | 'inactive'
   created_at?: string
   updated_at?: string
@@ -43,6 +50,11 @@ export interface StudentCollectionItem {
   } | null
   guardian_phone: string | null
   age: number | null
+  education?: string | null
+  school_type?: string | null
+  school_other?: string | null
+  class?: string | null
+  facebook_link?: string | null
   status: string
   created_at: string
 }
@@ -60,6 +72,11 @@ export interface CreateStudentInput {
   status?: 'active' | 'inactive' | 'suspended'
   student_id?: string
   slug?: string
+  education?: string | null
+  school_type?: StudentSchoolType | null
+  school_other?: string | null
+  class?: string | null
+  facebook_link?: string | null
 }
 
 export interface UpdateStudentInput {
@@ -77,6 +94,11 @@ export interface UpdateStudentInput {
   status?: 'active' | 'inactive' | 'suspended'
   student_id?: string
   slug?: string
+  education?: string | null
+  school_type?: StudentSchoolType | null
+  school_other?: string | null
+  class?: string | null
+  facebook_link?: string | null
 }
 
 export interface StudentsResponse {

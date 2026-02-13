@@ -74,6 +74,11 @@ export function StudentForm({ studentSlug }: StudentFormProps) {
       age: undefined,
       gender: undefined,
       address: '',
+      education: '',
+      school_type: undefined,
+      school_other: '',
+      class: '',
+      facebook_link: '',
       ...(isEditMode ? { password: '', password_confirmation: '' } : {}),
     },
   })
@@ -116,6 +121,11 @@ export function StudentForm({ studentSlug }: StudentFormProps) {
       age: student.age || undefined,
       gender: student.user.gender || undefined,
       address: student.user.address || '',
+      education: student.education || '',
+      school_type: student.school_type || undefined,
+      school_other: student.school_other || '',
+      class: student.class || '',
+      facebook_link: student.facebook_link || '',
       password: '',
       password_confirmation: '',
     }, {
@@ -140,6 +150,11 @@ export function StudentForm({ studentSlug }: StudentFormProps) {
         age: updateFormData.age,
         gender: updateFormData.gender,
         address: updateFormData.address,
+        education: updateFormData.education || undefined,
+        school_type: updateFormData.school_type || undefined,
+        school_other: updateFormData.school_other || undefined,
+        class: updateFormData.class || undefined,
+        facebook_link: updateFormData.facebook_link || undefined,
       }
       
       // Only include password if provided
@@ -158,6 +173,11 @@ export function StudentForm({ studentSlug }: StudentFormProps) {
         age: createFormData.age ?? 0,
         gender: createFormData.gender || 'male',
         address: createFormData.address || '',
+        education: createFormData.education || undefined,
+        school_type: createFormData.school_type || undefined,
+        school_other: createFormData.school_other || undefined,
+        class: createFormData.class || undefined,
+        facebook_link: createFormData.facebook_link || undefined,
       }
       createStudent.mutate(createData)
     }
@@ -294,6 +314,85 @@ export function StudentForm({ studentSlug }: StudentFormProps) {
                 />
                 {errors.age && (
                   <p className="text-sm text-destructive">{errors.age.message}</p>
+                )}
+              </div>
+
+              {/* Education */}
+              <div className="space-y-2">
+                <Label htmlFor="education">{t('student.form.education')}</Label>
+                <Input
+                  id="education"
+                  {...register('education')}
+                  placeholder={t('student.form.enterEducation')}
+                  disabled={isSubmitting}
+                />
+                {errors.education && (
+                  <p className="text-sm text-destructive">{errors.education.message}</p>
+                )}
+              </div>
+
+              {/* School Type */}
+              <div className="space-y-2">
+                <Label htmlFor="school_type">{t('student.form.schoolType')}</Label>
+                <Select
+                  value={watch('school_type') ?? ''}
+                  onValueChange={(value) => setValue('school_type', value === '' ? undefined : value as 'government' | 'international' | 'private' | 'other')}
+                  disabled={isSubmitting}
+                >
+                  <SelectTrigger id="school_type">
+                    <SelectValue placeholder={t('student.form.selectSchoolType')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="government">{t('student.form.schoolGovernment')}</SelectItem>
+                    <SelectItem value="international">{t('student.form.schoolInternational')}</SelectItem>
+                    <SelectItem value="private">{t('student.form.schoolPrivate')}</SelectItem>
+                    <SelectItem value="other">{t('student.form.schoolOther')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* School Other (when school type is Other) */}
+              {watch('school_type') === 'other' && (
+                <div className="space-y-2">
+                  <Label htmlFor="school_other">{t('student.form.schoolOtherSpecify')}</Label>
+                  <Input
+                    id="school_other"
+                    {...register('school_other')}
+                    placeholder={t('student.form.enterSchoolOther')}
+                    disabled={isSubmitting}
+                  />
+                  {errors.school_other && (
+                    <p className="text-sm text-destructive">{errors.school_other.message}</p>
+                  )}
+                </div>
+              )}
+
+              {/* Class */}
+              <div className="space-y-2">
+                <Label htmlFor="class">{t('student.form.class')}</Label>
+                <Input
+                  id="class"
+                  {...register('class')}
+                  placeholder={t('student.form.enterClass')}
+                  disabled={isSubmitting}
+                />
+                {errors.class && (
+                  <p className="text-sm text-destructive">{errors.class.message}</p>
+                )}
+              </div>
+
+              {/* Facebook Link */}
+              <div className="space-y-2">
+                <Label htmlFor="facebook_link">{t('student.form.facebookLink')}</Label>
+                <Input
+                  id="facebook_link"
+                  type="url"
+                  {...register('facebook_link')}
+                  placeholder={t('student.form.enterFacebookLink')}
+                  disabled={isSubmitting}
+                />
+                {errors.facebook_link && (
+                  <p className="text-sm text-destructive">{errors.facebook_link.message}</p>
                 )}
               </div>
 

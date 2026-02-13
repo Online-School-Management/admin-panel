@@ -147,6 +147,12 @@ export function TeacherDetail({ teacherSlug }: TeacherDetailProps) {
                     <p className="text-base">{formatCurrency(Number(teacher.per_session_amount))}</p>
                   </div>
                 )}
+                {teacher.bank_account && (
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">{t('teacher.detail.bankAccount')}</p>
+                    <p className="text-base">{teacher.bank_account}</p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

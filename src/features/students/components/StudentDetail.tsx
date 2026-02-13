@@ -159,6 +159,38 @@ export function StudentDetail({ studentSlug }: StudentDetailProps) {
                     <p className="text-base">{student.user.address}</p>
                   </div>
                 )}
+                {student.education && (
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">{t('student.detail.education')}</p>
+                    <p className="text-base">{student.education}</p>
+                  </div>
+                )}
+                {(student.school_type || student.school_other) && (
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">{t('student.detail.school')}</p>
+                    <p className="text-base">
+                      {student.school_type === 'other'
+                        ? (student.school_other || t('student.form.schoolOther'))
+                        : student.school_type
+                          ? t(`student.schoolType.${student.school_type}`)
+                          : student.school_other || '-'}
+                    </p>
+                  </div>
+                )}
+                {student.class && (
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">{t('student.detail.class')}</p>
+                    <p className="text-base">{student.class}</p>
+                  </div>
+                )}
+                {student.facebook_link && (
+                  <div className="space-y-1 md:col-span-2">
+                    <p className="text-sm font-medium text-muted-foreground">{t('student.detail.facebookLink')}</p>
+                    <a href={student.facebook_link} target="_blank" rel="noopener noreferrer" className="text-base text-primary hover:underline break-all">
+                      {student.facebook_link}
+                    </a>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

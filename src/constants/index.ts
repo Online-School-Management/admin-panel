@@ -148,10 +148,10 @@ export const COURSE_TYPE_OPTIONS = [
   { value: COURSE_TYPE.TEACHER_TRAINING, label: 'Teacher Training' },
 ] as const
 
-// API configuration
+// API configuration (BASE_URL from .env VITE_API_BASE_URL, fallback for dev)
 export const API_CONFIG = {
   TIMEOUT: 5000, // 5 seconds - reduced for faster failure detection
-  BASE_URL: 'http://localhost:8000/api/v1/backend',
+  BASE_URL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000/api/v1/backend',
 } as const
 
 // Form validation

@@ -20,7 +20,7 @@ export const auth = {
 
   // Messages
   messages: {
-    welcomeBack: 'Welcome back',
+    welcomeBack: 'TipTop Education',
     loginDescription: 'Enter your credentials to access the admin panel',
     loggingIn: 'Logging in...',
     demoCredentials: 'Demo Credentials',

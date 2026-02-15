@@ -20,7 +20,7 @@ export const auth = {
 
   // Messages
   messages: {
-    welcomeBack: 'ပြန်လည်ကြိုဆိုပါသည်',
+    welcomeBack: 'TipTop Education',
     loginDescription: 'စီမံခန့်ခွဲသူ ပေါ်တယ်သို့ ဝင်ရောက်ရန် သင့်အထောက်အထားများ ထည့်သွင်းပါ',
     loggingIn: 'ဝင်ရောက်နေသည်...',
     demoCredentials: 'ဒီမို အထောက်အထားများ',

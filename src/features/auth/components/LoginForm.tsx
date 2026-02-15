@@ -114,17 +114,6 @@ export function LoginForm() {
               t('common.buttons.login')
             )}
           </Button>
-
-          {/* Demo Credentials Hint */}
-          <div className="mt-4 rounded-md bg-muted p-3 text-sm">
-            <p className="font-medium">{t('auth.messages.demoCredentials')}:</p>
-            <p className="text-muted-foreground">
-              {t('auth.form.email')}: <span className="font-mono">admin@gmail.com</span>
-            </p>
-            <p className="text-muted-foreground">
-              {t('auth.form.password')}: <span className="font-mono">admin</span>
-            </p>
-          </div>
         </form>
       </CardContent>
     </Card>

@@ -10,9 +10,9 @@ import { LoginForm } from '@/features/auth/components/LoginForm'
 function LoginPage() {
   const { isAuthenticated } = useAuth()
 
-  // Redirect to dashboard if already authenticated
+  // Redirect to class-sessions if already authenticated
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />
+    return <Navigate to="/class-sessions" replace />
   }
 
   return (

@@ -26,8 +26,8 @@ export function useLogin() {
         description: `Welcome back, ${data.user.name}!`,
       })
 
-      // Redirect to dashboard
-      navigate('/dashboard')
+      // Redirect to class-sessions
+      navigate('/class-sessions')
     },
     onError: (error: unknown) => {
       // Show error toast with API error message

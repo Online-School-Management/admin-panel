@@ -221,9 +221,9 @@ export function TeachersList() {
               {isLoading && (
                 <TableSkeleton
                   columns={[
-                    { width: 'w-24' },
-                    { width: 'w-32' },
+                    { width: 'w-12', className: 'w-16' },
                     { width: 'w-40' },
+                    { width: 'w-32' },
                     { width: 'w-36' },
                     { width: 'w-28' },
                     { width: 'w-20' },
@@ -245,9 +245,9 @@ export function TeachersList() {
                   <Table>
                     <TableHeader>
                       <TableRow>
+                        <TableHead className="w-16">{t('teacher.table.no')}</TableHead>
                         <TableHead>{t('teacher.table.teacherId')}</TableHead>
                         <TableHead>{t('teacher.table.name')}</TableHead>
-                        <TableHead>{t('teacher.table.email')}</TableHead>
                         <TableHead>{t('teacher.table.commissionType')}</TableHead>
                         <TableHead>{t('teacher.table.amount')}</TableHead>
                         <TableHead>{t('teacher.table.status')}</TableHead>
@@ -255,15 +255,22 @@ export function TeachersList() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {teachers.map((teacher) => (
+                      {teachers.map((teacher, index) => {
+                        const rowNumber = pagination
+                          ? (pagination.current_page - 1) * pagination.per_page + index + 1
+                          : index + 1
+                        return (
                           <TableRow key={teacher.id}>
-                            <TableCell className="font-medium">
-                              {teacher.teacher_id}
+                            <TableCell className="text-muted-foreground text-center">
+                              {rowNumber}
+                            </TableCell>
+                            <TableCell>
+                              <div className="font-medium">{teacher.teacher_id}</div>
+                              <div className="text-sm text-muted-foreground">{teacher.user.email}</div>
                             </TableCell>
                             <TableCell>
                               <div className="font-medium">{teacher.user.name}</div>
                             </TableCell>
-                            <TableCell>{teacher.user.email}</TableCell>
                             <TableCell>
                               {teacher.commission_type
                                 ? getCommissionTypeLabel(teacher.commission_type)
@@ -306,7 +313,8 @@ export function TeachersList() {
                               </DropdownMenu>
                             </TableCell>
                           </TableRow>
-                      ))}
+                        )
+                      })}
                     </TableBody>
                   </Table>
                 </div>

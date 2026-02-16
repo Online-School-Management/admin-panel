@@ -68,6 +68,8 @@ export const teacher = {
     department: 'ဌာန',
     subject: 'ဘာသာရပ်',
     employmentType: 'အလုပ်ခန့်အပ်မှု အမျိုးအစား',
+    commissionType: 'လစာ အမျိုးအစား',
+    amount: 'ပမာဏ',
     status: 'အခြေအနေ',
     created: 'ဖန်တီးထားသည်',
     actions: 'လုပ်ဆောင်ချက်များ',

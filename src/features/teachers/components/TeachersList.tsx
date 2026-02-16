@@ -30,9 +30,8 @@ import { useTeachers, useDeleteTeacher } from '../hooks/useTeachers'
 import { DeleteTeacherDialog } from './DeleteTeacherDialog'
 import { Pagination } from '@/components/common/Pagination'
 import { TableSkeleton } from '@/components/common/skeletons/TableSkeleton'
-import { Skeleton } from '@/components/ui/skeleton'
 import { PAGINATION, TEACHER_STATUS_OPTIONS, EMPLOYMENT_TYPE_OPTIONS } from '@/constants'
-import format from 'date-fns/format'
+import { formatCurrency } from '@/utils/format'
 import type { TeacherCollectionItem } from '../types/teacher.types'
 import { useTranslation } from '@/i18n/context'
 
@@ -104,6 +103,28 @@ export function TeachersList() {
 
   const getEmploymentTypeLabel = (type: string) => {
     return t(`teacher.employmentType.${type}`) || type
+  }
+
+  const getCommissionTypeLabel = (type: string) => {
+    return t(`teacher.commissionType.${type}`) || type
+  }
+
+  const getAmountDisplay = (teacher: TeacherCollectionItem): string => {
+    const ct = teacher.commission_type
+    if (ct === 'monthly_percent') {
+      return teacher.commission_rate != null ? `${teacher.commission_rate}%` : '-'
+    }
+    if (ct === 'monthly_salary') {
+      return teacher.monthly_salary_amount != null
+        ? formatCurrency(Number(teacher.monthly_salary_amount))
+        : '-'
+    }
+    if (ct === 'per_session') {
+      return teacher.per_session_amount != null
+        ? formatCurrency(Number(teacher.per_session_amount))
+        : '-'
+    }
+    return '-'
   }
 
   const teachers = data?.data || []
@@ -200,23 +221,12 @@ export function TeachersList() {
               {isLoading && (
                 <TableSkeleton
                   columns={[
-                    { width: 'w-8', className: 'w-16' },
-                    { width: 'w-20' },
-                    { 
-                      width: 'w-32',
-                      customCell: () => (
-                        <div className="space-y-1">
-                          <Skeleton className="h-4 w-32" />
-                          <Skeleton className="h-3 w-24" />
-                        </div>
-                      )
-                    },
-                    { width: 'w-40' },
-                    { width: 'w-32' },
                     { width: 'w-24' },
+                    { width: 'w-32' },
+                    { width: 'w-40' },
+                    { width: 'w-36' },
                     { width: 'w-28' },
-                    { width: 'w-16' },
-                    { width: 'w-24', className: 'hidden lg:table-cell' },
+                    { width: 'w-20' },
                     { width: 'w-8', className: 'text-right' },
                   ]}
                   rows={5}
@@ -235,60 +245,35 @@ export function TeachersList() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-16">{t('teacher.table.no')}</TableHead>
                         <TableHead>{t('teacher.table.teacherId')}</TableHead>
                         <TableHead>{t('teacher.table.name')}</TableHead>
                         <TableHead>{t('teacher.table.email')}</TableHead>
-                        <TableHead>{t('teacher.table.department')}</TableHead>
-                        <TableHead>{t('teacher.table.subject')}</TableHead>
-                        <TableHead>{t('teacher.table.employmentType')}</TableHead>
+                        <TableHead>{t('teacher.table.commissionType')}</TableHead>
+                        <TableHead>{t('teacher.table.amount')}</TableHead>
                         <TableHead>{t('teacher.table.status')}</TableHead>
-                        <TableHead className="hidden lg:table-cell">{t('teacher.table.created')}</TableHead>
                         <TableHead className="text-right">{t('teacher.table.actions')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {teachers.map((teacher, index) => {
-                        // Calculate row number based on pagination
-                        const rowNumber = pagination
-                          ? (pagination.current_page - 1) * pagination.per_page + index + 1
-                          : index + 1
-                        
-                        return (
+                      {teachers.map((teacher) => (
                           <TableRow key={teacher.id}>
-                            <TableCell className="text-muted-foreground text-center">
-                              {rowNumber}
-                            </TableCell>
                             <TableCell className="font-medium">
                               {teacher.teacher_id}
                             </TableCell>
                             <TableCell>
-                              <div>
-                                <div className="font-medium">{teacher.user.name}</div>
-                                {teacher.user.phone && (
-                                  <div className="text-sm text-muted-foreground">
-                                    {teacher.user.phone}
-                                  </div>
-                                )}
-                              </div>
+                              <div className="font-medium">{teacher.user.name}</div>
                             </TableCell>
                             <TableCell>{teacher.user.email}</TableCell>
-                            <TableCell>{teacher.department || '-'}</TableCell>
-                            <TableCell>{teacher.subject || '-'}</TableCell>
                             <TableCell>
-                              <Badge variant="outline">
-                                {getEmploymentTypeLabel(teacher.employment_type)}
-                              </Badge>
+                              {teacher.commission_type
+                                ? getCommissionTypeLabel(teacher.commission_type)
+                                : '-'}
                             </TableCell>
+                            <TableCell>{getAmountDisplay(teacher)}</TableCell>
                             <TableCell>
                               <Badge variant={getStatusBadgeVariant(teacher.status)}>
                                 {getStatusLabel(teacher.status)}
                               </Badge>
-                            </TableCell>
-                            <TableCell className="text-sm text-muted-foreground hidden lg:table-cell">
-                              {teacher.created_at
-                                ? format(new Date(teacher.created_at), 'MMM dd, yyyy')
-                                : '-'}
                             </TableCell>
                             <TableCell className="text-right">
                               <DropdownMenu>
@@ -321,8 +306,7 @@ export function TeachersList() {
                               </DropdownMenu>
                             </TableCell>
                           </TableRow>
-                        )
-                      })}
+                      ))}
                     </TableBody>
                   </Table>
                 </div>

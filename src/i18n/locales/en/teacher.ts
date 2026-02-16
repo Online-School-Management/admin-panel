@@ -68,6 +68,8 @@ export const teacher = {
     department: 'Department',
     subject: 'Subject',
     employmentType: 'Employment Type',
+    commissionType: 'Commission Type',
+    amount: 'Amount',
     status: 'Status',
     created: 'Created',
     actions: 'Actions',

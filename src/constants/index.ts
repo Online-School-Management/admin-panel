@@ -104,11 +104,13 @@ export const COURSE_STATUS = {
 export const PAYMENT_STATUS = {
   PENDING: 'pending',
   PAID: 'paid',
+  FREE: 'free',
 } as const
 
 export const PAYMENT_STATUS_OPTIONS = [
   { value: PAYMENT_STATUS.PENDING, label: 'Pending' },
   { value: PAYMENT_STATUS.PAID, label: 'Paid' },
+  { value: PAYMENT_STATUS.FREE, label: 'Free' },
 ] as const
 
 // Payment method options

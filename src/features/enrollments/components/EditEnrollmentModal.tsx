@@ -39,7 +39,7 @@ interface EditEnrollmentModalProps {
  * EditEnrollmentModal - modal form to edit an existing enrollment.
  * Used on the course-enrollments page; stays on the page and refreshes the list on success.
  */
-export function EditEnrollmentModal({
+function EditEnrollmentModal({
   open,
   onOpenChange,
   enrollmentId,
@@ -251,3 +251,5 @@ export function EditEnrollmentModal({
     </Dialog>
   )
 }
+
+export { EditEnrollmentModal }

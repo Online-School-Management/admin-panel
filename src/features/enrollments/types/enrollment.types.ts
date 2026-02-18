@@ -64,6 +64,9 @@ export interface CreateEnrollmentInput {
   course_id: number
   enrolled_at?: string | null
   status?: 'active' | 'dropped' | 'completed'
+  first_n_months_free?: number
+  discount_type?: 'percentage' | 'fixed' | null
+  discount_value?: number | null
 }
 
 export interface UpdateEnrollmentInput {

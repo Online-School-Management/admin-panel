@@ -70,6 +70,7 @@ export const common = {
     dropped: "ထွက်သွားသည်",
     pending: "စောင့်ဆိုင်းနေသည်",
     paid: "ပေးချေပြီး",
+    free: "အခမဲ့",
   },
 
   // Common messages

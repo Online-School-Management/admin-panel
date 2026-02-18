@@ -405,6 +405,7 @@ function CourseEnrollmentsPage() {
         onOpenChange={setAddModalOpen}
         courseId={courseIdNum}
         courseTitle={course?.title}
+        courseDuration={course?.duration}
       />
 
       {/* Edit Enrollment Modal */}

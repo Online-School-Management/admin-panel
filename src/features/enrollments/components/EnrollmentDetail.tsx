@@ -5,8 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { DetailSkeleton } from '@/components/common/skeletons/DetailSkeleton'
 import { useEnrollment } from '../hooks/useEnrollments'
+import { useStudentPaymentsByEnrollment } from '@/features/student-payments/hooks/useStudentPayments'
 import format from 'date-fns/format'
 import { useTranslation } from '@/i18n/context'
+import { formatCurrency } from '@/utils/format'
 
 interface EnrollmentDetailProps {
   enrollmentId: number
@@ -18,6 +20,7 @@ interface EnrollmentDetailProps {
 export function EnrollmentDetail({ enrollmentId }: EnrollmentDetailProps) {
   const { t } = useTranslation()
   const { data: enrollmentData, isLoading, error } = useEnrollment(enrollmentId)
+  const { data: paymentsData } = useStudentPaymentsByEnrollment(enrollmentId)
 
   if (isLoading) {
     return <DetailSkeleton />
@@ -64,6 +67,21 @@ export function EnrollmentDetail({ enrollmentId }: EnrollmentDetailProps) {
     return t(`common.status.${status}`) || status
   }
 
+  const payments = paymentsData?.data ?? []
+  const firstNMonthsFree = (() => {
+    let n = 0
+    for (const p of payments) {
+      if (p.status === 'free') n++
+      else break
+    }
+    return n
+  })()
+  const discountFromPayments = payments.find(
+    (p) => p.discount_type != null && p.discount_value != null
+  )
+  const discountType = discountFromPayments?.discount_type ?? null
+  const discountValue = discountFromPayments?.discount_value ?? null
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Information */}
@@ -105,6 +123,41 @@ export function EnrollmentDetail({ enrollmentId }: EnrollmentDetailProps) {
                     </p>
                   </div>
                 )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Pricing: Free & Discount (derived from payments) */}
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('enrollment.detail.pricing')}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">
+                    {t('enrollment.detail.firstNMonthsFree')}
+                  </p>
+                  <p className="text-base">
+                    {firstNMonthsFree > 0
+                      ? t('enrollment.detail.firstNMonthsFreeValue', { n: firstNMonthsFree })
+                      : t('enrollment.detail.firstNMonthsFreeNone')}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">
+                    {t('enrollment.detail.discount')}
+                  </p>
+                  <p className="text-base">
+                    {discountType === 'percentage' && discountValue != null
+                      ? t('enrollment.detail.discountPercent', { value: discountValue })
+                      : discountType === 'fixed' && discountValue != null
+                        ? t('enrollment.detail.discountFixed', {
+                            value: formatCurrency(discountValue),
+                          })
+                        : t('enrollment.detail.noDiscount')}
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>

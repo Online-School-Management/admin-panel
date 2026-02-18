@@ -182,6 +182,8 @@ export function StudentPaymentsList() {
         return 'default'
       case 'pending':
         return 'warning'
+      case 'free':
+        return 'destructive'
       default:
         return 'secondary'
     }
@@ -200,11 +202,6 @@ export function StudentPaymentsList() {
 
   // Check if any filter is active
   const hasActiveFilters = search !== '' || statusFilter !== 'all' || courseFilter !== 'all'
-
-  const getPaymentMethodLabel = (method: string | null) => {
-    if (!method) return '-'
-    return t(`studentPayment.paymentMethod.${method}`) || method
-  }
 
   const handleMonthChange = (value: string) => {
     const [month, year] = value.split('-').map(Number)
@@ -378,6 +375,7 @@ export function StudentPaymentsList() {
               <SelectItem value="all">{t('studentPayment.filters.allStatus') || 'All Status'}</SelectItem>
               <SelectItem value={PAYMENT_STATUS.PENDING}>{getStatusLabel(PAYMENT_STATUS.PENDING)}</SelectItem>
               <SelectItem value={PAYMENT_STATUS.PAID}>{getStatusLabel(PAYMENT_STATUS.PAID)}</SelectItem>
+              <SelectItem value={PAYMENT_STATUS.FREE}>{getStatusLabel(PAYMENT_STATUS.FREE)}</SelectItem>
             </SelectContent>
           </Select>
           <Select
@@ -424,7 +422,6 @@ export function StudentPaymentsList() {
                     { width: 'w-32' },
                     { width: 'w-32' },
                     { width: 'w-24' },
-                    { width: 'w-24' },
                     { width: 'w-16' },
                     { width: 'w-8', className: 'text-right' },
                   ]}
@@ -448,7 +445,6 @@ export function StudentPaymentsList() {
                         <TableHead className="font-bold">{t('studentPayment.table.amount')}</TableHead>
                         <TableHead className="font-bold">{t('studentPayment.table.dueDate')}</TableHead>
                         <TableHead className="font-bold">{t('studentPayment.table.paymentDate')}</TableHead>
-                        <TableHead className="font-bold">{t('studentPayment.table.paymentMethod')}</TableHead>
                         <TableHead className="font-bold">{t('studentPayment.table.status')}</TableHead>
                         <TableHead className="text-right font-bold">{t('studentPayment.table.actions')}</TableHead>
                       </TableRow>
@@ -518,9 +514,19 @@ export function StudentPaymentsList() {
                               {t('studentPayment.monthNumber', { number: payment.month_number })}
                             </TableCell>
                             <TableCell>
-                              {payment.amount_paid
-                                ? formatCurrency(payment.amount_paid)
-                                : '-'}
+                              {payment.original_amount != null &&
+                              payment.original_amount !== payment.amount_paid ? (
+                                <span className="inline-flex items-center gap-2">
+                                  <span className="text-muted-foreground line-through">
+                                    {formatCurrency(payment.original_amount)}
+                                  </span>
+                                  <span>{formatCurrency(payment.amount_paid ?? 0)}</span>
+                                </span>
+                              ) : payment.amount_paid != null ? (
+                                formatCurrency(payment.amount_paid)
+                              ) : (
+                                '-'
+                              )}
                             </TableCell>
                             <TableCell className="text-sm text-muted-foreground">
                               {payment.due_date
@@ -531,15 +537,6 @@ export function StudentPaymentsList() {
                               {payment.payment_date
                                 ? format(new Date(payment.payment_date), 'MMM dd, yyyy')
                                 : '-'}
-                            </TableCell>
-                            <TableCell>
-                              {payment.payment_method ? (
-                                <Badge variant="outline">
-                                  {getPaymentMethodLabel(payment.payment_method)}
-                                </Badge>
-                              ) : (
-                                '-'
-                              )}
                             </TableCell>
                             <TableCell>
                               <Badge variant={getStatusBadgeVariant(payment.status)}>
@@ -573,7 +570,7 @@ export function StudentPaymentsList() {
                                       </Link>
                                     </DropdownMenuItem>
                                     {payment.status !== PAYMENT_STATUS.PAID && (
-                                      <DropdownMenuItem
+                                        <DropdownMenuItem
                                         onClick={() => handleDeleteClick(payment)}
                                         className="text-destructive"
                                       >

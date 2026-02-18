@@ -31,6 +31,9 @@ export const studentPayment = {
     selectAdmin: 'Select admin',
     noAdmin: 'No admin',
     enterAmount: 'Enter amount',
+    originalAmountHelp: 'Full price before discount (for display and reporting).',
+    discountType: 'Discount type',
+    selectDiscountType: 'Select discount type',
     enterNotes: 'Enter notes (optional)',
   },
 
@@ -83,6 +86,7 @@ export const studentPayment = {
     enrollmentInformation: 'Enrollment Information',
     monthNumber: 'Month Number',
     amount: 'Amount',
+    originalAmount: 'Original amount',
     dueDate: 'Due Date',
     paymentDate: 'Payment Date',
     paidAt: 'Paid At',
@@ -96,6 +100,12 @@ export const studentPayment = {
     created: 'Created',
     updated: 'Updated',
     errorLoading: 'Error loading payment',
+    free: 'Free',
+    thisMonthFree: 'This month is free (no charge)',
+    discount: 'Discount',
+    discountPercentage: '{{value}}% off',
+    discountFixedAmount: '{{value}} off',
+    noDiscount: 'No discount',
   },
 
   // Actions

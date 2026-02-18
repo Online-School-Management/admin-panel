@@ -53,6 +53,8 @@ export function StudentPaymentDetail({ paymentId }: StudentPaymentDetailProps) {
         return 'default'
       case 'pending':
         return 'warning'
+      case 'free':
+        return 'secondary'
       default:
         return 'secondary'
     }
@@ -93,11 +95,56 @@ export function StudentPaymentDetail({ paymentId }: StudentPaymentDetailProps) {
                     {t('studentPayment.detail.amount')}
                   </p>
                   <p className="text-base font-semibold">
-                    {payment.amount_paid
+                    {payment.amount_paid != null
                       ? formatCurrency(payment.amount_paid)
                       : '-'}
+                    {payment.original_amount != null &&
+                      payment.original_amount !== payment.amount_paid && (
+                      <span className="text-sm font-normal text-muted-foreground ml-2">
+                        ({t('studentPayment.detail.originalAmount')}: {formatCurrency(payment.original_amount)})
+                      </span>
+                    )}
                   </p>
                 </div>
+                {payment.status === 'free' && (
+                  <div className="space-y-1 md:col-span-2">
+                    <p className="text-sm font-medium text-muted-foreground">
+                      {t('studentPayment.detail.free')}
+                    </p>
+                    <p className="text-base text-muted-foreground">
+                      {t('studentPayment.detail.thisMonthFree')}
+                    </p>
+                  </div>
+                )}
+                {(payment.discount_type === 'percentage' || payment.discount_type === 'fixed') &&
+                  payment.discount_value != null && (
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">
+                      {t('studentPayment.detail.discount')}
+                    </p>
+                    <p className="text-base">
+                      {payment.discount_type === 'percentage'
+                        ? t('studentPayment.detail.discountPercentage', {
+                            value: payment.discount_value,
+                          })
+                        : t('studentPayment.detail.discountFixedAmount', {
+                            value: formatCurrency(payment.discount_value),
+                          })}
+                    </p>
+                  </div>
+                )}
+                {payment.status !== 'free' &&
+                  !payment.discount_type &&
+                  (payment.discount_value == null || payment.discount_value === 0) && (
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">
+                      {t('studentPayment.detail.discount')}
+                    </p>
+                    <p className="text-base text-muted-foreground">
+                      {t('studentPayment.detail.noDiscount')}
+                    </p>
+                  </div>
+                )}
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                     <Calendar className="h-4 w-4" />

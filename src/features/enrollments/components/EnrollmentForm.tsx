@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form'
+import { useForm, type FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useEffect, useMemo, useRef } from 'react'
@@ -96,6 +96,9 @@ export function EnrollmentForm({ enrollmentId }: EnrollmentFormProps) {
       course_id: prefilledCourseId || undefined,
       enrolled_at: undefined,
       status: 'active',
+      first_n_months_free: 0,
+      discount_type: undefined,
+      discount_value: undefined,
     },
   })
 
@@ -165,6 +168,9 @@ export function EnrollmentForm({ enrollmentId }: EnrollmentFormProps) {
         course_id: createFormData.course_id,
         enrolled_at: createFormData.enrolled_at || null,
         status: createFormData.status || 'active',
+        first_n_months_free: createFormData.first_n_months_free ?? 0,
+        discount_type: createFormData.discount_type ?? null,
+        discount_value: createFormData.discount_value ?? null,
       }
       createEnrollment.mutate(createData)
     }
@@ -271,6 +277,70 @@ export function EnrollmentForm({ enrollmentId }: EnrollmentFormProps) {
                   <p className="text-sm text-destructive">{errors.status.message}</p>
                 )}
               </div>
+
+              {/* First N months free + discount for paid months (create only) */}
+              {!isEditMode && (
+                <div className="space-y-4 md:col-span-2 border-l-2 border-muted pl-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="first_n_months_free">{t('enrollment.form.firstNMonthsFree')}</Label>
+                    <Input
+                      id="first_n_months_free"
+                      type="number"
+                      min={0}
+                      max={255}
+                      {...register('first_n_months_free', { valueAsNumber: true })}
+                      disabled={isSubmitting}
+                    />
+                    <p className="text-xs text-muted-foreground">{t('enrollment.form.firstNMonthsFreeHelp')}</p>
+                    {'first_n_months_free' in errors && (errors as FieldErrors<CreateEnrollmentFormData>).first_n_months_free && (
+                      <p className="text-sm text-destructive">{(errors as FieldErrors<CreateEnrollmentFormData>).first_n_months_free?.message}</p>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="discount_type">{t('enrollment.form.discountType')}</Label>
+                      <Select
+                        value={watch('discount_type') ?? 'none'}
+                        onValueChange={(value) => {
+                          const v = value === 'none' ? undefined : (value as 'percentage' | 'fixed')
+                          setValue('discount_type', v, { shouldValidate: true })
+                          if (v === undefined) setValue('discount_value', undefined)
+                        }}
+                        disabled={isSubmitting}
+                      >
+                        <SelectTrigger id="discount_type">
+                          <SelectValue placeholder={t('enrollment.form.selectDiscountType')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">{t('enrollment.form.discountNone')}</SelectItem>
+                          <SelectItem value="percentage">{t('enrollment.form.discountPercentage')}</SelectItem>
+                          <SelectItem value="fixed">{t('enrollment.form.discountFixed')}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {(watch('discount_type') === 'percentage' || watch('discount_type') === 'fixed') && (
+                      <div className="space-y-2">
+                        <Label htmlFor="discount_value">
+                          {watch('discount_type') === 'percentage'
+                            ? t('enrollment.form.discountValuePercent')
+                            : t('enrollment.form.discountValueFixed')}
+                        </Label>
+                        <Input
+                          id="discount_value"
+                          type="number"
+                          min={0}
+                          step={watch('discount_type') === 'percentage' ? 1 : 0.01}
+                          {...register('discount_value', { valueAsNumber: true })}
+                          disabled={isSubmitting}
+                        />
+                        {'discount_value' in errors && (errors as FieldErrors<CreateEnrollmentFormData>).discount_value && (
+                          <p className="text-sm text-destructive">{(errors as FieldErrors<CreateEnrollmentFormData>).discount_value?.message}</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

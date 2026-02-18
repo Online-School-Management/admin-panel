@@ -20,24 +20,34 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Combobox } from '@/components/ui/combobox'
+import { Checkbox } from '@/components/ui/checkbox'
 import { useCreateEnrollment } from '../hooks/useEnrollments'
 import { useStudents } from '@/features/students/hooks/useStudents'
 import { z } from 'zod'
 import { VALIDATION_MESSAGES } from '@/constants'
 import type { CreateEnrollmentInput } from '../types/enrollment.types'
 import { useTranslation } from '@/i18n/context'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 
 const addEnrollmentModalSchema = z
   .object({
     student_id: z.number().int().positive().optional(),
     enrolled_at: z.string().optional().nullable(),
     status: z.enum(['active', 'dropped', 'completed']).optional(),
+    first_n_months_free: z.number().int().min(0).max(255).optional(),
+    discount_enabled: z.boolean().optional(),
+    discount_type: z.enum(['percentage', 'fixed']).optional().nullable(),
+    discount_value: z.number().min(0).max(999999.99).optional().nullable(),
   })
   .refine((data) => data.student_id != null && data.student_id > 0, {
     message: VALIDATION_MESSAGES.REQUIRED('Student'),
     path: ['student_id'],
   })
+  .refine(
+    (data) =>
+      !data.discount_enabled || !data.discount_type || (data.discount_value != null && data.discount_value >= 0),
+    { message: 'Discount value is required when discount type is set', path: ['discount_value'] }
+  )
 
 type AddEnrollmentModalFormData = z.infer<typeof addEnrollmentModalSchema>
 
@@ -46,6 +56,8 @@ interface AddEnrollmentModalProps {
   onOpenChange: (open: boolean) => void
   courseId: number
   courseTitle?: string
+  /** Course duration in months; used to show month checkboxes when Free is selected */
+  courseDuration?: number
 }
 
 /**
@@ -57,6 +69,7 @@ export function AddEnrollmentModal({
   onOpenChange,
   courseId,
   courseTitle,
+  courseDuration = 0,
 }: AddEnrollmentModalProps) {
   const { t } = useTranslation()
   const createEnrollment = useCreateEnrollment(null) // No redirect; close modal and refresh list
@@ -83,12 +96,33 @@ export function AddEnrollmentModal({
       student_id: undefined,
       enrolled_at: undefined,
       status: 'active',
+      first_n_months_free: 0,
+      discount_enabled: false,
+      discount_type: undefined,
+      discount_value: undefined,
     },
   })
 
   const getStatusLabel = (status: string) => {
     return t(`common.status.${status}`) || status
   }
+
+  const discountEnabled = watch('discount_enabled')
+  const firstN = watch('first_n_months_free') ?? 0
+
+  useEffect(() => {
+    if (open) {
+      reset({
+        student_id: undefined,
+        enrolled_at: undefined,
+        status: 'active',
+        first_n_months_free: 0,
+        discount_enabled: false,
+        discount_type: undefined,
+        discount_value: undefined,
+      })
+    }
+  }, [open, reset])
 
   const onSubmit = (data: AddEnrollmentModalFormData) => {
     if (data.student_id == null) return
@@ -97,6 +131,9 @@ export function AddEnrollmentModal({
       course_id: courseId,
       enrolled_at: data.enrolled_at || null,
       status: data.status || 'active',
+      first_n_months_free: data.first_n_months_free ?? 0,
+      discount_type: data.discount_enabled ? (data.discount_type ?? null) : null,
+      discount_value: data.discount_enabled ? (data.discount_value ?? null) : null,
     }
     createEnrollment.mutate(payload, {
       onSuccess: () => {
@@ -110,7 +147,7 @@ export function AddEnrollmentModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>{t('enrollment.courseEnrollments.addEnrollment')}</DialogTitle>
           <DialogDescription>
@@ -171,6 +208,136 @@ export function AddEnrollmentModal({
               <p className="text-sm text-destructive">{errors.status.message}</p>
             )}
           </div>
+
+          <p className="text-sm text-muted-foreground">
+            {t('enrollment.form.freeOrDiscountHint')}
+          </p>
+
+          {/* Free: checkbox + month checkboxes (mutually exclusive with Discount) */}
+          {!discountEnabled && (
+          <div className="space-y-3">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="free_checkbox_modal"
+                checked={firstN > 0}
+                onCheckedChange={(checked) => {
+                  if (checked) {
+                    setValue('first_n_months_free', 1, { shouldValidate: true })
+                    setValue('discount_enabled', false)
+                    setValue('discount_type', undefined)
+                    setValue('discount_value', undefined)
+                  } else {
+                    setValue('first_n_months_free', 0, { shouldValidate: true })
+                  }
+                }}
+                disabled={isLoading || courseDuration < 1}
+              />
+              <Label htmlFor="free_checkbox_modal" className="font-normal cursor-pointer">
+                {t('enrollment.form.freeCheckbox')}
+              </Label>
+            </div>
+            {firstN > 0 && courseDuration > 0 && (
+              <div className="pl-6 space-y-2 border-l-2 border-muted">
+                <p className="text-sm text-muted-foreground">{t('enrollment.form.selectFreeMonths')}</p>
+                <div className="flex flex-wrap gap-3">
+                  {Array.from({ length: courseDuration }, (_, i) => i + 1).map((monthNum) => (
+                    <div key={monthNum} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`free_month_${monthNum}_modal`}
+                        checked={firstN >= monthNum}
+                        onCheckedChange={() => {
+                          setValue(
+                            'first_n_months_free',
+                            firstN >= monthNum ? monthNum - 1 : monthNum,
+                            { shouldValidate: true }
+                          )
+                        }}
+                        disabled={isLoading}
+                      />
+                      <Label
+                        htmlFor={`free_month_${monthNum}_modal`}
+                        className="text-sm font-normal cursor-pointer"
+                      >
+                        {t('studentPayment.monthNumber', { number: monthNum })}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+          )}
+
+          {/* Discount: checkbox + type/value (mutually exclusive with Free) */}
+          {firstN === 0 && (
+          <div className="space-y-3">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="discount_checkbox_modal"
+                checked={discountEnabled ?? false}
+                onCheckedChange={(checked) => {
+                  if (checked) {
+                    setValue('discount_enabled', true, { shouldValidate: true })
+                    setValue('first_n_months_free', 0)
+                  } else {
+                    setValue('discount_enabled', false, { shouldValidate: true })
+                    setValue('discount_type', undefined)
+                    setValue('discount_value', undefined)
+                  }
+                }}
+                disabled={isLoading}
+              />
+              <Label htmlFor="discount_checkbox_modal" className="font-normal cursor-pointer">
+                {t('enrollment.form.discountCheckbox')}
+              </Label>
+            </div>
+            {discountEnabled && (
+              <div className="pl-6 grid grid-cols-1 sm:grid-cols-2 gap-4 border-l-2 border-muted">
+                <div className="space-y-2">
+                  <Label>{t('enrollment.form.discountType')}</Label>
+                  <Select
+                    value={watch('discount_type') ?? 'none'}
+                    onValueChange={(value) => {
+                      const v = value === 'none' ? undefined : (value as 'percentage' | 'fixed')
+                      setValue('discount_type', v, { shouldValidate: true })
+                      if (v === undefined) setValue('discount_value', undefined)
+                    }}
+                    disabled={isLoading}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('enrollment.form.selectDiscountType')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">{t('enrollment.form.discountNone')}</SelectItem>
+                      <SelectItem value="percentage">{t('enrollment.form.discountPercentage')}</SelectItem>
+                      <SelectItem value="fixed">{t('enrollment.form.discountFixed')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {(watch('discount_type') === 'percentage' || watch('discount_type') === 'fixed') && (
+                  <div className="space-y-2">
+                    <Label htmlFor="discount_value_modal">
+                      {watch('discount_type') === 'percentage'
+                        ? t('enrollment.form.discountValuePercent')
+                        : t('enrollment.form.discountValueFixed')}
+                    </Label>
+                    <Input
+                      id="discount_value_modal"
+                      type="number"
+                      min={0}
+                      step={watch('discount_type') === 'percentage' ? 1 : 0.01}
+                      {...register('discount_value', { valueAsNumber: true })}
+                      disabled={isLoading}
+                    />
+                    {errors.discount_value && (
+                      <p className="text-sm text-destructive">{errors.discount_value.message}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          )}
 
           <DialogFooter className="gap-2 sm:gap-0">
             <Button

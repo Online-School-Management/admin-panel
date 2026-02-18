@@ -66,6 +66,9 @@ export function StudentPaymentForm({ paymentId }: StudentPaymentFormProps) {
     defaultValues: {
       status: PAYMENT_STATUS.PENDING,
       amount_paid: undefined,
+      original_amount: undefined,
+      discount_type: undefined,
+      discount_value: undefined,
       payment_date: undefined,
       payment_method: PAYMENT_METHOD.KBZ_PAY,
       notes: undefined,
@@ -92,7 +95,10 @@ export function StudentPaymentForm({ paymentId }: StudentPaymentFormProps) {
     // Reset form with all values at once using reset()
     reset({
       status: payment.status || PAYMENT_STATUS.PENDING,
-      amount_paid: payment.amount_paid || undefined,
+      amount_paid: payment.amount_paid ?? undefined,
+      original_amount: payment.original_amount ?? undefined,
+      discount_type: payment.discount_type ?? undefined,
+      discount_value: payment.discount_value ?? undefined,
       payment_date: payment.payment_date || undefined,
       payment_method: payment.payment_method || PAYMENT_METHOD.KBZ_PAY,
       received_by: payment.received_by || undefined,
@@ -111,13 +117,23 @@ export function StudentPaymentForm({ paymentId }: StudentPaymentFormProps) {
   const onSubmit = async (data: UpdateStudentPaymentFormData) => {
     const updateData: UpdateStudentPaymentInput = {
       status: data.status,
-      amount_paid: data.amount_paid || undefined,
+      amount_paid: data.amount_paid ?? undefined,
+      original_amount: data.original_amount ?? undefined,
+      discount_type: data.discount_type ?? undefined,
+      discount_value: data.discount_value ?? undefined,
       payment_date: data.payment_date || undefined,
       payment_method: data.payment_method || undefined,
       received_by: data.received_by || undefined,
       notes: data.notes || undefined,
     }
 
+    // If marking as free, set amount to 0 and clear discount (Option A)
+    if (updateData.status === PAYMENT_STATUS.FREE) {
+      updateData.amount_paid = 0
+      updateData.original_amount = 0
+      updateData.discount_type = null
+      updateData.discount_value = null
+    }
     // If marking as paid, set payment_date and paid_at if not provided
     if (updateData.status === PAYMENT_STATUS.PAID) {
       if (!updateData.payment_date) {
@@ -159,7 +175,7 @@ export function StudentPaymentForm({ paymentId }: StudentPaymentFormProps) {
             </Label>
             <Select
               value={status}
-              onValueChange={(value) => setValue('status', value as 'pending' | 'paid')}
+              onValueChange={(value) => setValue('status', value as 'pending' | 'paid' | 'free')}
             >
               <SelectTrigger id="status" className={errors.status ? 'border-destructive' : ''}>
                 <SelectValue placeholder={t('studentPayment.form.selectStatus')} />
@@ -193,6 +209,72 @@ export function StudentPaymentForm({ paymentId }: StudentPaymentFormProps) {
               <p className="text-sm text-destructive">{errors.amount_paid.message}</p>
             )}
           </div>
+
+          {/* Original amount (full price before discount); when not free */}
+          {status !== PAYMENT_STATUS.FREE && (
+            <div className="space-y-2">
+              <Label htmlFor="original_amount">{t('studentPayment.detail.originalAmount')}</Label>
+              <Input
+                id="original_amount"
+                type="number"
+                step="0.01"
+                min="0"
+                {...register('original_amount', { valueAsNumber: true })}
+                className={errors.original_amount ? 'border-destructive' : ''}
+                placeholder={t('studentPayment.form.enterAmount')}
+              />
+              <p className="text-xs text-muted-foreground">{t('studentPayment.form.originalAmountHelp')}</p>
+              {errors.original_amount && (
+                <p className="text-sm text-destructive">{errors.original_amount.message}</p>
+              )}
+            </div>
+          )}
+
+          {/* Discount (per payment - Option A); only when not free */}
+          {status !== PAYMENT_STATUS.FREE && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="discount_type">{t('studentPayment.form.discountType')}</Label>
+                <Select
+                  value={watch('discount_type') ?? 'none'}
+                  onValueChange={(value) => {
+                    const v = value === 'none' ? undefined : (value as 'percentage' | 'fixed')
+                    setValue('discount_type', v, { shouldValidate: true })
+                    if (v === undefined) setValue('discount_value', undefined)
+                  }}
+                >
+                  <SelectTrigger id="discount_type" className={errors.discount_type ? 'border-destructive' : ''}>
+                    <SelectValue placeholder={t('studentPayment.form.selectDiscountType')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">{t('enrollment.form.discountNone')}</SelectItem>
+                    <SelectItem value="percentage">{t('enrollment.form.discountPercentage')}</SelectItem>
+                    <SelectItem value="fixed">{t('enrollment.form.discountFixed')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {(watch('discount_type') === 'percentage' || watch('discount_type') === 'fixed') && (
+                <div className="space-y-2">
+                  <Label htmlFor="discount_value">
+                    {watch('discount_type') === 'percentage'
+                      ? t('enrollment.form.discountValuePercent')
+                      : t('enrollment.form.discountValueFixed')}
+                  </Label>
+                  <Input
+                    id="discount_value"
+                    type="number"
+                    min={0}
+                    step={watch('discount_type') === 'percentage' ? 1 : 0.01}
+                    {...register('discount_value', { valueAsNumber: true })}
+                    className={errors.discount_value ? 'border-destructive' : ''}
+                  />
+                  {errors.discount_value && (
+                    <p className="text-sm text-destructive">{errors.discount_value.message}</p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Payment Date */}
           {status === PAYMENT_STATUS.PAID && (

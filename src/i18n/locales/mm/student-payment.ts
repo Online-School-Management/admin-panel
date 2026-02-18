@@ -31,6 +31,9 @@ export const studentPayment = {
     selectAdmin: 'အက်မင်ရွေးချယ်ပါ',
     noAdmin: 'အက်မင်မရှိပါ',
     enterAmount: 'ငွေပမာဏ ထည့်သွင်းပါ',
+    originalAmountHelp: 'လျှော့ဈေးမတိုင်မီ မူရင်းဈေးနှုန်း (ပြသရန် နှင့် အစီရင်ခံရန်)။',
+    discountType: 'လျှော့ဈေး အမျိုးအစား',
+    selectDiscountType: 'လျှော့ဈေးအမျိုးအစား ရွေးချယ်ပါ',
     enterNotes: 'မှတ်ချက်များ ထည့်သွင်းပါ (ရွေးချယ်ရန်)',
   },
 
@@ -83,6 +86,7 @@ export const studentPayment = {
     enrollmentInformation: 'စာရင်းသွင်းမှု အချက်အလက်',
     monthNumber: 'လအရေအတွက်',
     amount: 'ငွေပမာဏ',
+    originalAmount: 'မူရင်း ငွေပမာဏ',
     dueDate: 'ပေးဆောင်ရမည့် ရက်စွဲ',
     paymentDate: 'ငွေပေးချေသည့် ရက်စွဲ',
     paidAt: 'ပေးချေသည့် အချိန်',
@@ -96,6 +100,12 @@ export const studentPayment = {
     created: 'ဖန်တီးထားသည်',
     updated: 'အပ်ဒိတ်လုပ်ထားသည်',
     errorLoading: 'ငွေပေးချေမှု ဖွင့်ရာတွင် အမှားအယွင်း',
+    free: 'အခမဲ့',
+    thisMonthFree: 'ဤလသည် အခမဲ့ ဖြစ်သည် (အခကြေးငွေ မယူပါ)',
+    discount: 'လျှော့ဈေး',
+    discountPercentage: '{{value}}% လျှော့သည်',
+    discountFixedAmount: '{{value}} လျှော့သည်',
+    noDiscount: 'လျှော့ဈေး မရှိ',
   },
 
   // Actions

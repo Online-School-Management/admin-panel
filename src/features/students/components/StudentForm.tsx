@@ -79,7 +79,6 @@ export function StudentForm({ studentSlug }: StudentFormProps) {
       school_other: '',
       class: '',
       facebook_link: '',
-      ...(isEditMode ? { password: '', password_confirmation: '' } : {}),
     },
   })
 
@@ -126,8 +125,6 @@ export function StudentForm({ studentSlug }: StudentFormProps) {
       school_other: student.school_other || '',
       class: student.class || '',
       facebook_link: student.facebook_link || '',
-      password: '',
-      password_confirmation: '',
     }, {
       keepDefaultValues: false,
     })
@@ -155,12 +152,6 @@ export function StudentForm({ studentSlug }: StudentFormProps) {
         school_other: updateFormData.school_other || undefined,
         class: updateFormData.class || undefined,
         facebook_link: updateFormData.facebook_link || undefined,
-      }
-      
-      // Only include password if provided
-      if (updateFormData.password && updateFormData.password.length > 0) {
-        updateData.password = updateFormData.password
-        updateData.password_confirmation = updateFormData.password_confirmation
       }
       updateStudent.mutate({ slug: studentSlug, data: updateData })
     } else {
@@ -395,39 +386,6 @@ export function StudentForm({ studentSlug }: StudentFormProps) {
                   <p className="text-sm text-destructive">{errors.facebook_link.message}</p>
                 )}
               </div>
-
-              {/* Password (only for edit mode) */}
-              {isEditMode && (
-                <>
-                  <div className="space-y-2">
-                    <Label htmlFor="password">{t('student.form.password')}</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      {...register('password' as any)}
-                      placeholder={t('student.form.enterPassword')}
-                      disabled={isSubmitting}
-                    />
-                    {'password' in errors && errors.password && (
-                      <p className="text-sm text-destructive">{(errors.password as any)?.message}</p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="password_confirmation">{t('student.form.passwordConfirmation')}</Label>
-                    <Input
-                      id="password_confirmation"
-                      type="password"
-                      {...register('password_confirmation' as any)}
-                      placeholder={t('student.form.enterPasswordConfirmation')}
-                      disabled={isSubmitting}
-                    />
-                    {'password_confirmation' in errors && errors.password_confirmation && (
-                      <p className="text-sm text-destructive">{(errors.password_confirmation as any)?.message}</p>
-                    )}
-                  </div>
-                </>
-              )}
 
               {/* Status */}
               <div className="space-y-2">

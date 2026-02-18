@@ -276,11 +276,11 @@ export function StudentsList() {
                         <TableHead className="w-16">{t('student.table.no')}</TableHead>
                         <TableHead>{t('student.table.studentId')}</TableHead>
                         <TableHead>{t('student.table.name')}</TableHead>
+                        <TableHead className="hidden lg:table-cell">{t('student.table.socialAccount')}</TableHead>
                         <TableHead>{t('student.table.email')}</TableHead>
                         <TableHead>{t('student.table.guardianPhone')}</TableHead>
                         <TableHead>{t('student.table.age')}</TableHead>
                         <TableHead>{t('student.table.status')}</TableHead>
-                        <TableHead className="hidden lg:table-cell">{t('student.table.socialAccount')}</TableHead>
                         <TableHead className="text-right">{t('student.table.actions')}</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -313,14 +313,6 @@ export function StudentsList() {
                                 <span className="text-muted-foreground italic">User deleted</span>
                               )}
                             </TableCell>
-                            <TableCell>{student.user?.email || '-'}</TableCell>
-                            <TableCell>{student.guardian_phone || '-'}</TableCell>
-                            <TableCell>{student.age || '-'}</TableCell>
-                            <TableCell>
-                              <Badge variant={getStatusBadgeVariant(student.status)}>
-                                {getStatusLabel(student.status)}
-                              </Badge>
-                            </TableCell>
                             <TableCell className="text-sm hidden lg:table-cell max-w-[180px] truncate" title={student.facebook_link || undefined}>
                               {student.facebook_link ? (
                                 /^https?:\/\//i.test(student.facebook_link) ? (
@@ -333,6 +325,14 @@ export function StudentsList() {
                               ) : (
                                 '-'
                               )}
+                            </TableCell>
+                            <TableCell>{student.user?.email || '-'}</TableCell>
+                            <TableCell>{student.guardian_phone || '-'}</TableCell>
+                            <TableCell>{student.age || '-'}</TableCell>
+                            <TableCell>
+                              <Badge variant={getStatusBadgeVariant(student.status)}>
+                                {getStatusLabel(student.status)}
+                              </Badge>
                             </TableCell>
                             <TableCell className="text-right">
                               {activeTab === 'trashed' ? (

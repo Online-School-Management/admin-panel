@@ -56,7 +56,7 @@ export const student = {
     class: 'အတန်း',
     enterClass: 'ဥပမာ ၁၀-က',
     facebookLink: 'ဖေ့စ်ဘုတ် (အမည် သို့မဟုတ် လင့်ခ်)',
-    enterFacebookLink: 'ဥပမာ Phyo Zaw သို့မဟုတ် https://facebook.com/...',
+    enterFacebookLink: 'ဥပမာ ဖေ့စ်ဘုတ် သို့မဟုတ် လူမှုမီဒီယာ အမည် သို့မဟုတ် လင့်ခ်',
   },
 
   schoolType: {

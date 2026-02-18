@@ -56,7 +56,7 @@ export const student = {
     class: 'Class',
     enterClass: 'e.g. Grade 10-A',
     facebookLink: 'Facebook (name or link)',
-    enterFacebookLink: 'e.g. Phyo Zaw or https://facebook.com/...',
+    enterFacebookLink: 'e.g. Facebook or Social Name or link',
   },
 
   schoolType: {

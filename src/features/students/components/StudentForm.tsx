@@ -386,7 +386,7 @@ export function StudentForm({ studentSlug }: StudentFormProps) {
                 <Label htmlFor="facebook_link">{t('student.form.facebookLink')}</Label>
                 <Input
                   id="facebook_link"
-                  type="url"
+                  type="text"
                   {...register('facebook_link')}
                   placeholder={t('student.form.enterFacebookLink')}
                   disabled={isSubmitting}

@@ -55,8 +55,8 @@ export const student = {
     enterSchoolOther: 'ကျောင်းအမည် ထည့်ပါ',
     class: 'အတန်း',
     enterClass: 'ဥပမာ ၁၀-က',
-    facebookLink: 'ဖေ့စ်ဘုတ် လင့်ခ်',
-    enterFacebookLink: 'https://facebook.com/...',
+    facebookLink: 'ဖေ့စ်ဘုတ် (အမည် သို့မဟုတ် လင့်ခ်)',
+    enterFacebookLink: 'ဥပမာ Phyo Zaw သို့မဟုတ် https://facebook.com/...',
   },
 
   schoolType: {
@@ -75,7 +75,7 @@ export const student = {
     guardianPhone: 'မိဘ/အုပ်ထိန်းသူ ဖုန်း',
     age: 'အသက်',
     status: 'အခြေအနေ',
-    created: 'ဖန်တီးထားသည်',
+    socialAccount: 'ဖေ့စ်ဘုတ် အကောင့်',
     actions: 'လုပ်ဆောင်ချက်များ',
   },
 

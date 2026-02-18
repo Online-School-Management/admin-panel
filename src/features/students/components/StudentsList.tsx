@@ -42,7 +42,6 @@ import { Pagination } from '@/components/common/Pagination'
 import { TableSkeleton } from '@/components/common/skeletons/TableSkeleton'
 import { Skeleton } from '@/components/ui/skeleton'
 import { PAGINATION } from '@/constants'
-import format from 'date-fns/format'
 import type { StudentCollectionItem } from '../types/student.types'
 import { useTranslation } from '@/i18n/context'
 import { cn } from '@/lib/utils'
@@ -281,7 +280,7 @@ export function StudentsList() {
                         <TableHead>{t('student.table.guardianPhone')}</TableHead>
                         <TableHead>{t('student.table.age')}</TableHead>
                         <TableHead>{t('student.table.status')}</TableHead>
-                        <TableHead className="hidden lg:table-cell">{t('student.table.created')}</TableHead>
+                        <TableHead className="hidden lg:table-cell">{t('student.table.socialAccount')}</TableHead>
                         <TableHead className="text-right">{t('student.table.actions')}</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -322,10 +321,18 @@ export function StudentsList() {
                                 {getStatusLabel(student.status)}
                               </Badge>
                             </TableCell>
-                            <TableCell className="text-sm text-muted-foreground hidden lg:table-cell">
-                              {student.created_at
-                                ? format(new Date(student.created_at), 'MMM dd, yyyy')
-                                : '-'}
+                            <TableCell className="text-sm hidden lg:table-cell max-w-[180px] truncate" title={student.facebook_link || undefined}>
+                              {student.facebook_link ? (
+                                /^https?:\/\//i.test(student.facebook_link) ? (
+                                  <a href={student.facebook_link} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline truncate block">
+                                    {student.facebook_link}
+                                  </a>
+                                ) : (
+                                  student.facebook_link
+                                )
+                              ) : (
+                                '-'
+                              )}
                             </TableCell>
                             <TableCell className="text-right">
                               {activeTab === 'trashed' ? (

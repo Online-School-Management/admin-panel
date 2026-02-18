@@ -55,8 +55,8 @@ export const student = {
     enterSchoolOther: 'Enter school name',
     class: 'Class',
     enterClass: 'e.g. Grade 10-A',
-    facebookLink: 'Facebook Account Link',
-    enterFacebookLink: 'https://facebook.com/...',
+    facebookLink: 'Facebook (name or link)',
+    enterFacebookLink: 'e.g. Phyo Zaw or https://facebook.com/...',
   },
 
   schoolType: {
@@ -75,7 +75,7 @@ export const student = {
     guardianPhone: 'Guardian Phone',
     age: 'Age',
     status: 'Status',
-    created: 'Created',
+    socialAccount: 'Social Account (Facebook)',
     actions: 'Actions',
   },
 

@@ -186,9 +186,13 @@ export function StudentDetail({ studentSlug }: StudentDetailProps) {
                 {student.facebook_link && (
                   <div className="space-y-1 md:col-span-2">
                     <p className="text-sm font-medium text-muted-foreground">{t('student.detail.facebookLink')}</p>
-                    <a href={student.facebook_link} target="_blank" rel="noopener noreferrer" className="text-base text-primary hover:underline break-all">
-                      {student.facebook_link}
-                    </a>
+                    {/^https?:\/\//i.test(student.facebook_link) ? (
+                      <a href={student.facebook_link} target="_blank" rel="noopener noreferrer" className="text-base text-primary hover:underline break-all">
+                        {student.facebook_link}
+                      </a>
+                    ) : (
+                      <p className="text-base break-all">{student.facebook_link}</p>
+                    )}
                   </div>
                 )}
               </div>

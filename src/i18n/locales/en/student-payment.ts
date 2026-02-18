@@ -87,6 +87,7 @@ export const studentPayment = {
     monthNumber: 'Month Number',
     amount: 'Amount',
     originalAmount: 'Original amount',
+    coursePrice: 'Course price',
     dueDate: 'Due Date',
     paymentDate: 'Payment Date',
     paidAt: 'Paid At',

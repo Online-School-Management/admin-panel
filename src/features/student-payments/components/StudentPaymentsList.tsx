@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { Trash2, Eye, MoreVertical, DollarSign, CheckCircle2, Search, RefreshCw } from 'lucide-react'
+import { Trash2, Eye, MoreVertical, DollarSign, CheckCircle2, Search, RefreshCw, Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -31,6 +31,7 @@ import { useCourses } from '@/features/courses/hooks/useCourses'
 import { COURSE_STATUS } from '@/constants'
 import { DeleteStudentPaymentDialog } from './DeleteStudentPaymentDialog'
 import { MarkAsPaidDialog } from './MarkAsPaidDialog'
+import { EditStudentPaymentModal } from './EditStudentPaymentModal'
 import { Pagination } from '@/components/common/Pagination'
 import { TableSkeleton } from '@/components/common/skeletons/TableSkeleton'
 import { formatCurrency } from '@/utils/format'
@@ -51,6 +52,8 @@ export function StudentPaymentsList() {
   const [selectedPayment, setSelectedPayment] = useState<StudentPaymentCollectionItem | null>(null)
   const [markAsPaidDialogOpen, setMarkAsPaidDialogOpen] = useState(false)
   const [selectedPaymentForMarkPaid, setSelectedPaymentForMarkPaid] = useState<StudentPaymentCollectionItem | null>(null)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [editPaymentId, setEditPaymentId] = useState<number | null>(null)
 
   // Filters
   const [search, setSearch] = useState('')
@@ -569,6 +572,15 @@ export function StudentPaymentsList() {
                                         {t('studentPayment.actions.view')}
                                       </Link>
                                     </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() => {
+                                        setEditPaymentId(payment.id)
+                                        setEditModalOpen(true)
+                                      }}
+                                    >
+                                      <Pencil className="h-4 w-4 mr-2" />
+                                      {t('studentPayment.actions.edit')}
+                                    </DropdownMenuItem>
                                     {payment.status !== PAYMENT_STATUS.PAID && (
                                         <DropdownMenuItem
                                         onClick={() => handleDeleteClick(payment)}
@@ -617,6 +629,16 @@ export function StudentPaymentsList() {
         onConfirm={handleMarkAsPaidConfirm}
         studentName={selectedPaymentForMarkPaid?.enrollment?.student?.name}
         isLoading={markAsPaidPayment.isPending}
+      />
+
+      {/* Edit Payment Modal */}
+      <EditStudentPaymentModal
+        open={editModalOpen}
+        onOpenChange={(open) => {
+          setEditModalOpen(open)
+          if (!open) setEditPaymentId(null)
+        }}
+        paymentId={editPaymentId}
       />
     </>
   )

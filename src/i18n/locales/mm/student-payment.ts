@@ -87,6 +87,7 @@ export const studentPayment = {
     monthNumber: 'လအရေအတွက်',
     amount: 'ငွေပမာဏ',
     originalAmount: 'မူရင်း ငွေပမာဏ',
+    coursePrice: 'သင်တန်း ဈေးနှုန်း',
     dueDate: 'ပေးဆောင်ရမည့် ရက်စွဲ',
     paymentDate: 'ငွေပေးချေသည့် ရက်စွဲ',
     paidAt: 'ပေးချေသည့် အချိန်',

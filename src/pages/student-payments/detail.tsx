@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { CheckCircle2 } from 'lucide-react'
+import { CheckCircle2, Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { StudentPaymentDetail } from '@/features/student-payments/components/StudentPaymentDetail'
 import { MarkAsPaidDialog } from '@/features/student-payments/components/MarkAsPaidDialog'
+import { EditStudentPaymentModal } from '@/features/student-payments/components/EditStudentPaymentModal'
 import { PageHeader } from '@/components/common/PageHeader'
 import { useTranslation } from '@/i18n/context'
 import { useStudentPayment, useMarkAsPaidPayment } from '@/features/student-payments/hooks/useStudentPayments'
@@ -19,6 +20,7 @@ function StudentPaymentDetailPage() {
   const paymentId = id ? parseInt(id) : 0
   
   const [markAsPaidDialogOpen, setMarkAsPaidDialogOpen] = useState(false)
+  const [editModalOpen, setEditModalOpen] = useState(false)
   const { data: paymentData } = useStudentPayment(paymentId)
   const markAsPaidPayment = useMarkAsPaidPayment()
   
@@ -57,15 +59,25 @@ function StudentPaymentDetailPage() {
         description={t('studentPayment.descriptions.detail')}
         backTo="/student-payments"
         action={
-          isPending ? (
+          <div className="flex items-center gap-2">
             <Button
-              variant="default"
-              onClick={handleMarkAsPaidClick}
+              variant="outline"
+              onClick={() => setEditModalOpen(true)}
+              disabled={!paymentId}
             >
-              <CheckCircle2 className="h-4 w-4 mr-2" />
-              {t('studentPayment.actions.markAsPaid')}
+              <Pencil className="h-4 w-4 mr-2" />
+              {t('studentPayment.actions.edit')}
             </Button>
-          ) : undefined
+            {isPending && (
+              <Button
+                variant="default"
+                onClick={handleMarkAsPaidClick}
+              >
+                <CheckCircle2 className="h-4 w-4 mr-2" />
+                {t('studentPayment.actions.markAsPaid')}
+              </Button>
+            )}
+          </div>
         }
       />
       {id && <StudentPaymentDetail paymentId={parseInt(id)} />}
@@ -77,6 +89,13 @@ function StudentPaymentDetailPage() {
         onConfirm={handleMarkAsPaidConfirm}
         studentName={payment?.enrollment?.student?.name}
         isLoading={markAsPaidPayment.isPending}
+      />
+
+      {/* Edit Payment Modal */}
+      <EditStudentPaymentModal
+        open={editModalOpen}
+        onOpenChange={setEditModalOpen}
+        paymentId={paymentId > 0 ? paymentId : null}
       />
     </div>
   )

@@ -14,8 +14,8 @@ export const classNavigation: NavigationItem[] = [
 export const mainNavigation: NavigationItem[] = [
   // { to: '/class-sessions', icon: CalendarDays, label: 'Class Sessions' },
   // { to: '/dashboard', icon: Home, label: 'Dashboard' },
-  { to: '/students', icon: Users, label: 'Students' },
   { to: '/enrollment-requests', icon: FileText, label: 'Enrollment Requests' },
+  { to: '/students', icon: Users, label: 'Students' },
   { to: '/enrollments', icon: BookText, label: 'Enrollments' },
   { to: '/student-payments', icon: CreditCard, label: 'Student Payments' },
   { to: '/teacher-payouts', icon: Wallet, label: 'Teacher Payouts' },

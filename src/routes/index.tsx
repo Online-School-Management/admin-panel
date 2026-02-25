@@ -46,6 +46,10 @@ const CreateCoursePage = lazy(() => import('@/pages/courses/create'))
 const EditCoursePage = lazy(() => import('@/pages/courses/edit'))
 const CourseDetailPage = lazy(() => import('@/pages/courses/detail'))
 
+// Enrollment Request pages
+const EnrollmentRequestsListPage = lazy(() => import('@/pages/enrollment-requests/list'))
+const EnrollmentRequestDetailPage = lazy(() => import('@/pages/enrollment-requests/detail'))
+
 // Enrollment pages
 const EnrollmentsListPage = lazy(() => import('@/pages/enrollments/list'))
 const CourseEnrollmentsPage = lazy(() => import('@/pages/enrollments/course-enrollments'))
@@ -181,6 +185,14 @@ export const router = createBrowserRouter([
   {
     path: '/courses/:slug',
     element: <ProtectedRoute><CourseDetailPage /></ProtectedRoute>,
+  },
+  {
+    path: '/enrollment-requests',
+    element: <ProtectedRoute><EnrollmentRequestsListPage /></ProtectedRoute>,
+  },
+  {
+    path: '/enrollment-requests/:id',
+    element: <ProtectedRoute><EnrollmentRequestDetailPage /></ProtectedRoute>,
   },
   {
     path: '/enrollments',

@@ -13,6 +13,7 @@ export const navigation = {
   adminPanel: 'Admin Panel',
   closeSidebar: 'Close sidebar',
   courses: 'Courses',
+  'enrollment-requests': 'Enrollment Requests',
   enrollments: 'Enrollment',
   'class-sessions': 'Class Sessions',
   'student-payments': 'Student Payments',

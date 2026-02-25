@@ -13,6 +13,7 @@ export const navigation = {
   students: 'ကျောင်းသားများ',
   subjects: 'ဘာသာရပ်များ',
   courses: 'သင်တန်းများ',
+  'enrollment-requests': 'စာရင်းသွင်းတောင်းဆိုမှုများ',
   enrollments: 'စာရင်းသွင်းမှုများ',
   'class-sessions': 'အတန်းချိန်များ',
   'student-payments': 'ကျောင်းသားငွေပေးချေမှုများ',

@@ -28,6 +28,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useEnrollmentRequests } from '../hooks/useEnrollmentRequests'
+import { useCourses } from '@/features/courses/hooks/useCourses'
 import { ApproveRequestDialog } from './ApproveRequestDialog'
 import { RejectRequestDialog } from './RejectRequestDialog'
 import { Pagination } from '@/components/common/Pagination'
@@ -38,8 +39,12 @@ import type { EnrollmentRequestCollectionItem } from '../types/enrollment-reques
 export function EnrollmentRequestsList() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('pending')
+  const [courseFilter, setCourseFilter] = useState<string>('all')
   const [page, setPage] = useState<number>(PAGINATION.DEFAULT_PAGE)
   const perPage = PAGINATION.DEFAULT_PER_PAGE
+
+  const { data: coursesData } = useCourses({ per_page: 200 })
+  const courses = coursesData?.data ?? []
 
   const [approveDialogOpen, setApproveDialogOpen] = useState(false)
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false)
@@ -50,6 +55,7 @@ export function EnrollmentRequestsList() {
     page,
     per_page: perPage,
     status: statusFilter !== 'all' ? statusFilter : undefined,
+    course_id: courseFilter !== 'all' ? Number(courseFilter) : undefined,
     search: search || undefined,
   })
 
@@ -66,6 +72,7 @@ export function EnrollmentRequestsList() {
   const handleReset = () => {
     setSearch('')
     setStatusFilter('pending')
+    setCourseFilter('all')
     setPage(1)
   }
 
@@ -124,6 +131,19 @@ export function EnrollmentRequestsList() {
               <SelectItem value="rejected">Rejected</SelectItem>
             </SelectContent>
           </Select>
+          <Select value={courseFilter} onValueChange={(v) => { setCourseFilter(v); setPage(1) }}>
+            <SelectTrigger className="w-full sm:w-[200px]">
+              <SelectValue placeholder="Filter by course" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Courses</SelectItem>
+              {courses.map((course) => (
+                <SelectItem key={course.id} value={String(course.id)}>
+                  {course.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Button variant="outline" onClick={handleReset} className="w-full sm:w-auto">
             <RefreshCw className="h-4 w-4 mr-2" />
             Clear
@@ -149,7 +169,7 @@ export function EnrollmentRequestsList() {
             {!isLoading && requests.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-center">
                 <p className="text-muted-foreground">
-                  {search || statusFilter !== 'pending'
+                  {search || statusFilter !== 'pending' || courseFilter !== 'all'
                     ? 'No enrollment requests found matching your criteria.'
                     : 'No pending enrollment requests.'}
                 </p>

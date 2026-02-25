@@ -1,12 +1,13 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from 'react-router-dom'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowLeft, Plus, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
+import { ImageUpload } from '@/components/common/ImageUpload'
+import { SummernoteEditor } from '@/components/common/SummernoteEditor'
 import {
   Select,
   SelectContent,
@@ -15,6 +16,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Separator } from '@/components/ui/separator'
 import { FormSkeleton } from '@/components/common/skeletons/FormSkeleton'
 import { useCreateCourse, useUpdateCourse, useCourse } from '../hooks/useCourses'
 import { useSubjects } from '@/features/subjects/hooks/useSubjects'
@@ -70,6 +73,8 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
     defaultValues: {
       subject_id: undefined,
       title: '',
+      image_url: undefined,
+      description: undefined,
       duration: 3,
       duration_unit: 'month',
       monthly_fee: undefined,
@@ -77,9 +82,11 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
       status: COURSE_STATUS.UPCOMING,
       start_date: '',
       end_date: undefined,
-      notes: undefined,
     },
   })
+
+  // Additional Settings: when true, show image and description (optional fields)
+  const [showAdditionalSettings, setShowAdditionalSettings] = useState(false)
 
   // Track the last dataUpdatedAt timestamp and courseSlug we used to populate the form
   const lastPopulatedRef = useRef<{ courseSlug: string; timestamp: number } | null>(null)
@@ -109,18 +116,22 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
     reset({
       subject_id: course.subject.id,
       title: course.title || '',
+      image_url: course.image_url || undefined,
+      description: course.description || undefined,
       duration: course.duration || 3,
       duration_unit: course.duration_unit || 'month',
       monthly_fee: course.monthly_fee || undefined,
       course_type: course.course_type || COURSE_TYPE.GROUP,
       status: course.status || COURSE_STATUS.UPCOMING,
-        start_date: course.start_date || '',
+      start_date: course.start_date || '',
       end_date: course.end_date || undefined,
-      notes: course.notes || undefined,
     }, {
       keepDefaultValues: false,
     })
     
+    // Expand Additional Settings if course has image or description
+    setShowAdditionalSettings(!!(course.image_url || course.description))
+
     // Update the last populated tracking
     lastPopulatedRef.current = {
       courseSlug,
@@ -134,6 +145,8 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
       const updateData: UpdateCourseInput = {
         subject_id: updateFormData.subject_id || undefined,
         title: updateFormData.title || undefined,
+        image_url: updateFormData.image_url ?? null,
+        description: updateFormData.description ?? null,
         duration: updateFormData.duration || undefined,
         duration_unit: updateFormData.duration_unit || undefined,
         monthly_fee: updateFormData.monthly_fee ?? undefined,
@@ -141,7 +154,6 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
         status: updateFormData.status || undefined,
         start_date: updateFormData.start_date,
         end_date: updateFormData.end_date || undefined,
-        notes: updateFormData.notes ?? undefined,
       }
       updateCourse.mutate({ slug: courseSlug, data: updateData })
     } else {
@@ -149,6 +161,8 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
       const createData: CreateCourseInput = {
         subject_id: createFormData.subject_id,
         title: createFormData.title,
+        image_url: createFormData.image_url ?? undefined,
+        description: createFormData.description ?? undefined,
         duration: createFormData.duration || undefined,
         duration_unit: createFormData.duration_unit || undefined,
         monthly_fee: createFormData.monthly_fee ?? undefined,
@@ -156,7 +170,6 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
         status: createFormData.status || undefined,
         start_date: createFormData.start_date,
         end_date: createFormData.end_date || undefined,
-        notes: createFormData.notes ?? undefined,
       }
       createCourse.mutate(createData)
     }
@@ -365,21 +378,59 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
             </div>
           </div>
 
-          {/* Notes - Full Width */}
-          <div className="space-y-2">
-            <Label htmlFor="notes">{t('course.form.notes')}</Label>
-            <Textarea
-              id="notes"
-              {...register('notes')}
-              placeholder={t('course.form.enterNotes')}
+          <Separator className="my-6" />
+
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="additional-settings"
+              checked={showAdditionalSettings}
+              onCheckedChange={(checked) => setShowAdditionalSettings(!!checked)}
               disabled={isSubmitting}
-              rows={4}
-              maxLength={5000}
             />
-            {errors.notes && (
-              <p className="text-sm text-destructive">{errors.notes.message}</p>
-            )}
+            <Label
+              htmlFor="additional-settings"
+              className="text-sm font-medium cursor-pointer"
+              onClick={() => setShowAdditionalSettings((prev) => !prev)}
+            >
+              {t('course.form.additionalSettings')}
+            </Label>
           </div>
+
+          {showAdditionalSettings && (
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+              <div className="md:col-span-3">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">{t('course.form.image')}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <ImageUpload
+                      value={watch('image_url') || null}
+                      onChange={(url) => setValue('image_url', url, { shouldValidate: true })}
+                      disabled={isSubmitting}
+                      label=""
+                    />
+                    {errors.image_url && (
+                      <p className="text-sm text-destructive">{errors.image_url.message}</p>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+              <div className="md:col-span-9 space-y-2">
+                <Label>{t('course.form.description')}</Label>
+                <SummernoteEditor
+                  value={watch('description') || ''}
+                  onChange={(content) => setValue('description', content, { shouldValidate: true })}
+                  placeholder={t('course.form.enterDescription')}
+                  height={250}
+                  disabled={isSubmitting}
+                />
+                {errors.description && (
+                  <p className="text-sm text-destructive">{errors.description.message}</p>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Form Actions */}
           <div className="flex justify-end gap-4 pt-4 border-t">

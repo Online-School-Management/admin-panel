@@ -15,6 +15,8 @@ const courseFormBaseSchema = z.object({
   title: z
     .string()
     .min(VALIDATION.MIN_NAME_LENGTH, VALIDATION_MESSAGES.MIN_LENGTH('Title', VALIDATION.MIN_NAME_LENGTH)),
+  image_url: z.string().url().max(500).optional().nullable(),
+  description: z.string().optional().nullable(),
   duration: z.number().int().min(1).optional(),
   duration_unit: z.enum(['month', 'day']).optional(),
   monthly_fee: z.number().min(0).max(999999.99).optional().nullable(),

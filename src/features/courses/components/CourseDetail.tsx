@@ -192,6 +192,24 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
             </CardContent>
           </Card>
 
+          {/* Description */}
+          {course.description && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  {t('course.detail.description')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div
+                  className="max-w-none text-sm leading-relaxed [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-2 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mb-2 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mb-2 [&_p]:mb-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:mb-2 [&_li]:mb-1 [&_a]:text-primary [&_a]:underline [&_table]:border-collapse [&_table]:w-full [&_td]:border [&_td]:border-border [&_td]:p-2 [&_th]:border [&_th]:border-border [&_th]:p-2 [&_th]:bg-muted [&_img]:max-w-full [&_img]:rounded"
+                  dangerouslySetInnerHTML={{ __html: course.description }}
+                />
+              </CardContent>
+            </Card>
+          )}
+
           {/* Class Sessions */}
           <ClassSessionsCard
             classSessions={course.class_sessions ?? []}
@@ -410,6 +428,21 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
               </div>
             </CardContent>
           </Card>
+
+          {/* Course Image - same width as Timestamps, 1:2 aspect ratio, capped height */}
+          {course.image_url && (
+            <Card className="overflow-hidden">
+              <CardContent className="p-0">
+                <div className="aspect-[1/2] w-full max-h-64">
+                  <img
+                    src={course.image_url}
+                    alt={course.title}
+                    className="h-full w-full object-contain"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Timestamps */}
           <Card>

@@ -37,6 +37,8 @@ export interface Course {
   slug: string
   subject: CourseSubject
   title: string
+  image_url?: string | null
+  description?: string | null
   duration: number
   duration_unit: 'month' | 'day'
   monthly_fee?: number | null
@@ -72,6 +74,8 @@ export interface CourseCollectionItem {
     slug: string
   }
   title: string
+  image_url?: string | null
+  description?: string | null
   duration: number
   duration_unit: 'month' | 'day'
   monthly_fee: number | null
@@ -98,6 +102,8 @@ export interface CreateCourseInput {
   subject_id: number
   title: string
   slug?: string
+  image_url?: string | null
+  description?: string | null
   duration?: number
   duration_unit?: 'month' | 'day'
   monthly_fee?: number | null
@@ -112,6 +118,8 @@ export interface UpdateCourseInput {
   subject_id?: number
   title?: string
   slug?: string
+  image_url?: string | null
+  description?: string | null
   duration?: number
   duration_unit?: 'month' | 'day'
   monthly_fee?: number | null

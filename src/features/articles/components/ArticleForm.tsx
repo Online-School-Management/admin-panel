@@ -76,10 +76,12 @@ export function ArticleForm({ articleSlug }: ArticleFormProps) {
 
   const lastPopulatedRef = useRef<{ articleSlug: string; timestamp: number } | null>(null)
   const [bodyEditorKey, setBodyEditorKey] = useState(0)
+  const loadedBodyRef = useRef<string>('')
 
   useEffect(() => {
     if (!isEditMode || !articleSlug) {
       lastPopulatedRef.current = null
+      loadedBodyRef.current = ''
       return
     }
 
@@ -93,13 +95,15 @@ export function ArticleForm({ articleSlug }: ArticleFormProps) {
     if (!shouldPopulate) return
 
     const article = articleData.data
+    const body = article.body ?? ''
 
+    loadedBodyRef.current = body
     reset(
       {
         title: article.title || '',
         category: article.category || '',
         excerpt: article.excerpt || '',
-        body: article.body || '',
+        body,
         image_url: article.image_url || '',
         status: (article.status as 'draft' | 'published') || 'draft',
       },
@@ -250,7 +254,7 @@ export function ArticleForm({ articleSlug }: ArticleFormProps) {
             </Label>
             <SummernoteEditor
               key={isEditMode ? `body-${bodyEditorKey}` : 'body-create'}
-              value={watch('body') || ''}
+              value={watch('body') || loadedBodyRef.current || ''}
               onChange={(val) => setValue('body', val)}
               height={500}
             />

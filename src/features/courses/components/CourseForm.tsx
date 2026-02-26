@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from 'react-router-dom'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { ArrowLeft, Plus, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -15,9 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Separator } from '@/components/ui/separator'
+import { Card, CardContent } from '@/components/ui/card'
 import { FormSkeleton } from '@/components/common/skeletons/FormSkeleton'
 import { useCreateCourse, useUpdateCourse, useCourse } from '../hooks/useCourses'
 import { useSubjects } from '@/features/subjects/hooks/useSubjects'
@@ -80,13 +78,12 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
       monthly_fee: undefined,
       course_type: COURSE_TYPE.GROUP,
       status: COURSE_STATUS.UPCOMING,
+      max_students: undefined,
       start_date: '',
       end_date: undefined,
+      enrollment_end_date: undefined,
     },
   })
-
-  // Additional Settings: when true, show image and description (optional fields)
-  const [showAdditionalSettings, setShowAdditionalSettings] = useState(false)
 
   // Track the last dataUpdatedAt timestamp and courseSlug we used to populate the form
   const lastPopulatedRef = useRef<{ courseSlug: string; timestamp: number } | null>(null)
@@ -123,15 +120,14 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
       monthly_fee: course.monthly_fee || undefined,
       course_type: course.course_type || COURSE_TYPE.GROUP,
       status: course.status || COURSE_STATUS.UPCOMING,
+      max_students: course.max_students ?? undefined,
       start_date: course.start_date || '',
       end_date: course.end_date || undefined,
+      enrollment_end_date: course.enrollment_end_date ?? undefined,
     }, {
       keepDefaultValues: false,
     })
     
-    // Expand Additional Settings if course has image or description
-    setShowAdditionalSettings(!!(course.image_url || course.description))
-
     // Update the last populated tracking
     lastPopulatedRef.current = {
       courseSlug,
@@ -152,8 +148,10 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
         monthly_fee: updateFormData.monthly_fee ?? undefined,
         course_type: updateFormData.course_type || undefined,
         status: updateFormData.status || undefined,
+        max_students: updateFormData.max_students ?? undefined,
         start_date: updateFormData.start_date,
         end_date: updateFormData.end_date || undefined,
+        enrollment_end_date: updateFormData.enrollment_end_date?.trim() || null,
       }
       updateCourse.mutate({ slug: courseSlug, data: updateData })
     } else {
@@ -168,8 +166,10 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
         monthly_fee: createFormData.monthly_fee ?? undefined,
         course_type: createFormData.course_type || undefined,
         status: createFormData.status || undefined,
+        max_students: createFormData.max_students ?? undefined,
         start_date: createFormData.start_date,
         end_date: createFormData.end_date || undefined,
+        enrollment_end_date: createFormData.enrollment_end_date?.trim() || null,
       }
       createCourse.mutate(createData)
     }
@@ -184,21 +184,16 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{isEditMode ? t('course.pages.edit') : t('course.pages.create')}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form 
-          key={isEditMode ? `course-form-${courseSlug}` : 'course-form-create'}
-          onSubmit={handleSubmit(onSubmit)} 
-          className="space-y-6"
-        >
-          {/* Form fields */}
+    <form
+      key={isEditMode ? `course-form-${courseSlug}` : 'course-form-create'}
+      onSubmit={handleSubmit(onSubmit)}
+      className="space-y-6"
+    >
+      {/* Card 1: Basic Information */}
+      <Card className="shadow-md">
+        <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Left Column */}
             <div className="space-y-4">
-              {/* Subject */}
               <div className="space-y-2">
                 <Label htmlFor="subject_id">
                   {t('course.form.subject')} <span className="text-destructive">*</span>
@@ -223,8 +218,6 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
                   <p className="text-sm text-destructive">{errors.subject_id.message}</p>
                 )}
               </div>
-
-              {/* Title */}
               <div className="space-y-2">
                 <Label htmlFor="title">
                   {t('course.form.title')} <span className="text-destructive">*</span>
@@ -239,8 +232,6 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
                   <p className="text-sm text-destructive">{errors.title.message}</p>
                 )}
               </div>
-
-              {/* Duration */}
               <div className="space-y-2">
                 <Label htmlFor="duration">{t('course.form.duration')}</Label>
                 <div className="flex gap-2">
@@ -274,30 +265,23 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
                   <p className="text-sm text-destructive">{errors.duration_unit.message}</p>
                 )}
               </div>
-
-              {/* Monthly Fee and Course Type - Horizontal */}
-              {/* Monthly Fee */}
-                <div className="space-y-2">
-                  <Label htmlFor="monthly_fee">{t('course.form.monthlyFee')}</Label>
-                  <Input
-                    id="monthly_fee"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    {...register('monthly_fee', { valueAsNumber: true })}
-                    placeholder={t('course.form.enterMonthlyFee')}
-                    disabled={isSubmitting}
-                  />
-                  {errors.monthly_fee && (
-                    <p className="text-sm text-destructive">{errors.monthly_fee.message}</p>
-                  )}
-                </div>
-
+              <div className="space-y-2">
+                <Label htmlFor="monthly_fee">{t('course.form.monthlyFee')}</Label>
+                <Input
+                  id="monthly_fee"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  {...register('monthly_fee', { valueAsNumber: true })}
+                  placeholder={t('course.form.enterMonthlyFee')}
+                  disabled={isSubmitting}
+                />
+                {errors.monthly_fee && (
+                  <p className="text-sm text-destructive">{errors.monthly_fee.message}</p>
+                )}
+              </div>
             </div>
-
-            {/* Right Column */}
             <div className="space-y-4">
-              {/* Status */}
               <div className="space-y-2">
                 <Label htmlFor="status">{t('course.form.status')}</Label>
                 <Select
@@ -320,8 +304,6 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
                   <p className="text-sm text-destructive">{errors.status.message}</p>
                 )}
               </div>
-
-              {/* Start Date */}
               <div className="space-y-2">
                 <Label htmlFor="start_date">
                   {t('course.form.startDate')} <span className="text-destructive">*</span>
@@ -337,8 +319,6 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
                   <p className="text-sm text-destructive">{errors.start_date.message}</p>
                 )}
               </div>
-
-              {/* End Date */}
               <div className="space-y-2">
                 <Label htmlFor="end_date">{t('course.form.endDate')}</Label>
                 <Input
@@ -351,89 +331,103 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
                   <p className="text-sm text-destructive">{errors.end_date.message}</p>
                 )}
               </div>
-
-              {/* Course Type */}
-                <div className="space-y-2">
-                  <Label htmlFor="course_type">{t('course.form.courseType')}</Label>
-                  <Select
-                    value={watch('course_type') || COURSE_TYPE.GROUP}
-                    onValueChange={(value) => setValue('course_type', value as typeof COURSE_TYPE.GROUP, { shouldValidate: true })}
-                    disabled={isSubmitting}
-                  >
-                    <SelectTrigger id="course_type">
-                      <SelectValue placeholder={t('course.form.selectCourseType')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {COURSE_TYPE_OPTIONS.map((type) => (
-                        <SelectItem key={type.value} value={type.value}>
-                          {type.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.course_type && (
-                    <p className="text-sm text-destructive">{errors.course_type.message}</p>
-                  )}
-                </div>
-            </div>
-          </div>
-
-          <Separator className="my-6" />
-
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="additional-settings"
-              checked={showAdditionalSettings}
-              onCheckedChange={(checked) => setShowAdditionalSettings(!!checked)}
-              disabled={isSubmitting}
-            />
-            <Label
-              htmlFor="additional-settings"
-              className="text-sm font-medium cursor-pointer"
-              onClick={() => setShowAdditionalSettings((prev) => !prev)}
-            >
-              {t('course.form.additionalSettings')}
-            </Label>
-          </div>
-
-          {showAdditionalSettings && (
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-              <div className="md:col-span-3">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">{t('course.form.image')}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <ImageUpload
-                      value={watch('image_url') || null}
-                      onChange={(url) => setValue('image_url', url, { shouldValidate: true })}
-                      disabled={isSubmitting}
-                      label=""
-                    />
-                    {errors.image_url && (
-                      <p className="text-sm text-destructive">{errors.image_url.message}</p>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-              <div className="md:col-span-9 space-y-2">
-                <Label>{t('course.form.description')}</Label>
-                <SummernoteEditor
-                  value={watch('description') || ''}
-                  onChange={(content) => setValue('description', content, { shouldValidate: true })}
-                  placeholder={t('course.form.enterDescription')}
-                  height={250}
+              <div className="space-y-2">
+                <Label htmlFor="course_type">{t('course.form.courseType')}</Label>
+                <Select
+                  value={watch('course_type') || COURSE_TYPE.GROUP}
+                  onValueChange={(value) => setValue('course_type', value as typeof COURSE_TYPE.GROUP, { shouldValidate: true })}
                   disabled={isSubmitting}
-                />
-                {errors.description && (
-                  <p className="text-sm text-destructive">{errors.description.message}</p>
+                >
+                  <SelectTrigger id="course_type">
+                    <SelectValue placeholder={t('course.form.selectCourseType')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {COURSE_TYPE_OPTIONS.map((type) => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.course_type && (
+                  <p className="text-sm text-destructive">{errors.course_type.message}</p>
                 )}
               </div>
             </div>
-          )}
+          </div>
+        </CardContent>
+      </Card>
 
-          {/* Form Actions */}
-          <div className="flex justify-end gap-4 pt-4 border-t">
+      {/* Card 2: Restriction */}
+      <Card className="shadow-md">
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="enrollment_end_date">{t('course.form.enrollmentEndDate')}</Label>
+              <Input
+                id="enrollment_end_date"
+                type="date"
+                {...register('enrollment_end_date')}
+                disabled={isSubmitting}
+              />
+              {errors.enrollment_end_date && (
+                <p className="text-sm text-destructive">{errors.enrollment_end_date.message}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="max_students">{t('course.form.maxStudents')}</Label>
+              <Input
+                id="max_students"
+                type="number"
+                {...register('max_students', { valueAsNumber: true, setValueAs: (v) => (v === '' || Number.isNaN(v) ? undefined : v) })}
+                placeholder={t('course.form.enterMaxStudents')}
+                disabled={isSubmitting}
+              />
+              {errors.max_students && (
+                <p className="text-sm text-destructive">{errors.max_students.message}</p>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Card 3: Additional */}
+      <Card className="shadow-md">
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+            <div className="md:col-span-3 space-y-2">
+              <Label>{t('course.form.image')}</Label>
+              <ImageUpload
+                value={watch('image_url') || null}
+                onChange={(url) => setValue('image_url', url, { shouldValidate: true })}
+                disabled={isSubmitting}
+                label=""
+              />
+              {errors.image_url && (
+                <p className="text-sm text-destructive">{errors.image_url.message}</p>
+              )}
+            </div>
+            <div className="md:col-span-9 space-y-2">
+              <Label>{t('course.form.description')}</Label>
+              <SummernoteEditor
+                value={watch('description') || ''}
+                onChange={(content) => setValue('description', content, { shouldValidate: true })}
+                placeholder={t('course.form.enterDescription')}
+                height={250}
+                disabled={isSubmitting}
+              />
+              {errors.description && (
+                <p className="text-sm text-destructive">{errors.description.message}</p>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Card 4: Actions */}
+      <Card className="shadow-md">
+        <CardContent className="pt-6">
+          <div className="flex justify-end gap-4">
             <Button
               type="button"
               variant="outline"
@@ -443,9 +437,9 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
               <ArrowLeft className="h-4 w-4 mr-2" />
               {t('course.actions.cancel')}
             </Button>
-            <Button 
-              type="submit" 
-              variant="default" 
+            <Button
+              type="submit"
+              variant="default"
               disabled={isSubmitting || createCourse.isPending || updateCourse.isPending}
             >
               {(isSubmitting || createCourse.isPending || updateCourse.isPending) ? (
@@ -465,9 +459,9 @@ export function CourseForm({ courseSlug }: CourseFormProps) {
               )}
             </Button>
           </div>
-        </form>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </form>
   )
 }
 

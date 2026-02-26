@@ -22,8 +22,18 @@ const courseFormBaseSchema = z.object({
   monthly_fee: z.number().min(0).max(999999.99).optional().nullable(),
   course_type: z.enum([COURSE_TYPE.ONE_ON_ONE, COURSE_TYPE.PRIVATE, COURSE_TYPE.GROUP, COURSE_TYPE.TEACHER_TRAINING]).optional(),
   status: z.enum([COURSE_STATUS.UPCOMING, COURSE_STATUS.IN_PROGRESS, COURSE_STATUS.COMPLETED, COURSE_STATUS.CANCELLED]).optional(),
+  max_students: z
+    .union([
+      z.number().int(),
+      z.nan().transform(() => undefined),
+      z.undefined(),
+      z.null(),
+    ])
+    .optional()
+    .nullable(),
   start_date: z.string().min(1, VALIDATION_MESSAGES.REQUIRED('Start date')),
   end_date: z.string().optional().nullable(),
+  enrollment_end_date: z.string().optional().nullable(),
   notes: z.string().max(5000).optional().nullable(),
 })
 

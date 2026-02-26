@@ -21,6 +21,9 @@ export const course = {
 
   // Form labels
   form: {
+    basicInformation: 'အခြေခံ အချက်အလက်များ',
+    restriction: 'ကန့်သတ်ချက်များ',
+    additional: 'အပို',
     subject: 'ဘာသာရပ်',
     title: 'ခေါင်းစဉ်',
     duration: 'ကြာချိန်',
@@ -31,6 +34,9 @@ export const course = {
     status: 'အခြေအနေ',
     startDate: 'စတင်ရက်',
     endDate: 'ပြီးဆုံးရက်',
+    enrollmentEndDate: 'စာရင်းသွင်းမှု နောက်ဆုံးရက်',
+    maxStudents: 'ကျောင်းသား အများဆုံး',
+    enterMaxStudents: 'ဥပမာ ၁၀',
     selectSubject: 'ဘာသာရပ် ရွေးချယ်ရန်',
     enterTitle: 'သင်တန်း ခေါင်းစဉ် ထည့်ရန်',
     enterDuration: 'ကြာချိန် ထည့်ရန်',
@@ -109,6 +115,9 @@ export const course = {
     dates: 'ရက်စွဲများ',
     startDate: 'စတင်ရက်',
     endDate: 'ပြီးဆုံးရက်',
+    enrollmentEndDate: 'စာရင်းသွင်းမှု နောက်ဆုံးရက်',
+    maxStudents: 'ကျောင်းသား အများဆုံး',
+    enrolledCount: 'စာရင်းသွင်းပြီး',
     image: 'သင်တန်း ဓာတ်ပုံ',
     description: 'ဖော်ပြချက်',
     notes: 'မှတ်စု',

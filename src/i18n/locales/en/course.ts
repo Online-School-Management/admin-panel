@@ -21,6 +21,9 @@ export const course = {
 
   // Form labels
   form: {
+    basicInformation: 'Basic Information',
+    restriction: 'Restriction',
+    additional: 'Additional',
     subject: 'Subject',
     title: 'Title',
     duration: 'Duration',
@@ -31,6 +34,9 @@ export const course = {
     status: 'Status',
     startDate: 'Start Date',
     endDate: 'End Date',
+    enrollmentEndDate: 'Enrollment End Date',
+    maxStudents: 'Max Students',
+    enterMaxStudents: 'e.g. 10',
     selectSubject: 'Select a subject',
     enterTitle: 'Enter course title',
     enterDuration: 'Enter duration',
@@ -109,6 +115,9 @@ export const course = {
     dates: 'Dates',
     startDate: 'Start Date',
     endDate: 'End Date',
+    enrollmentEndDate: 'Enrollment End Date',
+    maxStudents: 'Max Students',
+    enrolledCount: 'Enrolled',
     image: 'Course Image',
     description: 'Description',
     notes: 'Notes',

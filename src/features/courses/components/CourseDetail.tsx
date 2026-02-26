@@ -157,6 +157,30 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
                   </p>
                 </div>
 
+                {/* Max Students & Enrolled */}
+                {(course.max_students != null || course.enrollments_count != null) && (
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">
+                      {t('course.detail.maxStudents')} / {t('course.detail.enrolledCount')}
+                    </p>
+                    <p className="text-base">
+                      {course.max_students != null ? course.max_students : '—'} / {course.enrollments_count ?? 0}
+                    </p>
+                  </div>
+                )}
+
+                {/* Enrollment End Date */}
+                {course.enrollment_end_date && (
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">
+                      {t('course.detail.enrollmentEndDate')}
+                    </p>
+                    <p className="text-base">
+                      {format(new Date(course.enrollment_end_date), 'MMM dd, yyyy')}
+                    </p>
+                  </div>
+                )}
+
                 {/* Dates Section */}
                 {(course.start_date || course.end_date) && (
                   <>

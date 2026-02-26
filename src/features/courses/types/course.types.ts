@@ -46,8 +46,10 @@ export interface Course {
   course_type: 'one_on_one' | 'private' | 'group' | 'teacher_training'
   total_hours?: number | null
   status: 'upcoming' | 'in_progress' | 'completed' | 'cancelled'
+  max_students?: number | null
   start_date?: string | null
   end_date?: string | null
+  enrollment_end_date?: string | null
   notes?: string | null
   assigned_teacher: {
     id: number
@@ -60,6 +62,7 @@ export interface Course {
   } | null
   schedules: CourseSchedule[]
   class_sessions: ClassSession[]
+  enrollments_count?: number
   created_at?: string
   updated_at?: string
 }
@@ -83,8 +86,10 @@ export interface CourseCollectionItem {
   course_type: 'one_on_one' | 'private' | 'group' | 'teacher_training'
   total_hours: number | null
   status: 'upcoming' | 'in_progress' | 'completed' | 'cancelled'
+  max_students: number | null
   start_date: string | null
   end_date: string | null
+  enrollment_end_date: string | null
   notes: string | null
   assigned_teacher: {
     id: number
@@ -109,8 +114,10 @@ export interface CreateCourseInput {
   monthly_fee?: number | null
   course_type?: 'one_on_one' | 'private' | 'group' | 'teacher_training'
   status?: 'upcoming' | 'in_progress' | 'completed' | 'cancelled'
+  max_students?: number | null
   start_date?: string | null
   end_date?: string | null
+  enrollment_end_date?: string | null
   notes?: string | null
 }
 
@@ -125,8 +132,10 @@ export interface UpdateCourseInput {
   monthly_fee?: number | null
   course_type?: 'one_on_one' | 'private' | 'group' | 'teacher_training'
   status?: 'upcoming' | 'in_progress' | 'completed' | 'cancelled'
+  max_students?: number | null
   start_date?: string | null
   end_date?: string | null
+  enrollment_end_date?: string | null
   notes?: string | null
 }
 

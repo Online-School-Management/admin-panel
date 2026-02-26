@@ -22,6 +22,7 @@ import { classSession } from './class-session'
 import { studentPayment } from './student-payment'
 import { teacherPayout } from './teacher-payout'
 import { monthlyClosing } from './monthly-closing'
+import { article } from './article'
 
 export const en = {
   common,
@@ -43,6 +44,7 @@ export const en = {
   studentPayment,
   teacherPayout,
   monthlyClosing,
+  article,
 }
 
 

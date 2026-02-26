@@ -19,6 +19,7 @@ export const navigation = {
   'student-payments': 'Student Payments',
   'teacher-payouts': 'Teacher Payouts',
   'monthly-closing': 'Monthly closing',
+  articles: 'Articles',
 }
 
 

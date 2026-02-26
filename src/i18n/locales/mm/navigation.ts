@@ -19,6 +19,7 @@ export const navigation = {
   'student-payments': 'ကျောင်းသားငွေပေးချေမှုများ',
   'teacher-payouts': 'ဆရာပေးချေမှုများ',
   'monthly-closing': 'လစဉ်ပိတ်သိမ်းမှု',
+  articles: 'ဆောင်းပါးများ',
 }
 
 

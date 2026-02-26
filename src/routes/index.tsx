@@ -67,6 +67,12 @@ const TeacherPayoutDetailPage = lazy(() => import('@/pages/teacher-payouts/detai
 // Monthly closing page
 const MonthlyClosingListPage = lazy(() => import('@/pages/monthly-closing/list'))
 
+// Article pages
+const ArticlesListPage = lazy(() => import('@/pages/articles/list'))
+const CreateArticlePage = lazy(() => import('@/pages/articles/create'))
+const EditArticlePage = lazy(() => import('@/pages/articles/edit'))
+const ArticleDetailPage = lazy(() => import('@/pages/articles/detail'))
+
 // Student Payment pages
 const StudentPaymentsListPage = lazy(() => import('@/pages/student-payments/list'))
 const EditStudentPaymentPage = lazy(() => import('@/pages/student-payments/edit'))
@@ -229,6 +235,22 @@ export const router = createBrowserRouter([
   {
     path: '/monthly-closing',
     element: <ProtectedRoute><MonthlyClosingListPage /></ProtectedRoute>,
+  },
+  {
+    path: '/articles',
+    element: <ProtectedRoute><ArticlesListPage /></ProtectedRoute>,
+  },
+  {
+    path: '/articles/new',
+    element: <ProtectedRoute><CreateArticlePage /></ProtectedRoute>,
+  },
+  {
+    path: '/articles/:slug/edit',
+    element: <ProtectedRoute><EditArticlePage /></ProtectedRoute>,
+  },
+  {
+    path: '/articles/:slug',
+    element: <ProtectedRoute><ArticleDetailPage /></ProtectedRoute>,
   },
   {
     path: '/student-payments',

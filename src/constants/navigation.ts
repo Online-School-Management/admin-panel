@@ -1,4 +1,4 @@
-import { Shield, UserCog, Key, GraduationCap, Users, BookOpen, BookText, CreditCard, CalendarDays, Wallet, ClipboardList, FileText, LucideIcon } from 'lucide-react'
+import { Shield, UserCog, Key, GraduationCap, Users, BookOpen, BookText, CreditCard, CalendarDays, Wallet, ClipboardList, FileText, Newspaper, LucideIcon } from 'lucide-react'
 
 export interface NavigationItem {
   to: string
@@ -25,6 +25,7 @@ export const mainNavigation: NavigationItem[] = [
 export const subjectNavigation: NavigationItem[] = [
   { to: '/subjects', icon: BookOpen, label: 'Subjects' },
   { to: '/courses', icon: BookText, label: 'Courses' },
+  { to: '/articles', icon: Newspaper, label: 'Articles' },
   { to: '/teachers', icon: GraduationCap, label: 'Teachers' },
 ]
 

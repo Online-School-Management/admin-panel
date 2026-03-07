@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { Calculator, CheckCircle2, Search, RefreshCw, CalendarRange } from 'lucide-react'
+import { Calculator, CheckCircle2, Gift, Search, RefreshCw, CalendarRange } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -31,6 +31,7 @@ import {
   useMarkPayoutsAsPaidBulk,
 } from '@/features/payouts/hooks/usePayouts'
 import { MarkPayoutAsPaidDialog } from './MarkPayoutAsPaidDialog'
+import { EditPayoutBonusModal } from './EditPayoutBonusModal'
 import { Pagination } from '@/components/common/Pagination'
 import { TableSkeleton } from '@/components/common/skeletons/TableSkeleton'
 import { PAGINATION } from '@/constants'
@@ -70,6 +71,10 @@ export function TeacherPayoutsList() {
   const [selectedPayout, setSelectedPayout] = useState<PayoutItem | null>(null)
   const [bulkMarkPaidDialogOpen, setBulkMarkPaidDialogOpen] = useState(false)
   const [selectedIds, setSelectedIds] = useState<number[]>([])
+
+  // Bonus modal (list)
+  const [bonusModalOpen, setBonusModalOpen] = useState(false)
+  const [selectedPayoutForBonus, setSelectedPayoutForBonus] = useState<PayoutItem | null>(null)
 
   // Compute period dates
   const { periodStart, periodEnd, payoutMonth } = useMemo(() => {
@@ -556,7 +561,21 @@ export function TeacherPayoutsList() {
                                 </span>
                               </div>
                               <div>
-                                <span className="font-semibold">{formatCurrency(payout.total_amount)}</span>
+                                <span className="font-medium">{formatCurrency(payout.total_amount)}</span>
+                                <span className="text-muted-foreground text-xs ml-1">
+                                  ({t('teacherPayout.list.base')})
+                                </span>
+                              </div>
+                              {(payout.bonus_amount ?? 0) > 0 && (
+                                <div>
+                                  <span className="font-medium text-amber-600">{formatCurrency(payout.bonus_amount ?? 0)}</span>
+                                  <span className="text-muted-foreground text-xs ml-1">
+                                    ({t('teacherPayout.list.bonus')})
+                                  </span>
+                                </div>
+                              )}
+                              <div>
+                                <span className="font-semibold">{formatCurrency(payout.total_to_pay ?? payout.total_amount)}</span>
                                 <span className="text-muted-foreground text-xs ml-1">
                                   ({t('teacherPayout.list.toTeacher')})
                                 </span>
@@ -576,6 +595,21 @@ export function TeacherPayoutsList() {
                                   {t('teacherPayout.actions.view')}
                                 </Link>
                               </Button>
+                              {payout.status === 'pending' && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="h-8"
+                                  onClick={() => {
+                                    setSelectedPayoutForBonus(payout)
+                                    setBonusModalOpen(true)
+                                  }}
+                                  title={t('teacherPayout.detailPage.editBonus')}
+                                >
+                                  <Gift className="h-4 w-4 mr-1" />
+                                  {t('teacherPayout.list.addBonus')}
+                                </Button>
+                              )}
                               {payout.status === 'pending' ? (
                                 <Button
                                   variant="default"
@@ -621,7 +655,7 @@ export function TeacherPayoutsList() {
         onOpenChange={setMarkPaidDialogOpen}
         onConfirm={handleMarkPaidConfirm}
         teacherName={selectedPayout?.teacher?.name ?? selectedPayout?.recipient_name}
-        amount={selectedPayout?.total_amount}
+        amount={selectedPayout ? (selectedPayout.total_to_pay ?? selectedPayout.total_amount) : undefined}
         isLoading={markAsPaid.isPending}
       />
 
@@ -633,6 +667,16 @@ export function TeacherPayoutsList() {
         isBulk
         bulkCount={pendingSelectedCount}
         isLoading={markAsPaidBulk.isPending}
+      />
+
+      {/* Edit bonus modal */}
+      <EditPayoutBonusModal
+        open={bonusModalOpen}
+        onOpenChange={(open) => {
+          setBonusModalOpen(open)
+          if (!open) setSelectedPayoutForBonus(null)
+        }}
+        payout={selectedPayoutForBonus}
       />
     </>
   )

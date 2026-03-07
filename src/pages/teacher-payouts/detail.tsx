@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { CheckCircle2 } from 'lucide-react'
+import { CheckCircle2, Gift, Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge'
 import { useTranslation } from '@/i18n/context'
 import { usePayout, useMarkPayoutAsPaid } from '@/features/payouts/hooks/usePayouts'
 import { MarkPayoutAsPaidDialog } from '@/features/teacher-payouts/components/MarkPayoutAsPaidDialog'
+import { EditPayoutBonusModal } from '@/features/teacher-payouts/components/EditPayoutBonusModal'
 import { formatCurrency } from '@/utils/format'
 import format from 'date-fns/format'
 import type { PayoutSession, TeacherPayoutDetail } from '@/features/payouts/types/payout.types'
@@ -45,6 +46,7 @@ export default function TeacherPayoutDetailPage() {
   const { id } = useParams<{ id: string }>()
   const payoutId = id ? parseInt(id, 10) : 0
   const [markPaidDialogOpen, setMarkPaidDialogOpen] = useState(false)
+  const [bonusModalOpen, setBonusModalOpen] = useState(false)
 
   const { data: payoutResponse, isLoading, error } = usePayout(payoutId)
   const markAsPaid = useMarkPayoutAsPaid()
@@ -84,6 +86,8 @@ export default function TeacherPayoutDetailPage() {
 
   const teacherName = payout.teacher?.name ?? payout.recipient_name ?? '—'
 
+  const totalToPay = payout.total_to_pay ?? payout.total_amount
+
   // Flat list of all sessions in the period (from all courses), sorted by date
   const flatSessions: FlatSession[] = (payout.teacher_payouts ?? [])
     .flatMap((tp) =>
@@ -111,6 +115,46 @@ export default function TeacherPayoutDetailPage() {
           ) : undefined
         }
       />
+
+      {/* Bonus (before mark as paid) */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Gift className="h-4 w-4" />
+            {t('teacherPayout.detailPage.bonusTitle')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-wrap items-baseline gap-4 text-sm">
+            <div>
+              <span className="text-muted-foreground mr-1">{t('teacherPayout.detailPage.base')}:</span>
+              <span className="font-medium">{formatCurrency(payout.total_amount)}</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground mr-1">{t('teacherPayout.detailPage.bonus')}:</span>
+              <span className="font-medium">{formatCurrency(payout.bonus_amount ?? 0)}</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground mr-1">{t('teacherPayout.detailPage.totalToPay')}:</span>
+              <span className="font-semibold">{formatCurrency(totalToPay)}</span>
+            </div>
+          </div>
+          {(payout.bonus_notes ?? '').trim() && (
+            <p className="text-sm text-muted-foreground">{payout.bonus_notes}</p>
+          )}
+          {isPending && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-3"
+              onClick={() => setBonusModalOpen(true)}
+            >
+              <Pencil className="h-4 w-4 mr-2" />
+              {t('teacherPayout.detailPage.editBonus')}
+            </Button>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Section 1: Summary table (one row per course) */}
       <Card>
@@ -244,8 +288,14 @@ export default function TeacherPayoutDetailPage() {
         onOpenChange={setMarkPaidDialogOpen}
         onConfirm={handleMarkPaidConfirm}
         teacherName={payout.teacher?.name ?? payout.recipient_name}
-        amount={payout.total_amount}
+        amount={totalToPay}
         isLoading={markAsPaid.isPending}
+      />
+
+      <EditPayoutBonusModal
+        open={bonusModalOpen}
+        onOpenChange={setBonusModalOpen}
+        payout={payout}
       />
     </div>
   )

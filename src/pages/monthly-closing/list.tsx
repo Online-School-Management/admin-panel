@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { CalendarRange, Plus, Calculator } from 'lucide-react'
+import { CalendarRange, Plus, Calculator, Gift } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -21,6 +21,7 @@ import {
 import { useCalculatePayouts } from '@/features/teacher-payouts/hooks/useTeacherPayouts'
 import { AddPayoutModal } from '@/features/payouts/components/AddPayoutModal'
 import { MarkPayoutAsPaidDialog } from '@/features/teacher-payouts/components/MarkPayoutAsPaidDialog'
+import { EditPayoutBonusModal } from '@/features/teacher-payouts/components/EditPayoutBonusModal'
 import { useQueryClient } from '@tanstack/react-query'
 import { TableSkeleton } from '@/components/common/skeletons/TableSkeleton'
 import format from 'date-fns/format'
@@ -46,6 +47,8 @@ export default function MonthlyClosingListPage() {
   const [addPayoutOpen, setAddPayoutOpen] = useState(false)
   const [markPaidDialogOpen, setMarkPaidDialogOpen] = useState(false)
   const [selectedPayout, setSelectedPayout] = useState<PayoutItem | null>(null)
+  const [bonusModalOpen, setBonusModalOpen] = useState(false)
+  const [selectedPayoutForBonus, setSelectedPayoutForBonus] = useState<PayoutItem | null>(null)
 
   const now = new Date()
   const [periodMode, setPeriodMode] = useState<'month' | 'custom'>('month')
@@ -373,7 +376,17 @@ export default function MonthlyClosingListPage() {
                           <span className="text-muted-foreground">—</span>
                         )}
                       </TableCell>
-                      <TableCell>{formatCurrency(payout.total_amount)}</TableCell>
+                      <TableCell>
+                        <div className="text-sm space-y-0.5">
+                          {(payout.bonus_amount ?? 0) > 0 && (
+                            <div>
+                              <span className="text-muted-foreground">{formatCurrency(payout.total_amount)}</span>
+                              <span className="text-amber-600 ml-1">+ {formatCurrency(payout.bonus_amount ?? 0)}</span>
+                            </div>
+                          )}
+                          <span className="font-medium">{formatCurrency(payout.total_to_pay ?? payout.total_amount)}</span>
+                        </div>
+                      </TableCell>
                       <TableCell>{getStatusBadge(payout.status)}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
@@ -386,6 +399,21 @@ export default function MonthlyClosingListPage() {
                               >
                                 {t('monthlyClosing.actions.view')}
                               </Link>
+                            </Button>
+                          )}
+                          {payout.status === 'pending' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8"
+                              onClick={() => {
+                                setSelectedPayoutForBonus(payout)
+                                setBonusModalOpen(true)
+                              }}
+                              title={t('teacherPayout.detailPage.editBonus')}
+                            >
+                              <Gift className="h-4 w-4 mr-1" />
+                              {t('teacherPayout.list.addBonus')}
                             </Button>
                           )}
                           {payout.status === 'pending' ? (
@@ -494,8 +522,17 @@ export default function MonthlyClosingListPage() {
         onOpenChange={setMarkPaidDialogOpen}
         onConfirm={handleMarkPaidConfirm}
         teacherName={selectedPayout ? getDisplayName(selectedPayout) : undefined}
-        amount={selectedPayout?.total_amount}
+        amount={selectedPayout ? (selectedPayout.total_to_pay ?? selectedPayout.total_amount) : undefined}
         isLoading={markAsPaid.isPending}
+      />
+
+      <EditPayoutBonusModal
+        open={bonusModalOpen}
+        onOpenChange={(open) => {
+          setBonusModalOpen(open)
+          if (!open) setSelectedPayoutForBonus(null)
+        }}
+        payout={selectedPayoutForBonus}
       />
     </div>
   )

@@ -69,7 +69,10 @@ export const teacherPayout = {
   },
   list: {
     collectedFromStudent: 'collected from student',
+    base: 'base',
+    bonus: 'bonus',
     toTeacher: 'to teacher',
+    addBonus: 'Add / Edit bonus',
   },
   detailPage: {
     title: 'Payout Detail',
@@ -99,6 +102,17 @@ export const teacherPayout = {
     sessionTopic: 'Topic',
     noSessions: 'No sessions in this period',
     salaryAllCourses: 'Salary (all courses)',
+    bonusTitle: 'Bonus (before mark as paid)',
+    forTeacher: 'For teacher',
+    base: 'Base',
+    bonus: 'Bonus',
+    totalToPay: 'Total to pay',
+    bonusAmount: 'Bonus amount',
+    bonusNotes: 'Bonus notes',
+    bonusNotesPlaceholder: 'Optional reason or note',
+    saveBonus: 'Save bonus',
+    editBonus: 'Edit bonus',
+    saving: 'Saving…',
   },
   messages: {
     noPayouts: 'No payouts found for this period',

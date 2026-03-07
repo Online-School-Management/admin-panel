@@ -57,6 +57,9 @@ export interface PayoutItem {
   period_end: string
   payout_month: string | null
   total_amount: number
+  bonus_amount?: number
+  bonus_notes?: string | null
+  total_to_pay?: number
   total_collected?: number
   status: 'pending' | 'paid'
   paid_at: string | null
@@ -67,6 +70,11 @@ export interface PayoutItem {
   teacher_payouts?: TeacherPayoutDetail[]
   created_at: string
   updated_at?: string
+}
+
+export interface UpdatePayoutBonusInput {
+  bonus_amount: number
+  bonus_notes?: string | null
 }
 
 export interface MarkPayoutPaidInput {

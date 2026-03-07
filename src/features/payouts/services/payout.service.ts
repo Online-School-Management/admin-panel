@@ -6,6 +6,7 @@ import type {
   MarkPayoutsPaidBulkResponse,
   MonthlyClosingSummary,
   CreatePayoutInput,
+  UpdatePayoutBonusInput,
 } from '../types/payout.types'
 
 /**
@@ -75,5 +76,13 @@ export async function getMonthlyClosingSummary(periodStart: string, periodEnd: s
  */
 export async function createPayout(data: CreatePayoutInput): Promise<PayoutResponse> {
   const response = await apiClient.post<PayoutResponse>('/payouts', data)
+  return response.data
+}
+
+/**
+ * Update payout bonus (only for pending payouts)
+ */
+export async function updatePayoutBonus(id: number, data: UpdatePayoutBonusInput): Promise<PayoutResponse> {
+  const response = await apiClient.put<PayoutResponse>(`/payouts/${id}`, data)
   return response.data
 }

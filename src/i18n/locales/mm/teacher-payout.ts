@@ -69,7 +69,10 @@ export const teacherPayout = {
   },
   list: {
     collectedFromStudent: 'ကျောင်းသားထံမှ ရရှိငွေ',
+    base: 'အခြေခံ',
+    bonus: 'အပိုဆုငွေ',
     toTeacher: 'ဆရာသို့ ပေးချေရမည့်ငွေ',
+    addBonus: 'အပိုဆုငွေ ထည့်/ပြင်မည်',
   },
   detailPage: {
     title: 'ပေးချေမှု အသေးစိတ်',
@@ -99,6 +102,17 @@ export const teacherPayout = {
     sessionTopic: 'ခေါင်းစဉ်',
     noSessions: 'ဤကာလအတွက် ချိန်မရှိပါ',
     salaryAllCourses: 'လစာ (သင်တန်းအားလုံး)',
+    bonusTitle: 'အပိုဆုငွေ (ပေးပြီးမှတ်ခြင်းမပြုမီ)',
+    forTeacher: 'ဆရာ/ဆရာမ',
+    base: 'အခြေခံ',
+    bonus: 'အပိုဆုငွေ',
+    totalToPay: 'စုစုပေါင်းပေးချေရမည့်ငွေ',
+    bonusAmount: 'အပိုဆုငွေပမာဏ',
+    bonusNotes: 'အပိုဆုငွေ မှတ်ချက်',
+    bonusNotesPlaceholder: 'အကြောင်းရင်း သို့မဟုတ် မှတ်ချက် (ရွေးချယ်နိုင်သည်)',
+    saveBonus: 'အပိုဆုငွေ သိမ်းမည်',
+    editBonus: 'အပိုဆုငွေ ပြင်မည်',
+    saving: 'သိမ်းဆည်းနေသည်…',
   },
   messages: {
     noPayouts: 'ဤကာလအတွက် ပေးချေမှုမရှိပါ',

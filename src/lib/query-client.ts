@@ -29,10 +29,9 @@ export const queryClient = new QueryClient({
       placeholderData: (previousData: unknown) => previousData,
     },
     mutations: {
-      // Retry failed mutations once
-      retry: 1,
-      // Retry delay
-      retryDelay: 1000,
+      // Do not retry mutations - prevents duplicate creates when the first request
+      // succeeds on the server but the client times out or sees a network error
+      retry: 0,
     },
   },
 })

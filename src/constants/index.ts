@@ -152,7 +152,7 @@ export const COURSE_TYPE_OPTIONS = [
 
 // API configuration (BASE_URL from .env VITE_API_BASE_URL, fallback for dev)
 export const API_CONFIG = {
-  TIMEOUT: 5000, // 5 seconds - reduced for faster failure detection
+  TIMEOUT: 60000, // 60 seconds - allows slow networks to receive response before timeout (avoids false "failure" and duplicate submits)
   BASE_URL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000/api/v1/backend',
 } as const
 

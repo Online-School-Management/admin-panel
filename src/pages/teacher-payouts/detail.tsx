@@ -20,9 +20,10 @@ import { formatCurrency } from '@/utils/format'
 import format from 'date-fns/format'
 import type { PayoutSession, TeacherPayoutDetail } from '@/features/payouts/types/payout.types'
 
-/** Flat session row for the sessions table (session + course name + teacher name) */
+/** Flat session row for the sessions table (session + course name + subject + teacher name) */
 interface FlatSession extends PayoutSession {
   course_name: string
+  course_subject: string | null
   teacher_name: string
 }
 
@@ -89,6 +90,7 @@ export default function TeacherPayoutDetailPage() {
       (tp.sessions ?? []).map((s) => ({
         ...s,
         course_name: tp.course?.title ?? '—',
+        course_subject: tp.course?.subject?.name ?? null,
         teacher_name: teacherName,
       }))
     )
@@ -143,13 +145,20 @@ export default function TeacherPayoutDetailPage() {
                     )}
                   </TableCell>
                   <TableCell>{periodLabel}</TableCell>
-                  <TableCell className="font-medium">
+                  <TableCell>
                     {tp.course ? (
-                      <Link to={`/courses/${tp.course.slug}`} className="text-primary hover:underline">
-                        {tp.course.title}
-                      </Link>
+                      <div>
+                        <Link to={`/courses/${tp.course.slug}`} className="text-primary hover:underline font-medium">
+                          {tp.course.title}
+                        </Link>
+                        {tp.course.subject && (
+                          <div className="text-sm font-medium text-muted-foreground">
+                            {tp.course.subject.name}
+                          </div>
+                        )}
+                      </div>
                     ) : (
-                      t('teacherPayout.detailPage.salaryAllCourses')
+                      <span className="font-medium">{t('teacherPayout.detailPage.salaryAllCourses')}</span>
                     )}
                   </TableCell>
                   <TableCell>
@@ -203,7 +212,16 @@ export default function TeacherPayoutDetailPage() {
                   <TableRow key={s.id}>
                     <TableCell className="text-center">{index + 1}</TableCell>
                     <TableCell>{s.session_date ? format(new Date(s.session_date), 'dd MMM yyyy') : '—'}</TableCell>
-                    <TableCell>{s.course_name}</TableCell>
+                    <TableCell>
+                      <div>
+                        <span>{s.course_name}</span>
+                        {s.course_subject && (
+                          <div className="text-sm font-medium text-muted-foreground">
+                            {s.course_subject}
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell>{s.teacher_name}</TableCell>
                     <TableCell className="text-muted-foreground">{s.topic_covered ?? '—'}</TableCell>
                     <TableCell>

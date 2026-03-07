@@ -15,6 +15,7 @@ export interface PayoutCourse {
   id: number
   title: string
   slug: string
+  subject?: { id: number; name: string } | null
   monthly_fee?: number | null
   total_fee?: number | null
 }

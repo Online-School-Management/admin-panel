@@ -523,17 +523,21 @@ export function TeacherPayoutsList() {
                                     {payout.courses_count === 1 ? t('teacherPayout.detail.course') : t('teacherPayout.detail.courses')}
                                   </span>
                                   {payout.courses && payout.courses.length > 0 && (
-                                    <div className="mt-1 text-xs">
-                                      {payout.courses.map((c, i) => (
-                                        <span key={c.id}>
-                                          {i > 0 && ', '}
+                                    <div className="mt-1 space-y-1">
+                                      {payout.courses.map((c) => (
+                                        <div key={c.id}>
                                           <Link
                                             to={`/courses/${c.slug}`}
-                                            className="text-primary hover:underline"
+                                            className="text-primary hover:underline text-xs"
                                           >
                                             {c.title}
                                           </Link>
-                                        </span>
+                                          {c.subject && (
+                                            <div className="text-xs font-medium text-muted-foreground">
+                                              {c.subject.name}
+                                            </div>
+                                          )}
+                                        </div>
                                       ))}
                                     </div>
                                   )}

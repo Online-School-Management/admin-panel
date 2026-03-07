@@ -488,7 +488,7 @@ export function StudentPaymentsList() {
                             <TableCell>
                               {payment.enrollment?.course ? (
                                 <div>
-                                  <div className="font-medium">
+                                  <div className="text-sm font-medium">
                                     <Link
                                       to={`/courses/${payment.enrollment.course.slug}`}
                                       target="_blank"
@@ -499,7 +499,7 @@ export function StudentPaymentsList() {
                                     </Link>
                                   </div>
                                   {payment.enrollment.course.subject && (
-                                    <div className="text-sm text-muted-foreground">
+                                    <div className="font-medium text-muted-foreground">
                                       {payment.enrollment.course.subject.name}
                                     </div>
                                   )}

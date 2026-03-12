@@ -55,8 +55,8 @@ function EditEnrollmentModal({
     dataUpdatedAt: enrollmentDataUpdatedAt,
   } = useEnrollment(enrollmentId ?? 0)
 
-  const { data: studentsData } = useStudents({ per_page: 100 })
-  const { data: coursesData } = useCourses({ per_page: 100 })
+  const { data: studentsData } = useStudents({ per_page: 1000 })
+  const { data: coursesData } = useCourses({ per_page: 1000 })
 
   const studentOptions = useMemo(() => {
     return studentsData?.data.map((student) => ({

@@ -52,8 +52,8 @@ export function EnrollmentsList() {
   const [selectedEnrollment, setSelectedEnrollment] = useState<EnrollmentCollectionItem | null>(null)
 
   // Fetch students and courses for filter dropdowns
-  const { data: studentsData } = useStudents({ per_page: 100 })
-  const { data: coursesData } = useCourses({ per_page: 100 })
+  const { data: studentsData } = useStudents({ per_page: 1000 })
+  const { data: coursesData } = useCourses({ per_page: 1000 })
 
   const { data, isLoading, error } = useEnrollments({
     page,

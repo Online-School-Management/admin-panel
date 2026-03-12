@@ -56,8 +56,8 @@ export function EnrollmentForm({ enrollmentId }: EnrollmentFormProps) {
   const updateEnrollment = useUpdateEnrollment()
 
   // Fetch students and courses for dropdowns
-  const { data: studentsData } = useStudents({ per_page: 100 })
-  const { data: coursesData } = useCourses({ per_page: 100 })
+  const { data: studentsData } = useStudents({ per_page: 1000 })
+  const { data: coursesData } = useCourses({ per_page: 1000 })
 
   // Create options for comboboxes
   const studentOptions = useMemo(() => {

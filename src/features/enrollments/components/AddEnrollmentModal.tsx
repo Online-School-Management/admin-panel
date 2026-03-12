@@ -74,7 +74,7 @@ export function AddEnrollmentModal({
   const { t } = useTranslation()
   const createEnrollment = useCreateEnrollment(null) // No redirect; close modal and refresh list
 
-  const { data: studentsData } = useStudents({ per_page: 100 })
+  const { data: studentsData } = useStudents({ per_page: 1000 })
 
   const studentOptions = useMemo(() => {
     return studentsData?.data.map((student) => ({

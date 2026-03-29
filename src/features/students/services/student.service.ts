@@ -2,6 +2,7 @@ import apiClient from '@/services/api-client'
 import type {
   StudentsResponse,
   StudentResponse,
+  StudentsForEnrollmentPickerResponse,
   CreateStudentInput,
   UpdateStudentInput,
 } from '../types/student.types'
@@ -23,6 +24,13 @@ export async function getStudents(params?: {
   trashed?: boolean
 }): Promise<StudentsResponse> {
   const response = await apiClient.get<StudentsResponse>('/students', { params })
+  return response.data
+}
+
+export async function getStudentsForEnrollmentPicker(): Promise<StudentsForEnrollmentPickerResponse> {
+  const response = await apiClient.get<StudentsForEnrollmentPickerResponse>(
+    '/students/for-enrollment-picker'
+  )
   return response.data
 }
 

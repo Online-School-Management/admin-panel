@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { AddEnrollmentModal, EditEnrollmentModal } from '@/features/enrollments/components'
 import { Search, Edit, Trash2, Eye, MoreVertical, RefreshCw, UserPlus, BookOpen, Calendar, Users } from 'lucide-react'
@@ -34,7 +34,8 @@ import { Pagination } from '@/components/common/Pagination'
 import { TableSkeleton } from '@/components/common/skeletons/TableSkeleton'
 import { DeleteEnrollmentDialog } from '@/features/enrollments/components/DeleteEnrollmentDialog'
 import { useEnrollments, useDeleteEnrollment } from '@/features/enrollments/hooks/useEnrollments'
-import { useCourses } from '@/features/courses/hooks/useCourses'
+import { useCourseById } from '@/features/courses/hooks/useCourses'
+import { useStudentsForEnrollmentPicker } from '@/features/students/hooks/useStudents'
 import { PAGINATION } from '@/constants'
 import type { EnrollmentCollectionItem } from '@/features/enrollments/types/enrollment.types'
 import { useTranslation } from '@/i18n/context'
@@ -58,9 +59,24 @@ function CourseEnrollmentsPage() {
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [editEnrollmentId, setEditEnrollmentId] = useState<number | null>(null)
 
-  // Fetch course data to display summary
-  const { data: coursesData, isLoading: isLoadingCourse } = useCourses({ per_page: 100 })
-  const course = coursesData?.data.find((c) => c.id === courseIdNum)
+  const { data: courseResponse, isLoading: isLoadingCourse } = useCourseById(courseIdNum)
+  const course = courseResponse?.data
+
+  const { data: pickerResponse, isLoading: isPickerLoading } = useStudentsForEnrollmentPicker({
+    enabled: courseIdNum > 0,
+  })
+
+  const addEnrollmentStudentCombobox = useMemo(
+    () => ({
+      options:
+        pickerResponse?.data?.map((s) => ({
+          value: String(s.id),
+          label: `${s.name} (${s.student_id})`,
+        })) ?? [],
+      isLoading: isPickerLoading,
+    }),
+    [pickerResponse?.data, isPickerLoading]
+  )
 
   // Fetch enrollments filtered by this course
   const { data: enrollmentsData, isLoading: isLoadingEnrollments, error } = useEnrollments({
@@ -406,6 +422,7 @@ function CourseEnrollmentsPage() {
         courseId={courseIdNum}
         courseTitle={course?.title}
         courseDuration={course?.duration}
+        studentCombobox={addEnrollmentStudentCombobox}
       />
 
       {/* Edit Enrollment Modal */}

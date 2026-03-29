@@ -22,8 +22,7 @@ import {
 } from '@/components/ui/select'
 import { Combobox } from '@/components/ui/combobox'
 import { useEnrollment, useUpdateEnrollment } from '../hooks/useEnrollments'
-import { useStudents } from '@/features/students/hooks/useStudents'
-import { useCourses } from '@/features/courses/hooks/useCourses'
+import { useStudentsForEnrollmentPicker } from '@/features/students/hooks/useStudents'
 import { updateEnrollmentSchema, type UpdateEnrollmentFormData } from '../schemas/enrollment.schemas'
 import type { UpdateEnrollmentInput } from '../types/enrollment.types'
 import { useTranslation } from '@/i18n/context'
@@ -55,22 +54,29 @@ function EditEnrollmentModal({
     dataUpdatedAt: enrollmentDataUpdatedAt,
   } = useEnrollment(enrollmentId ?? 0)
 
-  const { data: studentsData } = useStudents({ per_page: 1000 })
-  const { data: coursesData } = useCourses({ per_page: 1000 })
+  const { data: pickerData, isLoading: pickerLoading } = useStudentsForEnrollmentPicker({
+    enabled: open && enrollmentId != null && enrollmentId > 0,
+  })
 
   const studentOptions = useMemo(() => {
-    return studentsData?.data.map((student) => ({
-      value: String(student.id),
-      label: `${student.user?.name ?? ''} (${student.student_id})`,
-    })) ?? []
-  }, [studentsData?.data])
+    return (
+      pickerData?.data?.map((student) => ({
+        value: String(student.id),
+        label: `${student.name} (${student.student_id})`,
+      })) ?? []
+    )
+  }, [pickerData?.data])
 
   const courseOptions = useMemo(() => {
-    return coursesData?.data.map((course) => ({
-      value: String(course.id),
-      label: `${course.title} (${course.subject.name})`,
-    })) ?? []
-  }, [coursesData?.data])
+    const e = enrollmentData?.data
+    if (!e?.course) return []
+    return [
+      {
+        value: String(e.course.id),
+        label: `${e.course.title} (${e.course.subject.name})`,
+      },
+    ]
+  }, [enrollmentData?.data])
 
   const {
     register,
@@ -135,7 +141,7 @@ function EditEnrollmentModal({
     )
   }
 
-  const isLoading = isSubmitting || updateEnrollment.isPending
+  const isLoading = isSubmitting || updateEnrollment.isPending || pickerLoading
   const showForm = open && enrollmentId && !isLoadingEnrollment && enrollmentData?.data
 
   return (

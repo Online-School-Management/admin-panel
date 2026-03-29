@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import {
   getCourses,
   getCoursesForAdminFilters,
+  getCourseById,
   getCourseBySlug,
   createCourse,
   updateCourse,
@@ -32,6 +33,7 @@ export const courseKeys = {
   forAdminFilters: () => [...courseKeys.all, 'for-admin-filters'] as const,
   details: () => [...courseKeys.all, 'detail'] as const,
   detail: (slug: string) => [...courseKeys.details(), slug] as const,
+  detailById: (id: number) => [...courseKeys.all, 'detail-id', id] as const,
 }
 
 /**
@@ -73,6 +75,19 @@ export function useCourse(slug: string) {
     staleTime: 0, // Always fetch fresh data
     refetchOnMount: 'always', // Always refetch when component mounts
     refetchOnWindowFocus: false, // Don't refetch on window focus
+  })
+}
+
+/**
+ * Hook to fetch a single course by numeric ID (admin).
+ */
+export function useCourseById(id: number) {
+  return useQuery({
+    queryKey: courseKeys.detailById(id),
+    queryFn: () => getCourseById(id),
+    enabled: id > 0,
+    staleTime: 1000 * 60 * 2,
+    refetchOnWindowFocus: false,
   })
 }
 

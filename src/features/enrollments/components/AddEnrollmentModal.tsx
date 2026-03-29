@@ -22,7 +22,7 @@ import {
 import { Combobox } from '@/components/ui/combobox'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useCreateEnrollment } from '../hooks/useEnrollments'
-import { useStudents } from '@/features/students/hooks/useStudents'
+import { useStudentsForEnrollmentPicker } from '@/features/students/hooks/useStudents'
 import { z } from 'zod'
 import { VALIDATION_MESSAGES } from '@/constants'
 import type { CreateEnrollmentInput } from '../types/enrollment.types'
@@ -58,6 +58,11 @@ interface AddEnrollmentModalProps {
   courseTitle?: string
   /** Course duration in months; used to show month checkboxes when Free is selected */
   courseDuration?: number
+  /** When set (e.g. course enrollments page), avoids a duplicate picker request in the modal */
+  studentCombobox?: {
+    options: { value: string; label: string }[]
+    isLoading: boolean
+  }
 }
 
 /**
@@ -70,18 +75,31 @@ export function AddEnrollmentModal({
   courseId,
   courseTitle,
   courseDuration = 0,
+  studentCombobox: studentComboboxProp,
 }: AddEnrollmentModalProps) {
   const { t } = useTranslation()
   const createEnrollment = useCreateEnrollment(null) // No redirect; close modal and refresh list
 
-  const { data: studentsData } = useStudents({ per_page: 1000 })
+  const externalCombobox = studentComboboxProp != null
+  const { data: pickerData, isLoading: pickerQueryLoading } = useStudentsForEnrollmentPicker({
+    enabled: !externalCombobox && open && courseId > 0,
+  })
 
   const studentOptions = useMemo(() => {
-    return studentsData?.data.map((student) => ({
-      value: String(student.id),
-      label: `${student.user?.name ?? ''} (${student.student_id})`,
-    })) ?? []
-  }, [studentsData?.data])
+    if (externalCombobox && studentComboboxProp) {
+      return studentComboboxProp.options
+    }
+    return (
+      pickerData?.data?.map((s) => ({
+        value: String(s.id),
+        label: `${s.name} (${s.student_id})`,
+      })) ?? []
+    )
+  }, [externalCombobox, studentComboboxProp, pickerData?.data])
+
+  const studentOptionsLoading = externalCombobox
+    ? (studentComboboxProp?.isLoading ?? false)
+    : pickerQueryLoading
 
   const {
     register,
@@ -143,7 +161,7 @@ export function AddEnrollmentModal({
     })
   }
 
-  const isLoading = isSubmitting || createEnrollment.isPending
+  const isLoading = isSubmitting || createEnrollment.isPending || studentOptionsLoading
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

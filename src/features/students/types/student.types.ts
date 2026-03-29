@@ -16,6 +16,20 @@ export interface StudentUser {
   last_login_at?: string | null
 }
 
+/** Minimal row for admin enrollment student comboboxes */
+export interface StudentEnrollmentPickerItem {
+  id: number
+  student_id: string
+  slug: string
+  name: string
+}
+
+export interface StudentsForEnrollmentPickerResponse {
+  success: boolean
+  data: StudentEnrollmentPickerItem[]
+  message: string
+}
+
 export type StudentSchoolType = 'government' | 'international' | 'private' | 'other'
 
 export interface Student {

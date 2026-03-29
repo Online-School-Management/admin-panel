@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import {
   getStudents,
+  getStudentsForEnrollmentPicker,
   getStudentBySlug,
   createStudent,
   updateStudent,
@@ -34,6 +35,7 @@ export const studentKeys = {
   lists: () => [...studentKeys.all, 'list'] as const,
   list: (params?: Record<string, unknown>) =>
     [...studentKeys.lists(), params] as const,
+  forEnrollmentPicker: () => [...studentKeys.all, 'for-enrollment-picker'] as const,
   details: () => [...studentKeys.all, 'detail'] as const,
   detail: (slug: string) => [...studentKeys.details(), slug] as const,
 }
@@ -54,6 +56,15 @@ export function useStudents(params?: {
     queryKey: studentKeys.list(params),
     queryFn: () => getStudents(params),
     staleTime: 1000 * 60 * 2, // 2 minutes
+  })
+}
+
+export function useStudentsForEnrollmentPicker(options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: studentKeys.forEnrollmentPicker(),
+    queryFn: () => getStudentsForEnrollmentPicker(),
+    staleTime: 1000 * 60 * 2,
+    enabled: options?.enabled !== false,
   })
 }
 
@@ -83,6 +94,7 @@ export function useCreateStudent() {
     onSuccess: (response) => {
       // Invalidate all student list queries to ensure fresh data
       queryClient.invalidateQueries({ queryKey: studentKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: studentKeys.forEnrollmentPicker() })
       // Also refetch to ensure the list is updated immediately
       queryClient.refetchQueries({ queryKey: studentKeys.lists() })
       showCreateSuccessToast('student', `${response.data.user?.name ?? 'Student'} has been added`)

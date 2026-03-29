@@ -34,6 +34,14 @@ export async function getCoursesForAdminFilters(): Promise<CoursesForAdminFilter
 }
 
 /**
+ * Get a single course by numeric ID (admin).
+ */
+export async function getCourseById(id: number): Promise<CourseResponse> {
+  const response = await apiClient.get<CourseResponse>(`/courses/by-id/${id}`)
+  return response.data
+}
+
+/**
  * Get a single course by slug
  */
 export async function getCourseBySlug(slug: string): Promise<CourseResponse> {

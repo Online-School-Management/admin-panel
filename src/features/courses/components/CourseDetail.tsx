@@ -237,7 +237,6 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
           {/* Class Sessions */}
           <ClassSessionsCard
             classSessions={course.class_sessions ?? []}
-            maxDisplay={28}
             headerAction={
               course.schedules && course.schedules.length > 0 ? (
                 <Button

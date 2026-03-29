@@ -14,6 +14,7 @@ import { useTranslation } from '@/i18n/context'
 
 interface ClassSessionsCardProps {
   classSessions: ClassSession[]
+  /** When set, only the first N sessions are shown and a “more” hint appears. Omit to show all. */
   maxDisplay?: number
   /** Optional action (e.g. "Add Session" button) shown in the card header */
   headerAction?: React.ReactNode
@@ -56,7 +57,7 @@ function getStatusVariant(status: string): 'destructive' | 'secondary' {
 
 export function ClassSessionsCard({
   classSessions,
-  maxDisplay = 28,
+  maxDisplay,
   headerAction,
   onEditSession,
   onDeleteSession,
@@ -64,7 +65,9 @@ export function ClassSessionsCard({
   const { t } = useTranslation()
   const showSessionActions = onEditSession != null || onDeleteSession != null
 
-  const displayedSessions = (classSessions ?? []).slice(0, maxDisplay)
+  const allSessions = classSessions ?? []
+  const displayedSessions =
+    maxDisplay != null ? allSessions.slice(0, maxDisplay) : allSessions
   const today = new Date()
   const hasSessions = displayedSessions.length > 0
 
@@ -164,9 +167,9 @@ export function ClassSessionsCard({
           })}
         </div>
         )}
-        {(classSessions?.length ?? 0) > maxDisplay && (
+        {maxDisplay != null && allSessions.length > maxDisplay && (
           <p className="text-sm text-muted-foreground text-center mt-4">
-            {t('course.detail.moreSessions', { count: (classSessions?.length ?? 0) - maxDisplay })}
+            {t('course.detail.moreSessions', { count: allSessions.length - maxDisplay })}
           </p>
         )}
       </CardContent>

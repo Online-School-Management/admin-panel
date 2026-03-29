@@ -26,7 +26,12 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useStudentPayments, useDeleteStudentPayment, useMarkAsPaidPayment } from '../hooks/useStudentPayments'
+import {
+  useStudentPayments,
+  useStudentPaymentsSummary,
+  useDeleteStudentPayment,
+  useMarkAsPaidPayment,
+} from '../hooks/useStudentPayments'
 import { useCoursesForAdminFilters } from '@/features/courses/hooks/useCourses'
 import { DeleteStudentPaymentDialog } from './DeleteStudentPaymentDialog'
 import { MarkAsPaidDialog } from './MarkAsPaidDialog'
@@ -111,15 +116,28 @@ export function StudentPaymentsList() {
     return options
   }, [])
 
+  const summaryParams = useMemo(
+    () => ({
+      month: selectedMonth,
+      year: selectedYear,
+      status: statusFilter !== 'all' ? statusFilter : undefined,
+      course_id: courseFilter !== 'all' ? Number(courseFilter) : undefined,
+      search: search || undefined,
+    }),
+    [selectedMonth, selectedYear, statusFilter, courseFilter, search]
+  )
+
   const { data, isLoading, error } = useStudentPayments({
     page,
     per_page: perPage,
-    month: selectedMonth,
-    year: selectedYear,
-    status: statusFilter !== 'all' ? statusFilter : undefined,
-    course_id: courseFilter !== 'all' ? Number(courseFilter) : undefined,
-    search: search || undefined,
+    ...summaryParams,
   })
+
+  const {
+    data: summaryResponse,
+    isLoading: summaryLoading,
+    isError: summaryError,
+  } = useStudentPaymentsSummary(summaryParams)
 
   const deletePayment = useDeleteStudentPayment()
   const markAsPaidPayment = useMarkAsPaidPayment()
@@ -209,24 +227,7 @@ export function StudentPaymentsList() {
   const payments = Array.isArray(data?.data) ? data.data : []
   const pagination = data?.meta?.pagination
 
-  // Calculate monthly stats
-  const monthlyStats = useMemo(() => {
-    const totalStudents = payments.length
-    const paidCount = payments.filter((p) => p.status === 'paid').length
-    const pendingCount = payments.filter((p) => p.status === 'pending').length
-    const paidAmount = payments
-      .filter((p) => p.status === 'paid')
-      .reduce((sum, p) => sum + (p.amount_paid || 0), 0)
-    const collectionRate = totalStudents > 0 ? Math.round((paidCount / totalStudents) * 100) : 0
-
-    return {
-      totalStudents,
-      paidCount,
-      pendingCount,
-      paidAmount,
-      collectionRate,
-    }
-  }, [payments])
+  const summary = summaryResponse?.data
 
   if (error) {
     return (
@@ -270,69 +271,64 @@ export function StudentPaymentsList() {
           </div>
         </div>
 
-        {/* Monthly Summary Cards - Sticky (Compact) */}
-        {!isLoading && payments.length > 0 && (
+        {/* Monthly summary cards: full filtered totals (API), not current page */}
+        {!summaryLoading && !summaryError && summary != null && summary.total > 0 && (
           <div className="sticky top-[136px] z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 pb-2 -mx-4 lg:-mx-6 xl:-mx-8 px-4 lg:px-6 xl:px-8 pt-2">
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-              {/* Total Students */}
               <Card className="p-3">
                 <CardHeader className="p-0 pb-2">
                   <CardTitle className="text-xs font-medium text-muted-foreground">
-                    Total Students
+                    {t('studentPayment.summary.totalPayments')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <p className="text-xl font-bold">{monthlyStats.totalStudents}</p>
+                  <p className="text-xl font-bold">{summary.total}</p>
                 </CardContent>
               </Card>
 
-              {/* Total Paid */}
               <Card className="p-3">
                 <CardHeader className="p-0 pb-2">
                   <CardTitle className="text-xs font-medium text-muted-foreground">
-                    Total Paid
+                    {t('studentPayment.summary.totalPaid')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <p className="text-xl font-bold text-green-600">{monthlyStats.paidCount}</p>
+                  <p className="text-xl font-bold text-green-600">{summary.paid_count}</p>
                 </CardContent>
               </Card>
 
-              {/* Total Pending */}
               <Card className="p-3">
                 <CardHeader className="p-0 pb-2">
                   <CardTitle className="text-xs font-medium text-muted-foreground">
-                    Total Pending
+                    {t('studentPayment.summary.totalPending')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <p className="text-xl font-bold text-orange-600">{monthlyStats.pendingCount}</p>
+                  <p className="text-xl font-bold text-orange-600">{summary.pending_count}</p>
                 </CardContent>
               </Card>
 
-              {/* Collection Rate */}
               <Card className="p-3">
                 <CardHeader className="p-0 pb-2">
                   <CardTitle className="text-xs font-medium text-muted-foreground">
-                    Collection Rate
+                    {t('studentPayment.summary.freeStudents')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <p className="text-xl font-bold">{monthlyStats.collectionRate}%</p>
+                  <p className="text-xl font-bold text-muted-foreground">{summary.free_count}</p>
                 </CardContent>
               </Card>
 
-              {/* Collected */}
               <Card className="p-3">
                 <CardHeader className="p-0 pb-2">
                   <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1">
                     <DollarSign className="h-3 w-3" />
-                    Collected
+                    {t('studentPayment.summary.collected')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
                   <p className="text-lg font-bold">
-                    {formatCurrency(monthlyStats.paidAmount)}
+                    {formatCurrency(summary.paid_amount)}
                   </p>
                 </CardContent>
               </Card>

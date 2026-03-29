@@ -97,6 +97,22 @@ export interface StudentPaymentsResponse {
   }
 }
 
+/** Same filters as list; aggregates over full result set (not one page). */
+export interface StudentPaymentSummary {
+  total: number
+  paid_count: number
+  pending_count: number
+  free_count: number
+  paid_amount: number
+  collection_rate: number
+}
+
+export interface StudentPaymentSummaryResponse {
+  success: boolean
+  message?: string
+  data: StudentPaymentSummary
+}
+
 export interface StudentPaymentResponse {
   success: boolean
   message?: string

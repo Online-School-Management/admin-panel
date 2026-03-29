@@ -1,6 +1,7 @@
 import apiClient from '@/services/api-client'
 import type {
   StudentPaymentsResponse,
+  StudentPaymentSummaryResponse,
   StudentPaymentResponse,
   UpdateStudentPaymentInput,
   MarkPaidBulkInput,
@@ -28,6 +29,21 @@ export async function getStudentPayments(params?: {
   year?: number
 }): Promise<StudentPaymentsResponse> {
   const response = await apiClient.get<StudentPaymentsResponse>('/student-payments', { params })
+  return response.data
+}
+
+export async function getStudentPaymentsSummary(params?: {
+  enrollment_id?: number
+  student_id?: number
+  course_id?: number
+  status?: string
+  search?: string
+  month?: number
+  year?: number
+}): Promise<StudentPaymentSummaryResponse> {
+  const response = await apiClient.get<StudentPaymentSummaryResponse>('/student-payments/summary', {
+    params,
+  })
   return response.data
 }
 

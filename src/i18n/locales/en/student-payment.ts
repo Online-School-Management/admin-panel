@@ -51,6 +51,15 @@ export const studentPayment = {
     actions: 'Actions',
   },
 
+  // List summary cards (full filtered dataset via API)
+  summary: {
+    totalPayments: 'Total payments',
+    totalPaid: 'Total paid',
+    totalPending: 'Total pending',
+    freeStudents: 'Free student count',
+    collected: 'Collected',
+  },
+
   // Filters
   filters: {
     allStatus: 'All Status',

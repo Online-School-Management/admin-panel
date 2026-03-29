@@ -51,6 +51,14 @@ export const studentPayment = {
     actions: 'လုပ်ဆောင်ချက်များ',
   },
 
+  summary: {
+    totalPayments: 'စုစုပေါင်း ငွေပေးချေမှု',
+    totalPaid: 'ပေးချေပြီး',
+    totalPending: 'စောင့်ဆိုင်း',
+    freeStudents: 'အခမဲ့ (လများ)',
+    collected: 'စုစုပေါင်း ရရှိငွေ',
+  },
+
   // Filters
   filters: {
     allStatus: 'အခြေအနေအားလုံး',

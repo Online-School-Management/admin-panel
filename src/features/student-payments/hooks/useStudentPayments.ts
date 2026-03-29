@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import {
   getStudentPayments,
+  getStudentPaymentsSummary,
   getStudentPaymentById,
   getStudentPaymentsByEnrollment,
   updateStudentPayment,
@@ -27,6 +28,9 @@ export const studentPaymentKeys = {
   lists: () => [...studentPaymentKeys.all, 'list'] as const,
   list: (params?: Record<string, unknown>) =>
     [...studentPaymentKeys.lists(), params] as const,
+  summaries: () => [...studentPaymentKeys.all, 'summary'] as const,
+  summary: (params?: Record<string, unknown>) =>
+    [...studentPaymentKeys.summaries(), params] as const,
   details: () => [...studentPaymentKeys.all, 'detail'] as const,
   detail: (id: number) => [...studentPaymentKeys.details(), id] as const,
   byEnrollment: (enrollmentId: number) => [...studentPaymentKeys.all, 'enrollment', enrollmentId] as const,
@@ -52,6 +56,27 @@ export function useStudentPayments(params?: {
     queryKey: studentPaymentKeys.list(params),
     queryFn: () => getStudentPayments(params),
     staleTime: 1000 * 60 * 2, // 2 minutes
+  })
+}
+
+/**
+ * Summary stats for the same filters as the list (full filtered set, not one page).
+ */
+export function useStudentPaymentsSummary(params?: {
+  enrollment_id?: number
+  student_id?: number
+  course_id?: number
+  status?: string
+  search?: string
+  month?: number
+  year?: number
+}) {
+  return useQuery({
+    queryKey: studentPaymentKeys.summary(params),
+    queryFn: () => getStudentPaymentsSummary(params),
+    staleTime: 0,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: false,
   })
 }
 
@@ -92,13 +117,12 @@ export function useUpdateStudentPayment() {
     mutationFn: ({ id, data }: { id: number; data: UpdateStudentPaymentInput }) =>
       updateStudentPayment(id, data),
     onSuccess: (response, variables) => {
-      // Invalidate and refetch list queries
       queryClient.invalidateQueries({ queryKey: studentPaymentKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: studentPaymentKeys.summaries() })
       queryClient.refetchQueries({ queryKey: studentPaymentKeys.lists() })
-      // Invalidate and refetch detail query
+      queryClient.refetchQueries({ queryKey: studentPaymentKeys.summaries() })
       queryClient.invalidateQueries({ queryKey: studentPaymentKeys.detail(variables.id) })
       queryClient.refetchQueries({ queryKey: studentPaymentKeys.detail(variables.id) })
-      // Invalidate enrollment payments if enrollment_id is available
       if (response.data.enrollment_id) {
         queryClient.invalidateQueries({ queryKey: studentPaymentKeys.byEnrollment(response.data.enrollment_id) })
         queryClient.refetchQueries({ queryKey: studentPaymentKeys.byEnrollment(response.data.enrollment_id) })
@@ -121,9 +145,10 @@ export function useDeleteStudentPayment() {
   return useMutation({
     mutationFn: (id: number) => deleteStudentPayment(id),
     onSuccess: () => {
-      // Invalidate and refetch list queries to ensure the deleted payment is removed
       queryClient.invalidateQueries({ queryKey: studentPaymentKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: studentPaymentKeys.summaries() })
       queryClient.refetchQueries({ queryKey: studentPaymentKeys.lists() })
+      queryClient.refetchQueries({ queryKey: studentPaymentKeys.summaries() })
       showDeleteSuccessToast('student payment')
     },
     onError: (error: unknown) => {
@@ -143,13 +168,12 @@ export function useMarkAsPaidPayment() {
     mutationFn: ({ id, data }: { id: number; data: UpdateStudentPaymentInput }) =>
       updateStudentPayment(id, data),
     onSuccess: (response, variables) => {
-      // Invalidate and refetch list queries
       queryClient.invalidateQueries({ queryKey: studentPaymentKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: studentPaymentKeys.summaries() })
       queryClient.refetchQueries({ queryKey: studentPaymentKeys.lists() })
-      // Invalidate and refetch detail query
+      queryClient.refetchQueries({ queryKey: studentPaymentKeys.summaries() })
       queryClient.invalidateQueries({ queryKey: studentPaymentKeys.detail(variables.id) })
       queryClient.refetchQueries({ queryKey: studentPaymentKeys.detail(variables.id) })
-      // Invalidate enrollment payments if enrollment_id is available
       if (response.data.enrollment_id) {
         queryClient.invalidateQueries({ queryKey: studentPaymentKeys.byEnrollment(response.data.enrollment_id) })
         queryClient.refetchQueries({ queryKey: studentPaymentKeys.byEnrollment(response.data.enrollment_id) })
@@ -173,6 +197,7 @@ export function useMarkPaidBulk() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: studentPaymentKeys.all })
       queryClient.refetchQueries({ queryKey: studentPaymentKeys.lists() })
+      queryClient.refetchQueries({ queryKey: studentPaymentKeys.summaries() })
       showUpdateSuccessToast('student payments', 'Payments have been marked as paid')
     },
     onError: (error: unknown) => {

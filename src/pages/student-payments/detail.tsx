@@ -89,6 +89,7 @@ function StudentPaymentDetailPage() {
         onConfirm={handleMarkAsPaidConfirm}
         studentName={payment?.enrollment?.student?.name}
         isLoading={markAsPaidPayment.isPending}
+        payment={payment ?? null}
       />
 
       {/* Edit Payment Modal */}

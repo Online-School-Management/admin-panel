@@ -122,7 +122,7 @@ export interface MarkPayoutsPaidBulkResponse {
   data: MarkPayoutsPaidBulkResult
 }
 
-/** Monthly closing summary (totals by type, from_students, balance) */
+/** Monthly closing summary (totals by type, from_students, balance, prepayment, total balance) */
 export interface MonthlyClosingSummary {
   summary: {
     teacher: number
@@ -136,6 +136,14 @@ export interface MonthlyClosingSummary {
   from_students: number
   total_to_pay: number
   balance: number
+  prepayment_carry_forward: number
+  total_balance: number
+  /** Paid teacher_payouts total for this period (matches month-close logic). */
+  total_to_teachers: number
+  pending_teacher_payouts_count: number
+  /** True when this period is a full calendar month and a snapshot exists with closed_at. */
+  month_already_closed: boolean
+  closed_at: string | null
 }
 
 export interface CreatePayoutInput {

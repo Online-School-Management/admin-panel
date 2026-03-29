@@ -12,6 +12,10 @@ export const monthlyClosing = {
   },
   summary: {
     title: 'Summary',
+    monthCloseHint:
+      'When teacher payouts for this month are paid, use Month close below to save the official snapshot.',
+    monthCloseCustomRange:
+      'Closing the month applies to one calendar month. Select a month tab above.',
     teachers: 'Teachers',
     allTeachers: 'All Teachers',
     admin: 'Admin',
@@ -23,6 +27,10 @@ export const monthlyClosing = {
     fromStudents: 'From students',
     totalToPay: 'Total to pay',
     balance: 'Balance',
+    prepaymentHeld: 'Holding Pre-payment',
+    prepaymentHeldHint: 'Paid for fee months after this period',
+    totalWithPrepayment: 'Total',
+    totalWithPrepaymentHint: 'Balance plus prepayment held',
   },
   type: {
     teacher: 'Teacher',
@@ -49,6 +57,9 @@ export const monthlyClosing = {
     calculating: 'Calculating...',
     view: 'View',
     markPaid: 'Mark paid',
+    monthClose: 'Month close',
+    calculateDisabledMonthClosed:
+      'This month is already closed. Re-calculate and add payout are not allowed.',
     cancel: 'Cancel',
     submit: 'Create payout',
     processing: 'Processing...',

@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { CalendarRange, Plus, Calculator, Gift } from 'lucide-react'
+import { Archive, CalendarRange, Plus, Calculator, Gift, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -14,6 +14,16 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import {
   usePayouts,
   useMonthlyClosingSummary,
   useMarkPayoutAsPaid,
@@ -23,6 +33,7 @@ import { AddPayoutModal } from '@/features/payouts/components/AddPayoutModal'
 import { MarkPayoutAsPaidDialog } from '@/features/teacher-payouts/components/MarkPayoutAsPaidDialog'
 import { EditPayoutBonusModal } from '@/features/teacher-payouts/components/EditPayoutBonusModal'
 import { useQueryClient } from '@tanstack/react-query'
+import { useCloseMonth } from '@/features/monthly-close/hooks/useMonthlyClose'
 import { TableSkeleton } from '@/components/common/skeletons/TableSkeleton'
 import format from 'date-fns/format'
 import startOfMonth from 'date-fns/startOfMonth'
@@ -49,6 +60,7 @@ export default function MonthlyClosingListPage() {
   const [selectedPayout, setSelectedPayout] = useState<PayoutItem | null>(null)
   const [bonusModalOpen, setBonusModalOpen] = useState(false)
   const [selectedPayoutForBonus, setSelectedPayoutForBonus] = useState<PayoutItem | null>(null)
+  const [monthCloseDialogOpen, setMonthCloseDialogOpen] = useState(false)
 
   const now = new Date()
   const [periodMode, setPeriodMode] = useState<'month' | 'custom'>('month')
@@ -58,12 +70,14 @@ export default function MonthlyClosingListPage() {
   const [customStart, setCustomStart] = useState<string>('')
   const [customEnd, setCustomEnd] = useState<string>('')
 
-  const { periodStart, periodEnd, payoutMonth } = useMemo(() => {
+  const { periodStart, periodEnd, payoutMonth, calendarYear, calendarMonth } = useMemo(() => {
     if (periodMode === 'custom' && customStart && customEnd) {
       return {
         periodStart: customStart,
         periodEnd: customEnd,
         payoutMonth: null as string | null,
+        calendarYear: null as number | null,
+        calendarMonth: null as number | null,
       }
     }
     const [year, month] = selectedMonth.split('-').map(Number)
@@ -72,6 +86,8 @@ export default function MonthlyClosingListPage() {
       periodStart: format(startOfMonth(date), 'yyyy-MM-dd'),
       periodEnd: format(endOfMonth(date), 'yyyy-MM-dd'),
       payoutMonth: selectedMonth,
+      calendarYear: year,
+      calendarMonth: month,
     }
   }, [periodMode, selectedMonth, customStart, customEnd])
 
@@ -106,26 +122,33 @@ export default function MonthlyClosingListPage() {
   }, [])
 
   const queryClient = useQueryClient()
-  const { data: summaryResponse } = useMonthlyClosingSummary(periodStart, periodEnd)
+  const monthClosePreviewEnabled =
+    periodMode === 'month' && calendarYear != null && calendarMonth != null
+  const closeMonthMutation = useCloseMonth()
+
+  const {
+    data: summaryResponse,
+    isLoading: summaryLoading,
+    isError: summaryIsError,
+    error: summaryFetchError,
+  } = useMonthlyClosingSummary(periodStart, periodEnd)
   const summaryData = summaryResponse?.data
   const { data: payoutsResponse, isLoading, error } = usePayouts({
     period_start: periodStart,
     period_end: periodEnd,
     per_page: 0,
   })
-  const { data: teacherPayoutsResponse } = usePayouts({
-    page: 1,
-    per_page: 1,
-    recipient_type: 'teacher',
-    period_start: periodStart,
-    period_end: periodEnd,
-  })
 
   const markAsPaid = useMarkPayoutAsPaid()
   const calculatePayouts = useCalculatePayouts()
   const payouts = Array.isArray(payoutsResponse?.data) ? payoutsResponse.data : []
-  const hasTeacherPayoutsForPeriod =
-    (teacherPayoutsResponse?.meta?.pagination?.total ?? 0) > 0
+  const hasTeacherPayoutsForPeriod = payouts.some((p) => p.recipient_type === 'teacher')
+
+  const monthAlreadyClosed = summaryData?.month_already_closed === true
+  const canCloseMonth =
+    summaryData &&
+    !summaryData.month_already_closed &&
+    summaryData.pending_teacher_payouts_count === 0
 
   const handleMonthChange = (value: string) => {
     setSelectedMonth(value)
@@ -183,6 +206,16 @@ export default function MonthlyClosingListPage() {
     TYPE_KEYS[type] ? t(TYPE_KEYS[type]) : type
 
   const periodValid = periodMode !== 'custom' || (customStart && customEnd)
+
+  const monthClosedLocksActions = monthClosePreviewEnabled && monthAlreadyClosed
+  const monthClosedActionTitle = monthClosedLocksActions
+    ? t('monthlyClosing.actions.calculateDisabledMonthClosed')
+    : undefined
+
+  const calculateDisabled =
+    !periodValid || calculatePayouts.isPending || monthClosedLocksActions
+
+  const addPayoutDisabled = !periodValid || monthClosedLocksActions
 
   if (error) {
     return (
@@ -262,7 +295,8 @@ export default function MonthlyClosingListPage() {
             <div className="flex flex-wrap items-center gap-3">
               <Button
                 onClick={handleCalculate}
-                disabled={!periodValid || calculatePayouts.isPending}
+                disabled={calculateDisabled}
+                title={monthClosedActionTitle}
               >
                 <Calculator className="h-4 w-4 mr-2" />
                 {calculatePayouts.isPending
@@ -273,7 +307,8 @@ export default function MonthlyClosingListPage() {
               </Button>
               <Button
                 onClick={() => setAddPayoutOpen(true)}
-                disabled={!periodValid}
+                disabled={addPayoutDisabled}
+                title={monthClosedActionTitle}
                 variant="outline"
               >
                 <Plus className="h-4 w-4 mr-2" />
@@ -451,7 +486,11 @@ export default function MonthlyClosingListPage() {
                   <h3 className="text-sm font-medium text-muted-foreground mb-3">
                     {t('monthlyClosing.summary.title')}
                   </h3>
-                  {summaryData ? (
+                  {summaryIsError ? (
+                    <p className="text-sm text-destructive">
+                      {(summaryFetchError as Error)?.message ?? t('common.messages.somethingWentWrong')}
+                    </p>
+                  ) : summaryData ? (
                     <div className="space-y-0 text-sm">
                       <div className="flex justify-between items-baseline gap-2 py-2">
                         <span className="font-medium">{t('monthlyClosing.summary.fromStudents')}</span>
@@ -498,9 +537,75 @@ export default function MonthlyClosingListPage() {
                           {formatCurrency(summaryData.balance)}
                         </span>
                       </div>
+                      <div className="flex justify-between items-start gap-2 py-2">
+                        <div className="min-w-0 pr-2">
+                          <span className="font-medium">{t('monthlyClosing.summary.prepaymentHeld')}</span>
+                          <p className="text-xs text-muted-foreground mt-0.5 leading-snug">
+                            {t('monthlyClosing.summary.prepaymentHeldHint')}
+                          </p>
+                        </div>
+                        <span className="shrink-0 tabular-nums">
+                          {formatCurrency(summaryData.prepayment_carry_forward)}
+                        </span>
+                      </div>
+                      <div className="border-t border-border my-2" role="presentation" />
+                      <div
+                        className="flex justify-between items-baseline gap-2 pt-1 pb-1"
+                        title={t('monthlyClosing.summary.totalWithPrepaymentHint')}
+                      >
+                        <span className="font-semibold">{t('monthlyClosing.summary.totalWithPrepayment')}</span>
+                        <span
+                          className={cn(
+                            'font-semibold tabular-nums',
+                            summaryData.total_balance >= 0 ? 'text-green-600' : 'text-red-600'
+                          )}
+                        >
+                          {formatCurrency(summaryData.total_balance)}
+                        </span>
+                      </div>
+                      <div className="border-t border-border mt-3 pt-3 space-y-2">
+                        {calendarYear != null && calendarMonth != null ? (
+                          <>
+                            {summaryData.month_already_closed && (
+                              <p className="text-xs text-destructive font-medium leading-relaxed">
+                                {t('monthlyClose.alreadyClosed')}
+                                {summaryData.closed_at && (
+                                  <>
+                                    {' '}
+                                    {format(new Date(summaryData.closed_at), 'yyyy-MM-dd HH:mm')}
+                                  </>
+                                )}
+                              </p>
+                            )}
+                            {!summaryData.month_already_closed && (
+                              <>
+                                <p className="text-xs text-muted-foreground leading-relaxed">
+                                  {t('monthlyClosing.summary.monthCloseHint')}
+                                </p>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  className="w-full"
+                                  onClick={() => setMonthCloseDialogOpen(true)}
+                                >
+                                  <Archive className="h-4 w-4 mr-2" />
+                                  {t('monthlyClosing.actions.monthClose')}
+                                </Button>
+                              </>
+                            )}
+                          </>
+                        ) : (
+                          <p className="text-xs text-muted-foreground leading-relaxed">
+                            {t('monthlyClosing.summary.monthCloseCustomRange')}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  ) : (
+                  ) : summaryLoading ? (
                     <div className="text-sm text-muted-foreground py-4">Loading summary…</div>
+                  ) : (
+                    <div className="text-sm text-muted-foreground py-4">—</div>
                   )}
                 </CardContent>
               </Card>
@@ -534,6 +639,91 @@ export default function MonthlyClosingListPage() {
         }}
         payout={selectedPayoutForBonus}
       />
+
+      <AlertDialog open={monthCloseDialogOpen} onOpenChange={setMonthCloseDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('monthlyClose.confirmCloseTitle')}</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3 text-left text-sm text-muted-foreground">
+                <p>{t('monthlyClose.confirmCloseDescription')}</p>
+                {summaryData ? (
+                  <div className="space-y-2 rounded-md border p-3 text-foreground">
+                    <p className="text-xs text-muted-foreground">
+                      {t('monthlyClose.period')}: {periodStart} — {periodEnd}
+                    </p>
+                    <div className="grid gap-2 text-xs sm:grid-cols-3">
+                      <div>
+                        <p className="text-muted-foreground">{t('monthlyClose.totalFromStudents')}</p>
+                        <p className="font-semibold text-sm">
+                          {formatCurrency(summaryData.from_students)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">{t('monthlyClose.totalToTeachers')}</p>
+                        <p className="font-semibold text-sm">
+                          {formatCurrency(summaryData.total_to_teachers)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">{t('monthlyClose.prepaymentCarry')}</p>
+                        <p className="font-semibold text-sm">
+                          {formatCurrency(summaryData.prepayment_carry_forward)}
+                        </p>
+                      </div>
+                    </div>
+                    {summaryData.pending_teacher_payouts_count > 0 && (
+                      <p className="text-amber-700 dark:text-amber-500 text-xs">
+                        {t('monthlyClose.pendingPayouts')}:{' '}
+                        {summaryData.pending_teacher_payouts_count}.{' '}
+                        {t('monthlyClose.pendingPayoutsWarning')}
+                      </p>
+                    )}
+                    {summaryData.month_already_closed && (
+                      <p className="text-xs text-destructive font-medium">
+                        {t('monthlyClose.alreadyClosed')}
+                      </p>
+                    )}
+                  </div>
+                ) : null}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={closeMonthMutation.isPending}>
+              {t('monthlyClosing.actions.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={
+                closeMonthMutation.isPending ||
+                !canCloseMonth ||
+                calendarYear == null ||
+                calendarMonth == null
+              }
+              onClick={(e) => {
+                e.preventDefault()
+                if (calendarYear == null || calendarMonth == null) return
+                closeMonthMutation.mutate(
+                  { year: calendarYear, month: calendarMonth },
+                  {
+                    onSuccess: () => {
+                      setMonthCloseDialogOpen(false)
+                      queryClient.invalidateQueries({
+                        queryKey: ['payouts', 'monthly-closing-summary'],
+                      })
+                    },
+                  }
+                )
+              }}
+            >
+              {closeMonthMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2 inline" />
+              ) : null}
+              {t('monthlyClose.closeMonth')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

@@ -533,7 +533,7 @@ export function StudentPaymentsList() {
                             </TableCell>
                             <TableCell className="text-sm text-muted-foreground">
                               {payment.due_date
-                                ? format(new Date(payment.due_date), 'MMM dd, yyyy')
+                                ? format(new Date(payment.due_date), 'MMM yyyy')
                                 : '-'}
                             </TableCell>
                             <TableCell className="text-sm text-muted-foreground">
@@ -629,6 +629,7 @@ export function StudentPaymentsList() {
         onConfirm={handleMarkAsPaidConfirm}
         studentName={selectedPaymentForMarkPaid?.enrollment?.student?.name}
         isLoading={markAsPaidPayment.isPending}
+        payment={selectedPaymentForMarkPaid}
       />
 
       {/* Edit Payment Modal */}

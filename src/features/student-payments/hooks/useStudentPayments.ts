@@ -6,6 +6,7 @@ import {
   getStudentPaymentsByEnrollment,
   updateStudentPayment,
   deleteStudentPayment,
+  markStudentPaymentsBulk,
 } from '../services/student-payment.service'
 import {
   showUpdateSuccessToast,
@@ -15,6 +16,7 @@ import {
 } from '@/utils/toast'
 import type {
   UpdateStudentPaymentInput,
+  MarkPaidBulkInput,
 } from '../types/student-payment.types'
 
 /**
@@ -156,6 +158,25 @@ export function useMarkAsPaidPayment() {
     },
     onError: (error: unknown) => {
       showUpdateErrorToast('student payment', error)
+    },
+  })
+}
+
+/**
+ * Hook to mark multiple payments as paid (pre-payment / bulk)
+ */
+export function useMarkPaidBulk() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: MarkPaidBulkInput) => markStudentPaymentsBulk(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: studentPaymentKeys.all })
+      queryClient.refetchQueries({ queryKey: studentPaymentKeys.lists() })
+      showUpdateSuccessToast('student payments', 'Payments have been marked as paid')
+    },
+    onError: (error: unknown) => {
+      showUpdateErrorToast('student payments', error)
     },
   })
 }

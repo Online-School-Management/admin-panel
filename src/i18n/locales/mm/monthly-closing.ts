@@ -12,6 +12,10 @@ export const monthlyClosing = {
   },
   summary: {
     title: 'အကျဉ်းချုပ်',
+    monthCloseHint:
+      'ဤလအတွက် ဆရာပေးချေမှုများ ပေးပြီးပါက အောက်ပါ လ ပိတ်သိမ်းခြင်းဖြင့် တရားဝင် snapshot သိမ်းပါ။',
+    monthCloseCustomRange:
+      'လ ပိတ်သိမ်းခြင်း တစ်ပြက္ခဒိန်လတည်းသာ လုပ်ဆောင်နိုင်သည်။ အပေါ်မှ လ တချက်ရွေးပါ။',
     teachers: 'ဆရာများ',
     allTeachers: 'ဆရာများအားလုံး',
     admin: 'Admin',
@@ -23,6 +27,10 @@ export const monthlyClosing = {
     fromStudents: 'ကျောင်းသားထံမှ',
     totalToPay: 'စုစုပေါင်း ပေးရမည်',
     balance: 'လက်ကျန်',
+    prepaymentHeld: 'အကြိုပေးချေမှု',
+    prepaymentHeldHint: 'ဤကာလပြီးနောက် ကျသင့်လများအတွက် ပေးပြီးသော ငွေ',
+    totalWithPrepayment: 'စုစုပေါင်း',
+    totalWithPrepaymentHint: 'လက်ကျန် နှင့် အကြိုပေးချေမှု ပေါင်းထားသည်',
   },
   type: {
     teacher: 'ဆရာ',
@@ -49,6 +57,9 @@ export const monthlyClosing = {
     calculating: 'တွက်ချက်နေသည်...',
     view: 'ကြည့်ရန်',
     markPaid: 'ပေးပြီး မှတ်ပါ',
+    monthClose: 'လစဉ်ပိတ်သိမ်းမှု',
+    calculateDisabledMonthClosed:
+      'ဤလကို ပိတ်ပြီးပါပြီ။ ပြန်တွက်ချက်ခြင်း နှင့် ပေးချေမှု ထည့်ခြင်း မလုပ်ဆောင်နိုင်ပါ။',
     cancel: 'ပယ်မည်',
     submit: 'ပေးချေမှု ဖန်တီးပါ',
     processing: 'လုပ်ဆောင်နေသည်...',

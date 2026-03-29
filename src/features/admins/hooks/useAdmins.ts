@@ -42,19 +42,23 @@ export const adminKeys = {
 /**
  * Hook to fetch all admins with filters and pagination
  */
-export function useAdmins(params?: {
-  page?: number
-  per_page?: number
-  status?: string
-  department?: string
-  search?: string
-  sort_by?: string
-  sort_order?: string
-}) {
+export function useAdmins(
+  params?: {
+    page?: number
+    per_page?: number
+    status?: string
+    department?: string
+    search?: string
+    sort_by?: string
+    sort_order?: string
+  },
+  options?: { enabled?: boolean }
+) {
   return useQuery({
     queryKey: adminKeys.list(params),
     queryFn: () => getAdmins(params),
     staleTime: 1000 * 60 * 2, // 2 minutes
+    enabled: options?.enabled ?? true,
   })
 }
 

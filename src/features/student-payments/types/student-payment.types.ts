@@ -103,4 +103,18 @@ export interface StudentPaymentResponse {
   data: StudentPayment
 }
 
+export interface MarkPaidBulkInput {
+  payment_ids: number[]
+  payment_date?: string
+  payment_method?: 'kbz_pay' | 'aya_pay' | 'kbz_mobile_banking' | 'wave_money'
+  received_by?: number
+  notes?: string
+}
+
+export interface MarkPaidBulkResponse {
+  success: boolean
+  message?: string
+  data: { updated_count: number }
+}
+
 

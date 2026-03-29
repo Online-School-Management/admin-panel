@@ -56,7 +56,7 @@ export function AddPayoutModal({
   const [status, setStatus] = useState<CreatePayoutInput['status']>('paid')
   const [notes, setNotes] = useState('')
 
-  const { data: adminsData } = useAdmins({ page: 1, per_page: 200 })
+  const { data: adminsData } = useAdmins({ page: 1, per_page: 200 }, { enabled: open })
   const createPayout = useCreatePayout()
 
   const admins = Array.isArray(adminsData?.data) ? adminsData.data : []

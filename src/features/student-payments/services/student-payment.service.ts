@@ -3,6 +3,8 @@ import type {
   StudentPaymentsResponse,
   StudentPaymentResponse,
   UpdateStudentPaymentInput,
+  MarkPaidBulkInput,
+  MarkPaidBulkResponse,
 } from '../types/student-payment.types'
 
 /**
@@ -61,6 +63,14 @@ export async function updateStudentPayment(
  */
 export async function deleteStudentPayment(id: number): Promise<void> {
   await apiClient.delete(`/student-payments/${id}`)
+}
+
+/**
+ * Mark multiple student payments as paid (pre-payment / bulk)
+ */
+export async function markStudentPaymentsBulk(data: MarkPaidBulkInput): Promise<MarkPaidBulkResponse> {
+  const response = await apiClient.put<MarkPaidBulkResponse>('/student-payments/mark-paid-bulk', data)
+  return response.data
 }
 
 

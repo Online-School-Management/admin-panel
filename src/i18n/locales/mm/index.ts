@@ -22,6 +22,7 @@ import { classSession } from './class-session'
 import { studentPayment } from './student-payment'
 import { teacherPayout } from './teacher-payout'
 import { monthlyClosing } from './monthly-closing'
+import { monthlyClose } from './monthly-close'
 import { article } from './article'
 
 export const mm = {
@@ -44,6 +45,7 @@ export const mm = {
   studentPayment,
   teacherPayout,
   monthlyClosing,
+  monthlyClose,
   article,
 }
 

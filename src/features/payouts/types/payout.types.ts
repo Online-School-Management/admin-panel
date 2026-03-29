@@ -103,6 +103,8 @@ export interface PayoutsResponse {
       to: number | null
     }
     period_totals?: {
+      /** Paid student fees for the calendar month of period_start (same as teacher-payouts period totals). */
+      total_from_students?: number
       total_to_pay: number
       total_pending: number
       total_paid: number

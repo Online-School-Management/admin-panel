@@ -28,7 +28,7 @@ export const monthlyClosing = {
     totalToPay: 'Total to pay',
     balance: 'Balance',
     prepaymentHeld: 'Holding Pre-payment',
-    prepaymentHeldHint: 'Paid for fee months after this period',
+    prepaymentHeldHint: 'Pre-payment carry forward (For next months)',
     totalWithPrepayment: 'Total',
     totalWithPrepaymentHint: 'Balance plus prepayment held',
   },

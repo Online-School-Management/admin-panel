@@ -27,8 +27,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useStudentPayments, useDeleteStudentPayment, useMarkAsPaidPayment } from '../hooks/useStudentPayments'
-import { useCourses } from '@/features/courses/hooks/useCourses'
-import { COURSE_STATUS } from '@/constants'
+import { useCoursesForAdminFilters } from '@/features/courses/hooks/useCourses'
 import { DeleteStudentPaymentDialog } from './DeleteStudentPaymentDialog'
 import { MarkAsPaidDialog } from './MarkAsPaidDialog'
 import { EditStudentPaymentModal } from './EditStudentPaymentModal'
@@ -65,17 +64,8 @@ export function StudentPaymentsList() {
   const [selectedMonth, setSelectedMonth] = useState<number>(now.getMonth() + 1)
   const [selectedYear, setSelectedYear] = useState<number>(now.getFullYear())
 
-  // Fetch courses for filter (only upcoming and in_progress)
-  const { data: coursesData } = useCourses({
-    per_page: 100,
-  })
-
-  // Filter courses to only show upcoming and in_progress
-  const availableCourses = useMemo(() => {
-    return coursesData?.data?.filter(
-      (course) => course.status === COURSE_STATUS.UPCOMING || course.status === COURSE_STATUS.IN_PROGRESS
-    ) || []
-  }, [coursesData])
+  const { data: filterCoursesResponse } = useCoursesForAdminFilters()
+  const filterCourses = filterCoursesResponse?.data ?? []
 
   // Generate month options for tabs (last 6 months + current + next 6 months)
   const monthOptions = useMemo(() => {
@@ -393,9 +383,17 @@ export function StudentPaymentsList() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{t('studentPayment.filters.allCourses') || 'All Courses'}</SelectItem>
-              {availableCourses.map((course) => (
+              {filterCourses.map((course) => (
                 <SelectItem key={course.id} value={String(course.id)}>
-                  {course.title}
+                  {course.subject_name ? (
+                    <>
+                      <span className="font-semibold">{course.subject_name}</span>
+                      <span className="text-muted-foreground">: </span>
+                      {course.title}
+                    </>
+                  ) : (
+                    course.title
+                  )}
                 </SelectItem>
               ))}
             </SelectContent>

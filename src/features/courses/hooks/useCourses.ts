@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import {
   getCourses,
+  getCoursesForAdminFilters,
   getCourseBySlug,
   createCourse,
   updateCourse,
@@ -28,6 +29,7 @@ export const courseKeys = {
   lists: () => [...courseKeys.all, 'list'] as const,
   list: (params?: Record<string, unknown>) =>
     [...courseKeys.lists(), params] as const,
+  forAdminFilters: () => [...courseKeys.all, 'for-admin-filters'] as const,
   details: () => [...courseKeys.all, 'detail'] as const,
   detail: (slug: string) => [...courseKeys.details(), slug] as const,
 }
@@ -49,6 +51,14 @@ export function useCourses(params?: {
     queryKey: courseKeys.list(params),
     queryFn: () => getCourses(params),
     staleTime: 1000 * 60 * 2, // 2 minutes
+  })
+}
+
+export function useCoursesForAdminFilters() {
+  return useQuery({
+    queryKey: courseKeys.forAdminFilters(),
+    queryFn: () => getCoursesForAdminFilters(),
+    staleTime: 1000 * 60 * 2,
   })
 }
 
@@ -78,6 +88,7 @@ export function useCreateCourse() {
     onSuccess: (response) => {
       // Invalidate all course list queries to ensure fresh data
       queryClient.invalidateQueries({ queryKey: courseKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: courseKeys.forAdminFilters() })
       // Also refetch to ensure the list is updated immediately
       queryClient.refetchQueries({ queryKey: courseKeys.lists() })
       showCreateSuccessToast('course', `${response.data.title} has been added`)
@@ -102,6 +113,7 @@ export function useUpdateCourse() {
     onSuccess: (response, variables) => {
       // Invalidate and refetch list queries
       queryClient.invalidateQueries({ queryKey: courseKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: courseKeys.forAdminFilters() })
       queryClient.refetchQueries({ queryKey: courseKeys.lists() })
       // Invalidate and refetch detail query
       queryClient.invalidateQueries({ queryKey: courseKeys.detail(variables.slug) })
@@ -126,6 +138,7 @@ export function useDeleteCourse() {
     onSuccess: () => {
       // Invalidate and refetch list queries to ensure the deleted course is removed
       queryClient.invalidateQueries({ queryKey: courseKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: courseKeys.forAdminFilters() })
       queryClient.refetchQueries({ queryKey: courseKeys.lists() })
       showDeleteSuccessToast('course')
     },

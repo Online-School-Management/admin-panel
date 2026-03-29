@@ -2,6 +2,7 @@ import apiClient from '@/services/api-client'
 import type {
   CoursesResponse,
   CourseResponse,
+  CoursesForAdminFiltersResponse,
   CreateCourseInput,
   UpdateCourseInput,
 } from '../types/course.types'
@@ -24,6 +25,11 @@ export async function getCourses(params?: {
   teacher_id?: number
 }): Promise<CoursesResponse> {
   const response = await apiClient.get<CoursesResponse>('/courses', { params })
+  return response.data
+}
+
+export async function getCoursesForAdminFilters(): Promise<CoursesForAdminFiltersResponse> {
+  const response = await apiClient.get<CoursesForAdminFiltersResponse>('/courses/for-admin-filters')
   return response.data
 }
 

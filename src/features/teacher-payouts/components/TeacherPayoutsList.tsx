@@ -21,10 +21,7 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import {
-  useTeacherPayouts,
-  useCalculatePayouts,
-} from '../hooks/useTeacherPayouts'
+import { useCalculatePayouts } from '../hooks/useTeacherPayouts'
 import {
   usePayouts,
   useMarkPayoutAsPaid,
@@ -142,14 +139,6 @@ export function TeacherPayoutsList() {
     search: search || undefined,
   })
 
-  // Also fetch teacher-payouts period totals (from students)
-  const { data: teacherPayoutsData } = useTeacherPayouts({
-    page: 1,
-    per_page: 1,
-    period_start: periodStart,
-    period_end: periodEnd,
-  })
-
   // Mutations
   const calculatePayouts = useCalculatePayouts()
   const markAsPaid = useMarkPayoutAsPaid()
@@ -158,7 +147,6 @@ export function TeacherPayoutsList() {
   const payouts = Array.isArray(data?.data) ? data.data : []
   const pagination = data?.meta?.pagination
   const periodTotals = data?.meta?.period_totals
-  const teacherPeriodTotals = teacherPayoutsData?.meta?.period_totals
   const hasTeacherPayoutsForPeriod = (pagination?.total ?? 0) > 0
 
   // Handlers
@@ -345,39 +333,33 @@ export function TeacherPayoutsList() {
           </Button>
 
           {/* Period totals inline */}
-          {(teacherPeriodTotals || periodTotals) && (
+          {periodTotals && (
             <div className="flex items-center gap-2 flex-wrap">
-              {teacherPeriodTotals && (
-                <div className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm">
-                  <span className="text-muted-foreground">{t('teacherPayout.summary.fromStudents')}:</span>
-                  <span className="font-semibold text-green-600">{formatCurrency(teacherPeriodTotals.total_from_students)}</span>
-                </div>
-              )}
-              {teacherPeriodTotals && periodTotals && (
-                <span className="text-muted-foreground font-medium">−</span>
-              )}
-              {periodTotals && (
-                <div className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm">
-                  <span className="text-muted-foreground">{t('teacherPayout.summary.toTeachers')}:</span>
-                  <span className="font-semibold text-orange-600">{formatCurrency(periodTotals.total_to_pay)}</span>
-                </div>
-              )}
-              {teacherPeriodTotals && periodTotals && (
-                <>
-                  <span className="text-muted-foreground font-medium">=</span>
-                  <div className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm">
-                    <span className="text-muted-foreground">{t('teacherPayout.summary.netBalance')}:</span>
-                    <span className={cn(
-                      'font-semibold',
-                      teacherPeriodTotals.total_from_students - periodTotals.total_to_pay >= 0
-                        ? 'text-blue-600'
-                        : 'text-red-600'
-                    )}>
-                      {formatCurrency(teacherPeriodTotals.total_from_students - periodTotals.total_to_pay)}
-                    </span>
-                  </div>
-                </>
-              )}
+              <div className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm">
+                <span className="text-muted-foreground">{t('teacherPayout.summary.fromStudents')}:</span>
+                <span className="font-semibold text-green-600">
+                  {formatCurrency(periodTotals.total_from_students ?? 0)}
+                </span>
+              </div>
+              <span className="text-muted-foreground font-medium">−</span>
+              <div className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm">
+                <span className="text-muted-foreground">{t('teacherPayout.summary.toTeachers')}:</span>
+                <span className="font-semibold text-orange-600">{formatCurrency(periodTotals.total_to_pay)}</span>
+              </div>
+              <span className="text-muted-foreground font-medium">=</span>
+              <div className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm">
+                <span className="text-muted-foreground">{t('teacherPayout.summary.netBalance')}:</span>
+                <span
+                  className={cn(
+                    'font-semibold',
+                    (periodTotals.total_from_students ?? 0) - periodTotals.total_to_pay >= 0
+                      ? 'text-blue-600'
+                      : 'text-red-600'
+                  )}
+                >
+                  {formatCurrency((periodTotals.total_from_students ?? 0) - periodTotals.total_to_pay)}
+                </span>
+              </div>
             </div>
           )}
 

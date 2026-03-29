@@ -161,3 +161,17 @@ export interface CourseResponse {
   data: Course
 }
 
+/** Minimal course row for admin dropdowns (e.g. student payments filter). */
+export interface CourseAdminFilterItem {
+  id: number
+  title: string
+  slug: string
+  status: string
+  subject_name?: string | null
+}
+
+export interface CoursesForAdminFiltersResponse {
+  success: boolean
+  message?: string
+  data: CourseAdminFilterItem[]
+}

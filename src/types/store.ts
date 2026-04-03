@@ -10,7 +10,10 @@ export interface User {
   email: string
   name: string
   role?: string
+  /** Active role slugs from login /me (for super_admin detection before permissions load). */
+  role_slugs?: string[]
   avatar?: string
+  user_type?: string
   [key: string]: unknown // Allow additional user properties
 }
 

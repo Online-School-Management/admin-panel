@@ -6,29 +6,50 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { classNavigation, mainNavigation, adminNavigation, subjectNavigation } from '@/constants/navigation'
 import { useTranslation } from '@/i18n/context'
+import { useMe } from '@/features/auth/hooks/useMe'
+import { filterNavigationByPermissions } from '@/utils/filterNavByPermissions'
+import { useMemo } from 'react'
 
 export const Sidebar = memo(function Sidebar() {
   const sidebarOpen = useUIStore((state) => state.sidebarOpen)
   const setSidebarOpen = useUIStore((state) => state.setSidebarOpen)
   const { t } = useTranslation()
-  
+  const { data: me } = useMe()
+
+  const visibleClassNav = useMemo(
+    () => filterNavigationByPermissions(classNavigation, me),
+    [me]
+  )
+  const visibleMainNav = useMemo(
+    () => filterNavigationByPermissions(mainNavigation, me),
+    [me]
+  )
+  const visibleSubjectNav = useMemo(
+    () => filterNavigationByPermissions(subjectNavigation, me),
+    [me]
+  )
+  const visibleAdminNav = useMemo(
+    () => filterNavigationByPermissions(adminNavigation, me),
+    [me]
+  )
+
   // Map navigation items with translations
-  const translatedClassNav = classNavigation.map(item => ({
+  const translatedClassNav = visibleClassNav.map(item => ({
     ...item,
     label: t(`navigation.${item.to.replace('/', '')}`) || item.label
   }))
 
-  const translatedMainNav = mainNavigation.map(item => ({
+  const translatedMainNav = visibleMainNav.map(item => ({
     ...item,
     label: t(`navigation.${item.to.replace('/', '')}`) || item.label
   }))
   
-  const translatedAdminNav = adminNavigation.map(item => ({
+  const translatedAdminNav = visibleAdminNav.map(item => ({
     ...item,
     label: t(`navigation.${item.to.replace('/', '')}`) || item.label
   }))
 
-  const translatedSubjectNav = subjectNavigation.map(item => ({
+  const translatedSubjectNav = visibleSubjectNav.map(item => ({
     ...item,
     label: t(`navigation.${item.to.replace('/', '')}`) || item.label
   }))

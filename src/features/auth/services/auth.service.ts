@@ -38,6 +38,7 @@ export async function login(
         name: user.name,
         user_type: user.user_type,
         role: user.admin?.roles?.[0]?.name,
+        role_slugs: user.admin?.roles?.map((r) => r.slug) ?? [],
         avatar: user.profile_image,
       },
       token,

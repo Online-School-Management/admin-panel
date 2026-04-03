@@ -5,6 +5,7 @@ import { ProtectedRoute } from '@/components/ProtectedRoute'
 // Lazy load pages for code splitting
 // Auth pages
 const LoginPage = lazy(() => import('@/pages/auth/login'))
+const UnauthorizedPage = lazy(() => import('@/pages/unauthorized'))
 
 // Dashboard
 const DashboardPage = lazy(() => import('@/pages/dashboard'))
@@ -90,7 +91,15 @@ export const router = createBrowserRouter([
     path: '/login',
     element: <LoginPage />,
   },
-  
+  {
+    path: '/unauthorized',
+    element: (
+      <ProtectedRoute bypassRoutePermission>
+        <UnauthorizedPage />
+      </ProtectedRoute>
+    ),
+  },
+
   // Protected routes - each wrapped individually with ProtectedRoute
   {
     path: '/',

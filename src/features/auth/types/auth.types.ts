@@ -71,6 +71,7 @@ export interface LoginResponse {
     name: string
     user_type: 'admin' | 'teacher' | 'student'
     role?: string
+    role_slugs?: string[]
     avatar?: string
     [key: string]: unknown
   }

@@ -23,10 +23,11 @@ export interface CourseTeacher {
   id: number
   course: CourseTeacherCourse
   teacher: CourseTeacherTeacher
-  commission_type?: 'monthly_percent' | 'monthly_salary' | 'per_session' | null
+  commission_type?: 'monthly_percent' | 'monthly_salary' | 'per_session' | 'fixed_amount' | null
   commission_rate?: number | null
   monthly_salary_amount?: number | null
   per_session_amount?: number | null
+  fixed_amount?: number | null
   created_at?: string
   updated_at?: string
 }
@@ -36,29 +37,32 @@ export interface CourseTeacherCollectionItem {
   id: number
   course: CourseTeacherCourse
   teacher: CourseTeacherTeacher
-  commission_type: 'monthly_percent' | 'monthly_salary' | 'per_session' | null
+  commission_type: 'monthly_percent' | 'monthly_salary' | 'per_session' | 'fixed_amount' | null
   commission_rate: number | null
   monthly_salary_amount: number | null
   per_session_amount: number | null
+  fixed_amount: number | null
   created_at: string
 }
 
 export interface CreateCourseTeacherInput {
   course_id: number
   teacher_id: number
-  commission_type?: 'monthly_percent' | 'monthly_salary' | 'per_session' | null
+  commission_type?: 'monthly_percent' | 'monthly_salary' | 'per_session' | 'fixed_amount' | null
   commission_rate?: number | null
   monthly_salary_amount?: number | null
   per_session_amount?: number | null
+  fixed_amount?: number | null
 }
 
 export interface UpdateCourseTeacherInput {
   course_id?: number
   teacher_id?: number
-  commission_type?: 'monthly_percent' | 'monthly_salary' | 'per_session' | null
+  commission_type?: 'monthly_percent' | 'monthly_salary' | 'per_session' | 'fixed_amount' | null
   commission_rate?: number | null
   monthly_salary_amount?: number | null
   per_session_amount?: number | null
+  fixed_amount?: number | null
 }
 
 export interface CourseTeachersResponse {

@@ -57,6 +57,7 @@ export const teacher = {
     monthly_percent: 'လစဉ် % ငွေပေးချေမှု',
     monthly_salary: 'ပုံသေ လစဉ် လစာ',
     per_session: 'တစ်ခေါက် ပုံသေ',
+    fixed_amount: 'ပုံသေ ပမာဏ (သင်တန်းတွင်သာ)',
   },
 
   // Table headers

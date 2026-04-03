@@ -21,7 +21,7 @@ export interface TeacherPayout {
   id: number
   teacher_id: number
   course_id: number | null
-  commission_type: 'monthly_percent' | 'monthly_salary' | 'per_session'
+  commission_type: 'monthly_percent' | 'monthly_salary' | 'per_session' | 'fixed_amount'
   period_start: string
   period_end: string
   payout_month: string | null
@@ -44,7 +44,7 @@ export interface TeacherPayoutCollectionItem {
   id: number
   teacher_id: number
   course_id: number | null
-  commission_type: 'monthly_percent' | 'monthly_salary' | 'per_session'
+  commission_type: 'monthly_percent' | 'monthly_salary' | 'per_session' | 'fixed_amount'
   period_start: string
   period_end: string
   payout_month: string | null

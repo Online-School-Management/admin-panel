@@ -101,6 +101,7 @@ export const course = {
     commissionRate: 'Commission Rate',
     monthlySalaryAmount: 'Monthly Salary',
     perSessionAmount: 'Per Session Amount',
+    fixedAmount: 'Fixed Amount (per period)',
     noTeacherAssigned: 'No teacher assigned',
     subject: 'Subject',
     title: 'Title',

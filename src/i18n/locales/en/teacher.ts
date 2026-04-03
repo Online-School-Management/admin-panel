@@ -57,6 +57,7 @@ export const teacher = {
     monthly_percent: 'Monthly % of Payments',
     monthly_salary: 'Fixed Monthly Salary',
     per_session: 'Per Session',
+    fixed_amount: 'Fixed Amount (course only)',
   },
 
   // Table headers

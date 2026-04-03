@@ -36,6 +36,8 @@ function getCommissionLabel(tp: TeacherPayoutDetail, t: (key: string) => string)
       return `${tp.sessions_count} × ${formatCurrency(tp.per_session_rate ?? 0)}`
     case 'monthly_salary':
       return t('teacherPayout.detailPage.salaryAllCourses')
+    case 'fixed_amount':
+      return `${t('teacherPayout.detailPage.commissionFixedAmount')}: ${formatCurrency(tp.payout_amount)}`
     default:
       return '—'
   }

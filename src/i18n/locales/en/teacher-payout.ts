@@ -23,6 +23,7 @@ export const teacherPayout = {
     monthlyPercent: '% of Payments',
     monthlySalary: 'Monthly Salary',
     perSession: 'Per Session',
+    fixedAmount: 'Fixed (course)',
   },
   table: {
     no: '#',
@@ -102,6 +103,7 @@ export const teacherPayout = {
     sessionTopic: 'Topic',
     noSessions: 'No sessions in this period',
     salaryAllCourses: 'Salary (all courses)',
+    commissionFixedAmount: 'Fixed amount (course)',
     bonusTitle: 'Bonus (before mark as paid)',
     forTeacher: 'For teacher',
     base: 'Base',

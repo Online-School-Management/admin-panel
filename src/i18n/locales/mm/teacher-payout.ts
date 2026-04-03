@@ -23,6 +23,7 @@ export const teacherPayout = {
     monthlyPercent: '% ကော်မရှင်',
     monthlySalary: 'လစာ',
     perSession: 'တစ်ခေါက်စျ',
+    fixedAmount: 'ပုံသေ (သင်တန်း)',
   },
   table: {
     no: '#',
@@ -102,6 +103,7 @@ export const teacherPayout = {
     sessionTopic: 'ခေါင်းစဉ်',
     noSessions: 'ဤကာလအတွက် ချိန်မရှိပါ',
     salaryAllCourses: 'လစာ (သင်တန်းအားလုံး)',
+    commissionFixedAmount: 'ပုံသေ ပမာဏ (သင်တန်း)',
     bonusTitle: 'အပိုဆုငွေ (ပေးပြီးမှတ်ခြင်းမပြုမီ)',
     forTeacher: 'ဆရာ/ဆရာမ',
     base: 'အခြေခံ',

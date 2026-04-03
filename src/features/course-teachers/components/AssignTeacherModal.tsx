@@ -32,10 +32,13 @@ import {
 } from '../hooks/useCourseTeachers'
 import { useTranslation } from '@/i18n/context'
 import type { TeacherCollectionItem } from '@/features/teachers/types/teacher.types'
+import { useToast } from '@/hooks/use-toast'
 
 const assignTeacherSchema = z.object({
   teacher_id: z.number().int().positive('Please select a teacher'),
-  commission_type: z.enum(['monthly_percent', 'monthly_salary', 'per_session']).optional(),
+  commission_type: z
+    .enum(['monthly_percent', 'monthly_salary', 'per_session', 'fixed_amount'])
+    .optional(),
   commission_rate: z
     .number()
     .min(0, 'Commission rate must be at least 0')
@@ -52,6 +55,12 @@ const assignTeacherSchema = z.object({
   per_session_amount: z
     .number()
     .min(0, 'Per session amount must be at least 0')
+    .nullable()
+    .optional()
+    .or(z.null()),
+  fixed_amount: z
+    .number()
+    .min(0, 'Fixed amount must be at least 0')
     .nullable()
     .optional()
     .or(z.null()),
@@ -74,6 +83,7 @@ function getCompensationSummary(
   commissionRate: number | null | undefined,
   monthlySalaryAmount: number | null | undefined,
   perSessionAmount: number | null | undefined,
+  fixedAmount: number | null | undefined,
   tFn: (key: string) => string,
 ): string | null {
   switch (commissionType) {
@@ -89,6 +99,10 @@ function getCompensationSummary(
       return perSessionAmount != null
         ? `${tFn('teacher.commissionType.per_session')}: ${formatCurrency(Number(perSessionAmount))}`
         : tFn('teacher.commissionType.per_session')
+    case 'fixed_amount':
+      return fixedAmount != null
+        ? `${tFn('teacher.commissionType.fixed_amount')}: ${formatCurrency(Number(fixedAmount))}`
+        : tFn('teacher.commissionType.fixed_amount')
     default:
       return null
   }
@@ -104,6 +118,7 @@ export function AssignTeacherModal({
   courseTitle,
 }: AssignTeacherModalProps) {
   const { t } = useTranslation()
+  const { toast } = useToast()
   const [editingId, setEditingId] = useState<number | null>(null)
   const [useDefault, setUseDefault] = useState(true)
 
@@ -136,6 +151,7 @@ export function AssignTeacherModal({
       commission_rate: null,
       monthly_salary_amount: null,
       per_session_amount: null,
+      fixed_amount: null,
     },
   })
 
@@ -162,6 +178,7 @@ export function AssignTeacherModal({
       selectedTeacher.commission_rate,
       selectedTeacher.monthly_salary_amount,
       selectedTeacher.per_session_amount,
+      undefined,
       t,
     )
   }, [selectedTeacher, t])
@@ -180,6 +197,7 @@ export function AssignTeacherModal({
         setValue('commission_rate', existingAssignment.commission_rate ?? null)
         setValue('monthly_salary_amount', existingAssignment.monthly_salary_amount ?? null)
         setValue('per_session_amount', existingAssignment.per_session_amount ?? null)
+        setValue('fixed_amount', existingAssignment.fixed_amount ?? null)
         // In edit mode, default to "use default" = true (admin can uncheck to override)
         setUseDefault(true)
       } else {
@@ -195,22 +213,39 @@ export function AssignTeacherModal({
 
     if (!useDefault) {
       const commissionType = data.commission_type || 'monthly_percent'
+      if (commissionType === 'fixed_amount' && (data.fixed_amount == null || data.fixed_amount === undefined)) {
+        toast({
+          title: t('courseTeacher.modal.fixedAmount'),
+          description: t('courseTeacher.modal.enterFixedAmount'),
+          variant: 'destructive',
+        })
+        return
+      }
       compensationPayload.commission_type = commissionType
       switch (commissionType) {
         case 'monthly_percent':
           compensationPayload.commission_rate = data.commission_rate ?? null
           compensationPayload.monthly_salary_amount = null
           compensationPayload.per_session_amount = null
+          compensationPayload.fixed_amount = null
           break
         case 'monthly_salary':
           compensationPayload.commission_rate = null
           compensationPayload.monthly_salary_amount = data.monthly_salary_amount ?? null
           compensationPayload.per_session_amount = null
+          compensationPayload.fixed_amount = null
           break
         case 'per_session':
           compensationPayload.commission_rate = null
           compensationPayload.monthly_salary_amount = null
           compensationPayload.per_session_amount = data.per_session_amount ?? null
+          compensationPayload.fixed_amount = null
+          break
+        case 'fixed_amount':
+          compensationPayload.commission_rate = null
+          compensationPayload.monthly_salary_amount = null
+          compensationPayload.per_session_amount = null
+          compensationPayload.fixed_amount = data.fixed_amount ?? null
           break
       }
     }
@@ -298,6 +333,7 @@ export function AssignTeacherModal({
                 setValue('commission_rate', selectedTeacher.commission_rate ?? null)
                 setValue('monthly_salary_amount', selectedTeacher.monthly_salary_amount ?? null)
                 setValue('per_session_amount', selectedTeacher.per_session_amount ?? null)
+                setValue('fixed_amount', null)
               }
             }}
             disabled={isSubmitting}
@@ -332,6 +368,7 @@ export function AssignTeacherModal({
                   <SelectItem value="monthly_percent">{t('teacher.commissionType.monthly_percent')}</SelectItem>
                   <SelectItem value="monthly_salary">{t('teacher.commissionType.monthly_salary')}</SelectItem>
                   <SelectItem value="per_session">{t('teacher.commissionType.per_session')}</SelectItem>
+                  <SelectItem value="fixed_amount">{t('teacher.commissionType.fixed_amount')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -405,6 +442,29 @@ export function AssignTeacherModal({
                 )}
               </div>
             )}
+
+            {selectedCommissionType === 'fixed_amount' && (
+              <div className="space-y-2">
+                <Label htmlFor={`${idPrefix}_fixed_amount`}>
+                  {t('courseTeacher.modal.fixedAmount')}
+                </Label>
+                <Input
+                  id={`${idPrefix}_fixed_amount`}
+                  type="number"
+                  step="1"
+                  min="0"
+                  {...register('fixed_amount', {
+                    setValueAs: (v) => v === '' || v === null || v === undefined ? null : (isNaN(Number(v)) ? null : Number(v))
+                  })}
+                  placeholder={t('courseTeacher.modal.enterFixedAmount')}
+                  disabled={isSubmitting}
+                />
+                <p className="text-xs text-muted-foreground">{t('courseTeacher.modal.fixedAmountHint')}</p>
+                {errors.fixed_amount && (
+                  <p className="text-sm text-destructive">{errors.fixed_amount.message}</p>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -444,6 +504,7 @@ export function AssignTeacherModal({
                           existingAssignment.commission_rate,
                           existingAssignment.monthly_salary_amount,
                           existingAssignment.per_session_amount,
+                          existingAssignment.fixed_amount,
                           t,
                         ) && (
                           <Badge variant="outline" className="mt-1">
@@ -452,6 +513,7 @@ export function AssignTeacherModal({
                               existingAssignment.commission_rate,
                               existingAssignment.monthly_salary_amount,
                               existingAssignment.per_session_amount,
+                              existingAssignment.fixed_amount,
                               t,
                             )}
                           </Badge>

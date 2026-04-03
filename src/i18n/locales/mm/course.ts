@@ -101,6 +101,7 @@ export const course = {
     commissionRate: 'ကော်မရှင် ရာခိုင်နှုန်း',
     monthlySalaryAmount: 'လစဉ် လစာ',
     perSessionAmount: 'တစ်ခေါက် ပမာဏ',
+    fixedAmount: 'ပုံသေ ပမာဏ (ကာလတစ်ခုလျှင်)',
     noTeacherAssigned: 'ဆရာ ခန့်အပ်ထားခြင်း မရှိပါ',
     subject: 'ဘာသာရပ်',
     title: 'ခေါင်းစဉ်',

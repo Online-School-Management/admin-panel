@@ -343,6 +343,20 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
                       </div>
                     </>
                   )}
+                  {course.assigned_teacher.commission_type === 'fixed_amount' && course.assigned_teacher.fixed_amount != null && (
+                    <>
+                      <Separator />
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                          <DollarSign className="h-4 w-4" />
+                          {t('course.detail.fixedAmount')}
+                        </p>
+                        <p className="text-base">
+                          {formatCurrency(Number(course.assigned_teacher.fixed_amount))}
+                        </p>
+                      </div>
+                    </>
+                  )}
                 </>
               ) : (
                 <div className="space-y-4">

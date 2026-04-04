@@ -4,7 +4,7 @@ import { ArrowLeft, Edit, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface PageHeaderProps {
-  title: string
+  title: ReactNode
   description?: string
   backTo?: string
   backLabel?: string

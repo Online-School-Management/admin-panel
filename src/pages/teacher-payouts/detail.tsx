@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { CheckCircle2, Gift, Pencil } from 'lucide-react'
+import { CheckCircle2, Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -8,6 +8,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -17,7 +18,7 @@ import { useTranslation } from '@/i18n/context'
 import { usePayout, useMarkPayoutAsPaid } from '@/features/payouts/hooks/usePayouts'
 import { MarkPayoutAsPaidDialog } from '@/features/teacher-payouts/components/MarkPayoutAsPaidDialog'
 import { EditPayoutBonusModal } from '@/features/teacher-payouts/components/EditPayoutBonusModal'
-import { formatCurrency } from '@/utils/format'
+import { formatCurrency, safeText } from '@/utils/format'
 import format from 'date-fns/format'
 import type { PayoutSession, TeacherPayoutDetail } from '@/features/payouts/types/payout.types'
 
@@ -28,12 +29,30 @@ interface FlatSession extends PayoutSession {
   teacher_name: string
 }
 
-function getCommissionLabel(tp: TeacherPayoutDetail, t: (key: string) => string): string {
+/** e.g. "March 2026" from payout_month (YYYY-MM) or period_start */
+function formatPayoutMonthYear(payout: {
+  payout_month?: string | null
+  period_start?: string
+}): string {
+  if (payout.payout_month && /^\d{4}-\d{2}$/.test(payout.payout_month)) {
+    const [y, m] = payout.payout_month.split('-').map(Number)
+    return format(new Date(y, m - 1, 1), 'MMMM yyyy')
+  }
+  if (payout.period_start) {
+    return format(new Date(payout.period_start), 'MMMM yyyy')
+  }
+  return '—'
+}
+
+function getCommissionLabel(
+  tp: TeacherPayoutDetail,
+  t: (key: string, params?: Record<string, string | number>) => string
+): string {
   switch (tp.commission_type) {
     case 'monthly_percent':
-      return `${tp.commission_rate ?? 0}%`
+      return `${Number(tp.commission_rate) || 0}%`
     case 'per_session':
-      return `${tp.sessions_count} × ${formatCurrency(tp.per_session_rate ?? 0)}`
+      return `${Number(tp.sessions_count) || 0} × ${formatCurrency(tp.per_session_rate)}`
     case 'monthly_salary':
       return t('teacherPayout.detailPage.salaryAllCourses')
     case 'fixed_amount':
@@ -43,8 +62,40 @@ function getCommissionLabel(tp: TeacherPayoutDetail, t: (key: string) => string)
   }
 }
 
+function PayoutDetailTitle({
+  teacherName,
+  monthYear,
+  locale,
+  t,
+}: {
+  teacherName: string
+  monthYear: string
+  locale: string
+  t: (key: string, params?: Record<string, string | number>) => string
+}) {
+  if (locale === 'mm') {
+    return (
+      <>
+        <span className="text-primary font-bold">{teacherName}</span>
+        <span className="text-foreground font-bold">{t('teacherPayout.detailPage.titleMmBetween')}</span>
+        <span className="font-bold text-foreground">{monthYear}</span>
+        <span className="text-muted-foreground font-bold">{t('teacherPayout.detailPage.titleMmClose')}</span>
+      </>
+    )
+  }
+  return (
+    <>
+      <span className="text-foreground font-normal">{t('teacherPayout.detailPage.titleEnLead')}</span>
+      <span className="text-primary font-bold">{teacherName}</span>
+      <span className="text-muted-foreground font-bold">{t('teacherPayout.detailPage.titleEnBetween')}</span>
+      <span className="font-bold text-foreground">{monthYear}</span>
+      <span className="text-muted-foreground font-bold">{t('teacherPayout.detailPage.titleEnClose')}</span>
+    </>
+  )
+}
+
 export default function TeacherPayoutDetailPage() {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const { id } = useParams<{ id: string }>()
   const payoutId = id ? parseInt(id, 10) : 0
   const [markPaidDialogOpen, setMarkPaidDialogOpen] = useState(false)
@@ -86,17 +137,35 @@ export default function TeacherPayoutDetailPage() {
     ? `${format(new Date(payout.period_start), 'dd MMM yyyy')} – ${format(new Date(payout.period_end), 'dd MMM yyyy')}`
     : payout.payout_month ?? '—'
 
-  const teacherName = payout.teacher?.name ?? payout.recipient_name ?? '—'
+  const teacherName = safeText(payout.teacher?.name ?? payout.recipient_name)
+  const monthYear = formatPayoutMonthYear(payout)
 
-  const totalToPay = payout.total_to_pay ?? payout.total_amount
+  const rawTotalToPay = Number(payout.total_to_pay ?? payout.total_amount)
+  const totalToPayDisplay = Number.isFinite(rawTotalToPay) ? rawTotalToPay : 0
+
+  const summaryLines = payout.teacher_payouts ?? []
+  const footerTotalCollected =
+    payout.total_collected ??
+    summaryLines.reduce((acc, tp) => acc + Number(tp.total_collected ?? 0), 0)
+  const footerTotalPayoutToTeacher = summaryLines.reduce(
+    (acc, tp) => acc + Number(tp.payout_amount ?? 0),
+    0
+  )
+  const footerTotalSessions = summaryLines.reduce(
+    (acc, tp) => acc + (tp.sessions?.length ?? tp.sessions_count ?? 0),
+    0
+  )
 
   // Flat list of all sessions in the period (from all courses), sorted by date
-  const flatSessions: FlatSession[] = (payout.teacher_payouts ?? [])
+  const flatSessions: FlatSession[] = summaryLines
     .flatMap((tp) =>
       (tp.sessions ?? []).map((s) => ({
         ...s,
-        course_name: tp.course?.title ?? '—',
-        course_subject: tp.course?.subject?.name ?? null,
+        course_name: safeText(tp.course?.title),
+        course_subject:
+          tp.course?.subject && typeof tp.course.subject.name === 'string'
+            ? tp.course.subject.name
+            : null,
         teacher_name: teacherName,
       }))
     )
@@ -105,58 +174,82 @@ export default function TeacherPayoutDetailPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={t('teacherPayout.detailPage.titleWithTeacher', { teacherName })}
+        title={
+          <PayoutDetailTitle
+            teacherName={teacherName}
+            monthYear={monthYear}
+            locale={locale}
+            t={t}
+          />
+        }
         description={t('teacherPayout.detailPage.description')}
         backTo="/teacher-payouts"
         action={
           isPending ? (
-            <Button variant="default" onClick={() => setMarkPaidDialogOpen(true)}>
-              <CheckCircle2 className="h-4 w-4 mr-2" />
-              {t('teacherPayout.actions.markPaid')}
-            </Button>
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              <Button
+                variant="outline"
+                className="border-payout-bonus/80 text-payout-bonus hover:border-payout-bonus hover:bg-payout-bonus/10 hover:text-payout-bonus"
+                onClick={() => setBonusModalOpen(true)}
+              >
+                <Pencil className="h-4 w-4 mr-2" />
+                {t('teacherPayout.detailPage.editBonus')}
+              </Button>
+              <Button variant="default" onClick={() => setMarkPaidDialogOpen(true)}>
+                <CheckCircle2 className="h-4 w-4 mr-2" />
+                {t('teacherPayout.actions.markPaid')}
+              </Button>
+            </div>
           ) : undefined
         }
       />
 
-      {/* Bonus (before mark as paid) */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Gift className="h-4 w-4" />
-            {t('teacherPayout.detailPage.bonusTitle')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-wrap items-baseline gap-4 text-sm">
-            <div>
-              <span className="text-muted-foreground mr-1">{t('teacherPayout.detailPage.base')}:</span>
-              <span className="font-medium">{formatCurrency(payout.total_amount)}</span>
-            </div>
-            <div>
-              <span className="text-muted-foreground mr-1">{t('teacherPayout.detailPage.bonus')}:</span>
-              <span className="font-medium">{formatCurrency(payout.bonus_amount ?? 0)}</span>
-            </div>
-            <div>
-              <span className="text-muted-foreground mr-1">{t('teacherPayout.detailPage.totalToPay')}:</span>
-              <span className="font-semibold">{formatCurrency(totalToPay)}</span>
-            </div>
-          </div>
-          {(payout.bonus_notes ?? '').trim() && (
-            <p className="text-sm text-muted-foreground">{payout.bonus_notes}</p>
-          )}
-          {isPending && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="mt-3"
-              onClick={() => setBonusModalOpen(true)}
-            >
-              <Pencil className="h-4 w-4 mr-2" />
-              {t('teacherPayout.detailPage.editBonus')}
-            </Button>
-          )}
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-12 gap-6 items-start">
+        <Card className="col-span-12 md:col-span-4">
+          <CardContent className="space-y-4 pt-6">
+            {(payout.bonus_notes ?? '').trim() && (
+              <p className="text-sm text-muted-foreground">{payout.bonus_notes}</p>
+            )}
+            <dl className="space-y-3 text-sm">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                <dt className="text-muted-foreground">{t('teacherPayout.detailPage.summaryCollected')}</dt>
+                <dd className="tabular-nums font-medium text-medium-blue">
+                  {formatCurrency(footerTotalCollected)}
+                </dd>
+              </div>
+              <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                <dt className="text-muted-foreground">{t('teacherPayout.detailPage.base')}</dt>
+                <dd className="tabular-nums font-medium text-medium-blue">
+                  {formatCurrency(payout.total_amount)}
+                </dd>
+              </div>
+              <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                <dt className="font-medium text-payout-bonus">{t('teacherPayout.detailPage.bonus')}</dt>
+                <dd className="tabular-nums font-semibold text-payout-bonus">
+                  {formatCurrency(payout.bonus_amount ?? 0)}
+                </dd>
+              </div>
+              <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-t pt-3">
+                <dt className="font-semibold text-foreground">{t('teacherPayout.detailPage.totalToPay')}</dt>
+                <dd className="tabular-nums font-semibold text-medium-blue">
+                  {formatCurrency(totalToPayDisplay)}
+                </dd>
+              </div>
+            </dl>
+          </CardContent>
+        </Card>
+
+        <Card className="col-span-12 md:col-span-3">
+          <CardHeader className="space-y-0 pb-2">
+            <CardTitle className="text-base">{t('teacherPayout.detailPage.paymentStatusTitle')}</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <Badge variant={payout.status === 'paid' ? 'default' : 'warning'} className="text-sm">
+              {t(`teacherPayout.status.${payout.status}`)}
+            </Badge>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Section 1: Summary table (one row per course) */}
       <Card>
@@ -167,6 +260,7 @@ export default function TeacherPayoutDetailPage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-12 text-center">{t('teacherPayout.table.no')}</TableHead>
                 <TableHead className="w-[140px]">{t('teacherPayout.detailPage.summaryTeacher')}</TableHead>
                 <TableHead className="w-[160px]">{t('teacherPayout.detailPage.summaryPeriod')}</TableHead>
                 <TableHead className="w-[180px]">{t('teacherPayout.detailPage.summaryCourseName')}</TableHead>
@@ -175,29 +269,45 @@ export default function TeacherPayoutDetailPage() {
                 <TableHead>{t('teacherPayout.detailPage.commission')}</TableHead>
                 <TableHead>{t('teacherPayout.detailPage.summaryToTeacher')}</TableHead>
                 <TableHead className="w-24 text-center">{t('teacherPayout.detailPage.totalSessionClass')}</TableHead>
-                <TableHead>{t('teacherPayout.detailPage.summaryStatus')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {(payout.teacher_payouts ?? []).map((tp) => (
+              {summaryLines.map((tp, index) => (
                 <TableRow key={tp.id}>
+                  <TableCell className="text-center tabular-nums text-muted-foreground">{index + 1}</TableCell>
                   <TableCell>
                     {payout.teacher ? (
-                      <Link to={`/teachers/${payout.teacher.slug}`} className="text-primary hover:underline font-medium">
-                        {payout.teacher.name ?? payout.teacher.teacher_id}
-                      </Link>
+                      typeof payout.teacher.slug === 'string' && payout.teacher.slug ? (
+                        <Link
+                          to={`/teachers/${payout.teacher.slug}`}
+                          className="text-primary hover:underline font-medium"
+                        >
+                          {safeText(payout.teacher.name ?? payout.teacher.teacher_id)}
+                        </Link>
+                      ) : (
+                        <span className="font-medium">
+                          {safeText(payout.teacher.name ?? payout.teacher.teacher_id)}
+                        </span>
+                      )
                     ) : (
-                      payout.recipient_name ?? '—'
+                      safeText(payout.recipient_name)
                     )}
                   </TableCell>
                   <TableCell>{periodLabel}</TableCell>
                   <TableCell>
                     {tp.course ? (
                       <div>
-                        <Link to={`/courses/${tp.course.slug}`} className="text-primary hover:underline font-medium">
-                          {tp.course.title}
-                        </Link>
-                        {tp.course.subject && (
+                        {typeof tp.course.slug === 'string' && tp.course.slug ? (
+                          <Link
+                            to={`/courses/${tp.course.slug}`}
+                            className="text-primary hover:underline font-medium"
+                          >
+                            {safeText(tp.course.title)}
+                          </Link>
+                        ) : (
+                          <span className="font-medium">{safeText(tp.course.title)}</span>
+                        )}
+                        {tp.course.subject && typeof tp.course.subject.name === 'string' && (
                           <div className="text-sm font-medium text-muted-foreground">
                             {tp.course.subject.name}
                           </div>
@@ -220,16 +330,30 @@ export default function TeacherPayoutDetailPage() {
                   <TableCell className="text-center">
                     {tp.sessions?.length ?? tp.sessions_count ?? 0}
                   </TableCell>
-                  <TableCell>
-                    <Badge variant={payout.status === 'paid' ? 'default' : 'warning'}>
-                      {t(`teacherPayout.status.${payout.status}`)}
-                    </Badge>
-                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
+            {summaryLines.length > 0 && (
+              <TableFooter>
+                <TableRow className="hover:bg-transparent">
+                  <TableCell colSpan={5} className="text-right font-semibold">
+                    {t('teacherPayout.detailPage.summaryFooterTotal')}
+                  </TableCell>
+                  <TableCell className="font-semibold tabular-nums text-medium-blue">
+                    {formatCurrency(footerTotalCollected)}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">—</TableCell>
+                  <TableCell className="font-semibold tabular-nums text-medium-blue">
+                    {formatCurrency(footerTotalPayoutToTeacher)}
+                  </TableCell>
+                  <TableCell className="text-center tabular-nums font-semibold text-medium-blue">
+                    {footerTotalSessions}
+                  </TableCell>
+                </TableRow>
+              </TableFooter>
+            )}
           </Table>
-          {(!payout.teacher_payouts || payout.teacher_payouts.length === 0) && (
+          {summaryLines.length === 0 && (
             <p className="text-muted-foreground py-4">{t('teacherPayout.messages.noPayouts')}</p>
           )}
         </CardContent>
@@ -255,7 +379,7 @@ export default function TeacherPayoutDetailPage() {
               </TableHeader>
               <TableBody>
                 {flatSessions.map((s, index) => (
-                  <TableRow key={s.id}>
+                  <TableRow key={typeof s.id === 'number' || typeof s.id === 'string' ? s.id : index}>
                     <TableCell className="text-center">{index + 1}</TableCell>
                     <TableCell>{s.session_date ? format(new Date(s.session_date), 'dd MMM yyyy') : '—'}</TableCell>
                     <TableCell>
@@ -272,7 +396,7 @@ export default function TeacherPayoutDetailPage() {
                     <TableCell className="text-muted-foreground">{s.topic_covered ?? '—'}</TableCell>
                     <TableCell>
                       <Badge variant="outline" className="capitalize">
-                        {s.status}
+                        {safeText(s.status, '')}
                       </Badge>
                     </TableCell>
                   </TableRow>
@@ -289,8 +413,8 @@ export default function TeacherPayoutDetailPage() {
         open={markPaidDialogOpen}
         onOpenChange={setMarkPaidDialogOpen}
         onConfirm={handleMarkPaidConfirm}
-        teacherName={payout.teacher?.name ?? payout.recipient_name}
-        amount={totalToPay}
+        teacherName={safeText(payout.teacher?.name ?? payout.recipient_name, '') || undefined}
+        amount={totalToPayDisplay}
         isLoading={markAsPaid.isPending}
       />
 

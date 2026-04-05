@@ -94,6 +94,37 @@ function PayoutDetailTitle({
   )
 }
 
+function SectionSummaryTitle({
+  teacherName,
+  monthYear,
+  locale,
+  t,
+}: {
+  teacherName: string
+  monthYear: string
+  locale: string
+  t: (key: string, params?: Record<string, string | number>) => string
+}) {
+  if (locale === 'mm') {
+    return (
+      <>
+        <span className="text-primary">{monthYear}</span>
+        <span className="text-foreground">{t('teacherPayout.detailPage.sectionSummaryMmBetweenMonthAndTeacher')}</span>
+        <span className="text-primary">{teacherName}</span>
+        <span className="text-foreground">{t('teacherPayout.detailPage.sectionSummaryMmSuffix')}</span>
+      </>
+    )
+  }
+  return (
+    <>
+      <span className="text-foreground">{t('teacherPayout.detailPage.sectionSummaryLead')}</span>
+      <span className="text-primary">{teacherName}</span>
+      <span className="text-muted-foreground">{t('teacherPayout.detailPage.sectionSummaryBetween')}</span>
+      <span className="text-primary">{monthYear}</span>
+    </>
+  )
+}
+
 export default function TeacherPayoutDetailPage() {
   const { t, locale } = useTranslation()
   const { id } = useParams<{ id: string }>()
@@ -182,7 +213,6 @@ export default function TeacherPayoutDetailPage() {
             t={t}
           />
         }
-        description={t('teacherPayout.detailPage.description')}
         backTo="/teacher-payouts"
         action={
           isPending ? (
@@ -204,57 +234,71 @@ export default function TeacherPayoutDetailPage() {
         }
       />
 
-      <div className="grid grid-cols-12 gap-6 items-start">
-        <Card className="col-span-12 md:col-span-4">
-          <CardContent className="space-y-4 pt-6">
-            {(payout.bonus_notes ?? '').trim() && (
-              <p className="text-sm text-muted-foreground">{payout.bonus_notes}</p>
-            )}
-            <dl className="space-y-3 text-sm">
-              <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                <dt className="text-muted-foreground">{t('teacherPayout.detailPage.summaryCollected')}</dt>
-                <dd className="tabular-nums font-medium text-medium-blue">
-                  {formatCurrency(footerTotalCollected)}
-                </dd>
-              </div>
-              <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                <dt className="text-muted-foreground">{t('teacherPayout.detailPage.base')}</dt>
-                <dd className="tabular-nums font-medium text-medium-blue">
-                  {formatCurrency(payout.total_amount)}
-                </dd>
-              </div>
-              <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                <dt className="font-medium text-payout-bonus">{t('teacherPayout.detailPage.bonus')}</dt>
-                <dd className="tabular-nums font-semibold text-payout-bonus">
-                  {formatCurrency(payout.bonus_amount ?? 0)}
-                </dd>
-              </div>
-              <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-t pt-3">
-                <dt className="font-semibold text-foreground">{t('teacherPayout.detailPage.totalToPay')}</dt>
-                <dd className="tabular-nums font-semibold text-medium-blue">
-                  {formatCurrency(totalToPayDisplay)}
-                </dd>
-              </div>
-            </dl>
-          </CardContent>
-        </Card>
+      <div className="space-y-4">
+        {(payout.bonus_notes ?? '').trim() && (
+          <p className="text-sm text-muted-foreground">{payout.bonus_notes}</p>
+        )}
 
-        <Card className="col-span-12 md:col-span-3">
-          <CardHeader className="space-y-0 pb-2">
-            <CardTitle className="text-base">{t('teacherPayout.detailPage.paymentStatusTitle')}</CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <Badge variant={payout.status === 'paid' ? 'default' : 'warning'} className="text-sm">
-              {t(`teacherPayout.status.${payout.status}`)}
-            </Badge>
-          </CardContent>
-        </Card>
+        <div
+          className="flex items-center gap-2 flex-wrap"
+          role="group"
+          aria-label={t('teacherPayout.detailPage.amountsEquationAria')}
+        >
+          <div className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm">
+            <span className="text-muted-foreground">{t('teacherPayout.detailPage.summaryCollected')}:</span>
+            <span className="font-semibold tabular-nums text-green-600">
+              {formatCurrency(footerTotalCollected)}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm">
+            <span className="text-muted-foreground">{t('teacherPayout.detailPage.base')}:</span>
+            <span className="font-semibold tabular-nums text-orange-600">
+              {formatCurrency(payout.total_amount)}
+            </span>
+          </div>
+
+          <span className="text-muted-foreground font-medium select-none" aria-hidden>
+            +
+          </span>
+
+          <div className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm">
+            <span className="text-muted-foreground">{t('teacherPayout.detailPage.bonus')}:</span>
+            <span className="font-semibold tabular-nums text-amber-600">
+              {formatCurrency(payout.bonus_amount ?? 0)}
+            </span>
+          </div>
+
+          <span className="text-muted-foreground font-medium select-none" aria-hidden>
+            =
+          </span>
+
+          <div className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm">
+            <span className="text-muted-foreground">{t('teacherPayout.detailPage.totalToPay')}:</span>
+            <span className="font-semibold tabular-nums text-orange-600">
+              {formatCurrency(totalToPayDisplay)}
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* Section 1: Summary table (one row per course) */}
       <Card>
-        <CardHeader>
-          <CardTitle>{t('teacherPayout.detailPage.sectionSummary')}</CardTitle>
+        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3 space-y-0">
+          <CardTitle className="font-normal">
+            <SectionSummaryTitle
+              teacherName={teacherName}
+              monthYear={monthYear}
+              locale={locale}
+              t={t}
+            />
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">{t('teacherPayout.detailPage.paymentStatusTitle')}:</span>
+            <Badge variant={payout.status === 'paid' ? 'default' : 'warning'} className="text-sm">
+              {t(`teacherPayout.status.${payout.status}`)}
+            </Badge>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>

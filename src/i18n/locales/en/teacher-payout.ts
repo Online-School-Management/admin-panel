@@ -83,8 +83,9 @@ export const teacherPayout = {
     titleEnClose: ')',
     titleMmBetween: ' အတွက် ပေးချေမှု အသေးစိတ် (',
     titleMmClose: ')',
-    description: 'View payout breakdown by course and sessions',
-    sectionSummary: 'Summary',
+    /** Summary card title — colored parts built in React */
+    sectionSummaryLead: 'Summary for ',
+    sectionSummaryBetween: ' in ',
     sectionSessions: 'Session ({{period}})',
     summaryTeacher: 'Teacher',
     summaryPeriod: 'Period',
@@ -111,6 +112,8 @@ export const teacherPayout = {
     salaryAllCourses: 'Salary (all courses)',
     commissionFixedAmount: 'Fixed amount (course)',
     paymentStatusTitle: 'Payment status',
+    /** Screen reader label for Base + Bonus = Total block */
+    amountsEquationAria: 'Base plus bonus equals total to pay',
     bonusTitle: 'Bonus (before mark as paid)',
     forTeacher: 'For teacher',
     base: 'Base',

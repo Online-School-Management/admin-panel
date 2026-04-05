@@ -136,5 +136,7 @@ export const teacherPayout = {
   messages: {
     noPayouts: 'No payouts found for this period',
     clickCalculate: 'Click "Calculate Payouts" to generate payout records.',
+    staleCalculationWarning:
+      'Warning! Student payments or commissions changed — please run Re-calculate.',
   },
 }

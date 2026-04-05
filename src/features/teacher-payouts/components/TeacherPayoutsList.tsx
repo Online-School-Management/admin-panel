@@ -169,6 +169,7 @@ export function TeacherPayoutsList() {
   const payouts = Array.isArray(data?.data) ? data.data : []
   const pagination = data?.meta?.pagination
   const periodTotals = data?.meta?.period_totals
+  const periodCalculation = data?.meta?.period_calculation
   const hasTeacherPayoutsForPeriod = (pagination?.total ?? 0) > 0
 
   // Handlers
@@ -402,6 +403,15 @@ export function TeacherPayoutsList() {
             </Button>
           )}
         </div>
+
+        {periodCalculation?.needs_recalculate && (
+          <div
+            role="status"
+            className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-950 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100"
+          >
+            {t('teacherPayout.messages.staleCalculationWarning')}
+          </div>
+        )}
 
         {/* Search and Filters */}
         <div className="flex flex-col sm:flex-row gap-4">

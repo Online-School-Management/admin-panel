@@ -109,6 +109,12 @@ export interface PayoutsResponse {
       total_pending: number
       total_paid: number
     }
+    /** Present when period_start + period_end filters are sent (same request as period_totals). */
+    period_calculation?: {
+      last_calculated_at: string | null
+      needs_recalculate: boolean
+      stale_reason: string | null
+    }
   }
 }
 

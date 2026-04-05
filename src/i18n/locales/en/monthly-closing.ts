@@ -91,5 +91,7 @@ export const monthlyClosing = {
   },
   messages: {
     noPayouts: 'No payouts for this period',
+    staleCalculationWarning:
+      'Warning! Student payments or commissions changed — please run Re-calculate.',
   },
 }

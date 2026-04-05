@@ -89,5 +89,7 @@ export const monthlyClosing = {
   },
   messages: {
     noPayouts: 'ဤကာလအတွက် ပေးချေမှု မရှိပါ',
+    staleCalculationWarning:
+      'သတိ! ကျောင်းသားပေးချေမှု သို့ ကော်မရှင်များ ပြောင်းလဲထားပါသည် — ပြန်တွက်ချက်ပါ။',
   },
 }

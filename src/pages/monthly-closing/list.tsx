@@ -375,52 +375,61 @@ export default function MonthlyClosingListPage() {
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell>
-                        {payout.recipient_type === 'teacher' &&
-                        (payout.courses_count != null && payout.courses_count > 0) ? (
-                          <div className="text-sm">
-                            <span className="font-medium">{payout.courses_count}</span>
+                      <TableCell className="text-center text-sm">
+                        {payout.recipient_type === 'teacher' ? (
+                          <>
+                            <span className="font-medium tabular-nums">{payout.courses_count ?? 0}</span>
                             <span className="text-muted-foreground ml-1">
-                              {payout.courses_count === 1
+                              {(payout.courses_count ?? 0) === 1
                                 ? t('teacherPayout.detail.course')
                                 : t('teacherPayout.detail.courses')}
                             </span>
-                            {payout.courses && payout.courses.length > 0 && (
-                              <div className="mt-1 space-y-1">
-                                {payout.courses.map((c) => (
-                                  <div key={c.id}>
-                                    <Link
-                                      to={`/courses/${c.slug}`}
-                                      className="text-primary hover:underline text-xs"
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                    >
-                                      {c.title}
-                                    </Link>
-                                    {c.subject && (
-                                      <div className="text-xs font-medium text-muted-foreground">
-                                        {c.subject.name}
-                                      </div>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
+                          </>
                         ) : (
                           <span className="text-muted-foreground">—</span>
                         )}
                       </TableCell>
                       <TableCell>
-                        <div className="text-sm space-y-0.5">
-                          {(payout.bonus_amount ?? 0) > 0 && (
+                        {payout.recipient_type === 'teacher' ? (
+                          <div className="text-sm space-y-0.5">
                             <div>
-                              <span className="text-muted-foreground">{formatCurrency(payout.total_amount)}</span>
-                              <span className="text-amber-600 ml-1">+ {formatCurrency(payout.bonus_amount ?? 0)}</span>
+                              <span className="font-medium">{formatCurrency(payout.total_collected ?? 0)}</span>
+                              <span className="text-muted-foreground text-xs ml-1">
+                                ({t('teacherPayout.list.collectedFromStudent')})
+                              </span>
                             </div>
-                          )}
-                          <span className="font-medium">{formatCurrency(payout.total_to_pay ?? payout.total_amount)}</span>
-                        </div>
+                            <div>
+                              <span className="font-medium">{formatCurrency(payout.total_amount)}</span>
+                              <span className="text-muted-foreground text-xs ml-1">
+                                ({t('teacherPayout.list.base')})
+                              </span>
+                            </div>
+                            {(payout.bonus_amount ?? 0) > 0 && (
+                              <div>
+                                <span className="font-medium text-amber-600">
+                                  {formatCurrency(payout.bonus_amount ?? 0)}
+                                </span>
+                                <span className="text-muted-foreground text-xs ml-1">
+                                  ({t('teacherPayout.list.bonus')})
+                                </span>
+                              </div>
+                            )}
+                            <div>
+                              <span className="font-semibold">
+                                {formatCurrency(payout.total_to_pay ?? payout.total_amount)}
+                              </span>
+                              <span className="text-muted-foreground text-xs ml-1">
+                                ({t('teacherPayout.list.toTeacher')})
+                              </span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-sm">
+                            <span className="font-medium">
+                              {formatCurrency(payout.total_to_pay ?? payout.total_amount)}
+                            </span>
+                          </div>
+                        )}
                       </TableCell>
                       <TableCell>{getStatusBadge(payout.status)}</TableCell>
                       <TableCell className="text-right">
@@ -478,9 +487,9 @@ export default function MonthlyClosingListPage() {
             </div>
           </div>
 
-          {/* Right: Summary table */}
+          {/* Right: Summary — sticky below navbar + month bar (month bar is top-[64px] z-20) */}
           {periodValid && (
-            <div>
+            <div className="sticky top-[12.5rem] z-10 self-start max-h-[calc(100vh-13.5rem)] overflow-y-auto pb-2">
               <Card className="h-fit">
                 <CardContent className="pt-6">
                   <h3 className="text-sm font-medium text-muted-foreground mb-3">

@@ -67,6 +67,13 @@ export const teacherPayout = {
     markPaidDescription: 'Are you sure you want to mark this payout as paid for',
     markBulkTitle: 'Mark Selected as Paid',
     markBulkDescription: 'Are you sure you want to mark {{count}} selected payouts as paid?',
+    confirmCalculateTitleLead: 'Run payout calculation for ',
+    confirmCalculateTitleTrail: '?',
+    /** Follows colored period (MM word order: period first) */
+    confirmCalculateTitleMmAfterPeriod: ' အတွက် ဆရာပေးချေမှု တွက်ချက်မလား?',
+    confirmCalculateDescription:
+      'Teacher payouts for this period will be computed or refreshed. Existing payout rows may be updated.',
+    confirmCalculateConfirm: 'Yes, run calculation',
   },
   list: {
     collectedFromStudent: 'collected from student',

@@ -50,6 +50,14 @@ export const monthlyClosing = {
     status: 'Status',
     actions: 'Actions',
   },
+  dialog: {
+    confirmCalculateTitleLead: 'Run payout calculation for ',
+    confirmCalculateTitleTrail: '?',
+    confirmCalculateTitleMmAfterPeriod: ' အတွက် ဆရာပေးချေမှု တွက်ချက်မလား?',
+    confirmCalculateDescription:
+      'Teacher payouts for this period will be computed or refreshed. Existing payout rows may be updated.',
+    confirmCalculateConfirm: 'Yes, run calculation',
+  },
   actions: {
     addPayout: 'Add payout',
     calculatePayout: 'Calculate payout',

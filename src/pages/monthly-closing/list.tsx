@@ -54,13 +54,14 @@ const TYPE_KEYS: Record<string, string> = {
 }
 
 export default function MonthlyClosingListPage() {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const [addPayoutOpen, setAddPayoutOpen] = useState(false)
   const [markPaidDialogOpen, setMarkPaidDialogOpen] = useState(false)
   const [selectedPayout, setSelectedPayout] = useState<PayoutItem | null>(null)
   const [bonusModalOpen, setBonusModalOpen] = useState(false)
   const [selectedPayoutForBonus, setSelectedPayoutForBonus] = useState<PayoutItem | null>(null)
   const [monthCloseDialogOpen, setMonthCloseDialogOpen] = useState(false)
+  const [calculateConfirmOpen, setCalculateConfirmOpen] = useState(false)
 
   const now = new Date()
   const [periodMode, setPeriodMode] = useState<'month' | 'custom'>('month')
@@ -90,6 +91,17 @@ export default function MonthlyClosingListPage() {
       calendarMonth: month,
     }
   }, [periodMode, selectedMonth, customStart, customEnd])
+
+  const calculateDialogPeriodLabel = useMemo(() => {
+    if (periodMode === 'custom' && customStart && customEnd) {
+      return `${customStart} – ${customEnd}`
+    }
+    if (payoutMonth && /^\d{4}-\d{2}$/.test(payoutMonth)) {
+      const [y, m] = payoutMonth.split('-').map(Number)
+      return format(new Date(y, m - 1, 1), 'MMMM yyyy')
+    }
+    return `${periodStart} – ${periodEnd}`
+  }, [periodMode, customStart, customEnd, payoutMonth, periodStart, periodEnd])
 
   const monthOptions = useMemo(() => {
     const options: Array<{ value: string; label: string; shortLabel: string }> = []
@@ -157,7 +169,7 @@ export default function MonthlyClosingListPage() {
     setCustomEnd('')
   }
 
-  const handleCalculate = () => {
+  const handleCalculateConfirm = () => {
     calculatePayouts.mutate(
       {
         period_start: periodStart,
@@ -168,6 +180,7 @@ export default function MonthlyClosingListPage() {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ['payouts', 'monthly-closing-summary'] })
         },
+        onSettled: () => setCalculateConfirmOpen(false),
       }
     )
   }
@@ -294,7 +307,7 @@ export default function MonthlyClosingListPage() {
           <div className="min-w-0 flex flex-col gap-4">
             <div className="flex flex-wrap items-center gap-3">
               <Button
-                onClick={handleCalculate}
+                onClick={() => setCalculateConfirmOpen(true)}
                 disabled={calculateDisabled}
                 title={monthClosedActionTitle}
               >
@@ -622,6 +635,56 @@ export default function MonthlyClosingListPage() {
           )}
         </div>
       </div>
+
+      <AlertDialog open={calculateConfirmOpen} onOpenChange={setCalculateConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-left">
+              {locale === 'mm' ? (
+                <>
+                  <span className="font-semibold text-amber-600 dark:text-amber-500">
+                    {calculateDialogPeriodLabel}
+                  </span>
+                  {t('monthlyClosing.dialog.confirmCalculateTitleMmAfterPeriod')}
+                </>
+              ) : (
+                <>
+                  {t('monthlyClosing.dialog.confirmCalculateTitleLead')}
+                  <span className="font-semibold text-amber-600 dark:text-amber-500">
+                    {' '}
+                    {calculateDialogPeriodLabel}
+                  </span>
+                  {t('monthlyClosing.dialog.confirmCalculateTitleTrail')}
+                </>
+              )}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('monthlyClosing.dialog.confirmCalculateDescription')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={calculatePayouts.isPending}>
+              {t('monthlyClosing.actions.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={calculatePayouts.isPending}
+              onClick={(e) => {
+                e.preventDefault()
+                handleCalculateConfirm()
+              }}
+            >
+              {calculatePayouts.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 inline animate-spin" />
+                  {t('monthlyClosing.actions.calculating')}
+                </>
+              ) : (
+                t('monthlyClosing.dialog.confirmCalculateConfirm')
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AddPayoutModal
         open={addPayoutOpen}

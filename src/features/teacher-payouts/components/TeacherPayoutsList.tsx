@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { Calculator, CheckCircle2, Gift, Search, RefreshCw, CalendarRange } from 'lucide-react'
+import { Calculator, CheckCircle2, Gift, Loader2, Search, RefreshCw, CalendarRange } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -21,6 +21,16 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { useCalculatePayouts } from '../hooks/useTeacherPayouts'
 import {
   usePayouts,
@@ -46,7 +56,7 @@ import { formatCurrency } from '@/utils/format'
  * Calculate still uses teacher-payouts endpoint which syncs to payouts
  */
 export function TeacherPayoutsList() {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const [page, setPage] = useState<number>(PAGINATION.DEFAULT_PAGE)
   const perPage = PAGINATION.DEFAULT_PER_PAGE
 
@@ -72,6 +82,7 @@ export function TeacherPayoutsList() {
   // Bonus modal (list)
   const [bonusModalOpen, setBonusModalOpen] = useState(false)
   const [selectedPayoutForBonus, setSelectedPayoutForBonus] = useState<PayoutItem | null>(null)
+  const [calculateConfirmOpen, setCalculateConfirmOpen] = useState(false)
 
   // Compute period dates
   const { periodStart, periodEnd, payoutMonth } = useMemo(() => {
@@ -91,6 +102,17 @@ export function TeacherPayoutsList() {
       payoutMonth: selectedMonth,
     }
   }, [periodMode, selectedMonth, customStart, customEnd])
+
+  const calculateDialogPeriodLabel = useMemo(() => {
+    if (periodMode === 'custom' && customStart && customEnd) {
+      return `${customStart} – ${customEnd}`
+    }
+    if (payoutMonth && /^\d{4}-\d{2}$/.test(payoutMonth)) {
+      const [y, m] = payoutMonth.split('-').map(Number)
+      return format(new Date(y, m - 1, 1), 'MMMM yyyy')
+    }
+    return `${periodStart} – ${periodEnd}`
+  }, [periodMode, customStart, customEnd, payoutMonth, periodStart, periodEnd])
 
   // Generate month options (last 6 months + current + next 3 months)
   const monthOptions = useMemo(() => {
@@ -150,12 +172,17 @@ export function TeacherPayoutsList() {
   const hasTeacherPayoutsForPeriod = (pagination?.total ?? 0) > 0
 
   // Handlers
-  const handleCalculate = () => {
-    calculatePayouts.mutate({
-      period_start: periodStart,
-      period_end: periodEnd,
-      payout_month: payoutMonth,
-    })
+  const handleCalculateConfirm = () => {
+    calculatePayouts.mutate(
+      {
+        period_start: periodStart,
+        period_end: periodEnd,
+        payout_month: payoutMonth,
+      },
+      {
+        onSettled: () => setCalculateConfirmOpen(false),
+      }
+    )
   }
 
   const handleMarkPaidClick = (payout: PayoutItem) => {
@@ -321,7 +348,7 @@ export function TeacherPayoutsList() {
         {/* Action bar: Calculate + Period Totals + Bulk Mark Paid */}
         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center flex-wrap">
           <Button
-            onClick={handleCalculate}
+            onClick={() => setCalculateConfirmOpen(true)}
             disabled={calculatePayouts.isPending || (periodMode === 'custom' && (!customStart || !customEnd))}
           >
             <Calculator className="h-4 w-4 mr-2" />
@@ -660,6 +687,56 @@ export function TeacherPayoutsList() {
         }}
         payout={selectedPayoutForBonus}
       />
+
+      <AlertDialog open={calculateConfirmOpen} onOpenChange={setCalculateConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-left">
+              {locale === 'mm' ? (
+                <>
+                  <span className="font-semibold text-amber-600 dark:text-amber-500">
+                    {calculateDialogPeriodLabel}
+                  </span>
+                  {t('teacherPayout.dialog.confirmCalculateTitleMmAfterPeriod')}
+                </>
+              ) : (
+                <>
+                  {t('teacherPayout.dialog.confirmCalculateTitleLead')}
+                  <span className="font-semibold text-amber-600 dark:text-amber-500">
+                    {' '}
+                    {calculateDialogPeriodLabel}
+                  </span>
+                  {t('teacherPayout.dialog.confirmCalculateTitleTrail')}
+                </>
+              )}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('teacherPayout.dialog.confirmCalculateDescription')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={calculatePayouts.isPending}>
+              {t('teacherPayout.actions.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={calculatePayouts.isPending}
+              onClick={(e) => {
+                e.preventDefault()
+                handleCalculateConfirm()
+              }}
+            >
+              {calculatePayouts.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 inline animate-spin" />
+                  {t('teacherPayout.actions.calculating')}
+                </>
+              ) : (
+                t('teacherPayout.dialog.confirmCalculateConfirm')
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }

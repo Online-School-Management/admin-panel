@@ -67,6 +67,10 @@ export const teacherPayout = {
     markPaidDescription: 'ဤပေးချေမှုကို ပေးပြီးအဖြစ်မှတ်ရန် သေချာပါသလား',
     markBulkTitle: 'ရွေးထားသည်များ ပေးပြီးမှတ်ရန်',
     markBulkDescription: 'ရွေးထားသော {{count}} ခုကို ပေးပြီးအဖြစ်မှတ်ရန် သေချာပါသလား',
+    confirmCalculateTitleMmAfterPeriod: ' အတွက် ဆရာပေးချေမှု တွက်ချက်မလား?',
+    confirmCalculateDescription:
+      'ဤကာလအတွက် ဆရာပေးချေမှုများကို တွက်ချက်/ပြန်လည်အပ်ဒိတ်လုပ်မည်။ ရှိပြီးသား အတန်းများကို ပြောင်းလဲနိုင်သည်။',
+    confirmCalculateConfirm: 'ဟုတ်ကဲ့၊ တွက်ချက်မည်',
   },
   list: {
     collectedFromStudent: 'ကျောင်းသားထံမှ ရရှိငွေ',

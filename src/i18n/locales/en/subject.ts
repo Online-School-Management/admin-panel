@@ -22,16 +22,26 @@ export const subject = {
   // Form labels
   form: {
     name: 'Name',
+    image: 'Subject image',
+    shortDescription: 'Short description',
+    tagEn: 'Tag (English)',
+    tagMm: 'Tag (Myanmar)',
     description: 'Description',
     enterName: 'Enter subject name',
+    enterShortDescription: 'Enter short description shown on subject list',
+    enterTagEn: 'Enter English tag (e.g. Best for beginners)',
+    enterTagMm: 'Enter Myanmar tag',
     enterDescription: 'Enter subject description (optional)',
   },
 
   // Table headers
   table: {
     no: 'No',
+    image: 'Image',
     name: 'Name',
     slug: 'Slug',
+    shortDescription: 'Short description',
+    tag: 'Tags',
     description: 'Description',
     created: 'Created',
     actions: 'Actions',
@@ -57,6 +67,9 @@ export const subject = {
     basicInformation: 'Basic Information',
     name: 'Name',
     slug: 'Slug',
+    image: 'Image',
+    shortDescription: 'Short description',
+    tags: 'Tags',
     description: 'Description',
     timestamps: 'Timestamps',
     created: 'Created',

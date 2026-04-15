@@ -6,7 +6,11 @@ export interface Subject {
   id: number
   name: string
   slug: string
+  image_url?: string | null
   description?: string | null
+  short_description?: string | null
+  tag_en?: string | null
+  tag_mm?: string | null
   created_at?: string
   updated_at?: string
 }
@@ -16,20 +20,32 @@ export interface SubjectCollectionItem {
   id: number
   name: string
   slug: string
+  image_url?: string | null
   description: string | null
+  short_description?: string | null
+  tag_en?: string | null
+  tag_mm?: string | null
   created_at: string
 }
 
 export interface CreateSubjectInput {
   name: string
   slug?: string
+  image_url?: string | null
   description?: string | null
+  short_description?: string | null
+  tag_en?: string | null
+  tag_mm?: string | null
 }
 
 export interface UpdateSubjectInput {
   name?: string
   slug?: string
+  image_url?: string | null
   description?: string | null
+  short_description?: string | null
+  tag_en?: string | null
+  tag_mm?: string | null
 }
 
 export interface SubjectsResponse {

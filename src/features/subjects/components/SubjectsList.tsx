@@ -116,9 +116,11 @@ export function SubjectsList() {
                 <TableSkeleton
                   columns={[
                     { width: 'w-8', className: 'w-16' },
+                    { width: 'w-12' },
                     { width: 'w-40' },
                     { width: 'w-40' },
                     { width: 'w-64', className: 'hidden md:table-cell' },
+                    { width: 'w-40', className: 'hidden lg:table-cell' },
                     { width: 'w-24', className: 'hidden lg:table-cell' },
                     { width: 'w-8', className: 'text-right' },
                   ]}
@@ -139,9 +141,11 @@ export function SubjectsList() {
                     <TableHeader>
                       <TableRow>
                         <TableHead className="w-16">{t('subject.table.no')}</TableHead>
+                        <TableHead className="w-14">{t('subject.table.image')}</TableHead>
                         <TableHead>{t('subject.table.name')}</TableHead>
                         <TableHead>{t('subject.table.slug')}</TableHead>
-                        <TableHead className="hidden md:table-cell">{t('subject.table.description')}</TableHead>
+                        <TableHead className="hidden md:table-cell">{t('subject.table.shortDescription')}</TableHead>
+                        <TableHead className="hidden lg:table-cell">{t('subject.table.tag')}</TableHead>
                         <TableHead className="hidden lg:table-cell">{t('subject.table.created')}</TableHead>
                         <TableHead className="text-right">{t('subject.table.actions')}</TableHead>
                       </TableRow>
@@ -158,6 +162,17 @@ export function SubjectsList() {
                             <TableCell className="text-muted-foreground text-center">
                               {rowNumber}
                             </TableCell>
+                            <TableCell className="w-14 p-2">
+                              {subject.image_url ? (
+                                <img
+                                  src={subject.image_url}
+                                  alt=""
+                                  className="h-10 w-10 rounded object-cover border"
+                                />
+                              ) : (
+                                <span className="text-muted-foreground text-xs">—</span>
+                              )}
+                            </TableCell>
                             <TableCell className="font-medium">
                               {subject.name}
                             </TableCell>
@@ -167,10 +182,28 @@ export function SubjectsList() {
                               </code>
                             </TableCell>
                             <TableCell className="hidden md:table-cell">
-                              {subject.description ? (
+                              {subject.short_description ? (
                                 <p className="text-sm text-muted-foreground line-clamp-2">
-                                  {subject.description}
+                                  {subject.short_description}
                                 </p>
+                              ) : (
+                                <span className="text-muted-foreground">-</span>
+                              )}
+                            </TableCell>
+                            <TableCell className="hidden lg:table-cell">
+                              {(subject.tag_en || subject.tag_mm) ? (
+                                <div className="flex flex-wrap gap-1">
+                                  {subject.tag_en && (
+                                    <span className="inline-flex rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">
+                                      EN: {subject.tag_en}
+                                    </span>
+                                  )}
+                                  {subject.tag_mm && (
+                                    <span className="inline-flex rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">
+                                      MM: {subject.tag_mm}
+                                    </span>
+                                  )}
+                                </div>
                               ) : (
                                 <span className="text-muted-foreground">-</span>
                               )}

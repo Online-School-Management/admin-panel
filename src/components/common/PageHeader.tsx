@@ -32,17 +32,19 @@ export function PageHeader({
   action,
 }: PageHeaderProps) {
   return (
-    <div className="flex items-center justify-between gap-4">
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
       {/* Left side - Title */}
-      <div className="flex-1">
-        <h2 className="text-2xl font-bold text-primary tracking-tight">{title}</h2>
+      <div className="min-w-0 flex-1">
+        <h2 className="text-xl font-bold text-primary tracking-tight sm:text-2xl break-words">
+          {title}
+        </h2>
         {description && (
-          <p className="text-muted-foreground mt-1 text-sm">{description}</p>
+          <p className="text-muted-foreground mt-1 text-sm break-words">{description}</p>
         )}
       </div>
-      
+
       {/* Right side - Back, Add, and Edit buttons */}
-      <div className="flex items-center gap-2">
+      <div className="flex w-full flex-shrink-0 flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
         {backTo && (
           <Button asChild variant="outline">
             <Link to={backTo}>

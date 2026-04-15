@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import { RichHtmlContent } from '@/components/common/RichHtmlContent'
 import { DetailSkeleton } from '@/components/common/skeletons/DetailSkeleton'
 import { useCourse } from '../hooks/useCourses'
 import { AssignTeacherModal } from '@/features/course-teachers/components/AssignTeacherModal'
@@ -226,10 +227,7 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div
-                  className="max-w-none text-sm leading-relaxed [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-2 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mb-2 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mb-2 [&_p]:mb-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:mb-2 [&_li]:mb-1 [&_a]:text-primary [&_a]:underline [&_table]:border-collapse [&_table]:w-full [&_td]:border [&_td]:border-border [&_td]:p-2 [&_th]:border [&_th]:border-border [&_th]:p-2 [&_th]:bg-muted [&_img]:max-w-full [&_img]:rounded"
-                  dangerouslySetInnerHTML={{ __html: course.description }}
-                />
+                <RichHtmlContent html={course.description} className="text-sm" />
               </CardContent>
             </Card>
           )}

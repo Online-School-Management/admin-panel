@@ -1,6 +1,7 @@
 import { FileText } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { RichHtmlContent } from '@/components/common/RichHtmlContent'
 import { DetailSkeleton } from '@/components/common/skeletons/DetailSkeleton'
 import { useArticle, useArticleCategories } from '../hooks/useArticles'
 import format from 'date-fns/format'
@@ -101,10 +102,7 @@ export function ArticleDetail({ articleSlug }: ArticleDetailProps) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div
-                className="prose max-w-none"
-                dangerouslySetInnerHTML={{ __html: article.body }}
-              />
+              <RichHtmlContent html={article.body} />
             </CardContent>
           </Card>
         </div>

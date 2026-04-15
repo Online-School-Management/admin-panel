@@ -11,7 +11,11 @@ const subjectFormBaseSchema = z.object({
   name: z
     .string()
     .min(VALIDATION.MIN_NAME_LENGTH, VALIDATION_MESSAGES.MIN_LENGTH('Name', VALIDATION.MIN_NAME_LENGTH)),
-  description: z.string().optional().nullable(),
+  image_url: z.string().url().max(500).optional().nullable(),
+  description: z.string().max(65535).optional().nullable(),
+  short_description: z.string().optional().nullable(),
+  tag_en: z.string().max(100).optional().nullable(),
+  tag_mm: z.string().max(100).optional().nullable(),
 })
 
 /**

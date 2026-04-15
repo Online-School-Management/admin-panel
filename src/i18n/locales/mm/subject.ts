@@ -22,16 +22,26 @@ export const subject = {
   // Form labels
   form: {
     name: 'အမည်',
+    image: 'ဘာသာရပ် ပုံ',
+    shortDescription: 'အတိုချုံး ဖော်ပြချက်',
+    tagEn: 'Tag (English)',
+    tagMm: 'Tag (Myanmar)',
     description: 'ဖော်ပြချက်',
     enterName: 'ဘာသာရပ် အမည် ထည့်ရန်',
+    enterShortDescription: 'ဘာသာရပ်စာရင်းတွင် ပြမည့် အတိုချုံးဖော်ပြချက် ထည့်ရန်',
+    enterTagEn: 'English tag ထည့်ရန် (ဥပမာ: Best for beginners)',
+    enterTagMm: 'Myanmar tag ထည့်ရန်',
     enterDescription: 'ဘာသာရပ် ဖော်ပြချက် ထည့်ရန် (ရွေးချယ်ရမည်)',
   },
 
   // Table headers
   table: {
     no: 'နံပါတ်',
+    image: 'ပုံ',
     name: 'အမည်',
     slug: 'Slug',
+    shortDescription: 'အတိုချုံး ဖော်ပြချက်',
+    tag: 'Tags',
     description: 'ဖော်ပြချက်',
     created: 'ဖန်တီးထားသည်',
     actions: 'လုပ်ဆောင်ချက်များ',
@@ -57,6 +67,9 @@ export const subject = {
     basicInformation: 'အခြေခံ အချက်အလက်များ',
     name: 'အမည်',
     slug: 'Slug',
+    image: 'ပုံ',
+    shortDescription: 'အတိုချုံး ဖော်ပြချက်',
+    tags: 'Tags',
     description: 'ဖော်ပြချက်',
     timestamps: 'အချိန်မှတ်တမ်းများ',
     created: 'ဖန်တီးထားသည်',

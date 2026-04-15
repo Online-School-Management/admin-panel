@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { ImageUpload } from '@/components/common/ImageUpload'
+import { SummernoteEditor } from '@/components/common/SummernoteEditor'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { FormSkeleton } from '@/components/common/skeletons/FormSkeleton'
 import { useCreateSubject, useUpdateSubject, useSubject } from '../hooks/useSubjects'
@@ -26,72 +28,71 @@ export function SubjectForm({ subjectSlug }: SubjectFormProps) {
   const navigate = useNavigate()
   const isEditMode = !!subjectSlug
 
-  const { 
-    data: subjectData, 
+  const {
+    data: subjectData,
     isLoading: isLoadingSubject,
     isFetching: isFetchingSubject,
     dataUpdatedAt: subjectDataUpdatedAt,
-  } = useSubject(
-    subjectSlug || ''
-  )
+  } = useSubject(subjectSlug || '')
 
   const createSubject = useCreateSubject()
   const updateSubject = useUpdateSubject()
 
-  // Select schema based on edit mode
   const subjectFormSchema = useMemo(() => {
     return isEditMode ? updateSubjectSchema : createSubjectSchema
   }, [isEditMode])
 
-  // Type for form data based on mode
   type SubjectFormData = CreateSubjectFormData | UpdateSubjectFormData
 
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     reset,
     formState: { errors, isSubmitting },
   } = useForm<SubjectFormData>({
     resolver: zodResolver(subjectFormSchema),
     defaultValues: {
       name: '',
-      description: '',
+      image_url: undefined,
+      short_description: undefined,
+      tag_en: undefined,
+      tag_mm: undefined,
+      description: undefined,
     },
   })
 
-  // Track the last dataUpdatedAt timestamp and subjectSlug we used to populate the form
   const lastPopulatedRef = useRef<{ subjectSlug: string; timestamp: number } | null>(null)
-  
-  // Populate form values when subject data loads (edit mode)
+
   useEffect(() => {
-    // Only proceed if we're in edit mode
     if (!isEditMode || !subjectSlug) {
       lastPopulatedRef.current = null
       return
     }
-    
-    // Wait for subject data to be loaded
+
     if (isLoadingSubject || isFetchingSubject || !subjectData?.data) return
-    
-    // Check if we need to populate
-    const shouldPopulate = 
+
+    const shouldPopulate =
       lastPopulatedRef.current === null ||
       lastPopulatedRef.current.subjectSlug !== subjectSlug ||
       subjectDataUpdatedAt > lastPopulatedRef.current.timestamp
-    
+
     if (!shouldPopulate) return
-    
+
     const subject = subjectData.data
-    
-    // Reset form with all values at once using reset()
+
     reset({
       name: subject.name || '',
-      description: subject.description || '',
+      image_url: subject.image_url || undefined,
+      short_description: subject.short_description || undefined,
+      tag_en: subject.tag_en || undefined,
+      tag_mm: subject.tag_mm || undefined,
+      description: subject.description || undefined,
     }, {
       keepDefaultValues: false,
     })
-    
-    // Update the last populated tracking
+
     lastPopulatedRef.current = {
       subjectSlug,
       timestamp: subjectDataUpdatedAt,
@@ -103,14 +104,22 @@ export function SubjectForm({ subjectSlug }: SubjectFormProps) {
       const updateFormData = data as UpdateSubjectFormData
       const updateData: UpdateSubjectInput = {
         name: updateFormData.name || undefined,
-        description: updateFormData.description || undefined,
+        image_url: updateFormData.image_url ?? null,
+        short_description: updateFormData.short_description ?? null,
+        tag_en: updateFormData.tag_en ?? null,
+        tag_mm: updateFormData.tag_mm ?? null,
+        description: updateFormData.description ?? null,
       }
       updateSubject.mutate({ slug: subjectSlug, data: updateData })
     } else {
       const createFormData = data as CreateSubjectFormData
       const createData: CreateSubjectInput = {
         name: createFormData.name,
-        description: createFormData.description || undefined,
+        image_url: createFormData.image_url ?? undefined,
+        short_description: createFormData.short_description ?? undefined,
+        tag_en: createFormData.tag_en ?? undefined,
+        tag_mm: createFormData.tag_mm ?? undefined,
+        description: createFormData.description ?? undefined,
       }
       createSubject.mutate(createData)
     }
@@ -126,19 +135,18 @@ export function SubjectForm({ subjectSlug }: SubjectFormProps) {
         <CardTitle>{isEditMode ? t('subject.pages.edit') : t('subject.pages.create')}</CardTitle>
       </CardHeader>
       <CardContent>
-        <form 
+        <form
           key={isEditMode ? `subject-form-${subjectSlug}` : 'subject-form-create'}
-          onSubmit={handleSubmit(onSubmit)} 
+          onSubmit={handleSubmit(onSubmit)}
           className="space-y-6"
         >
-          {/* Form fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Left Column */}
             <div className="space-y-4">
-              {/* Name */}
               <div className="space-y-2">
                 <Label htmlFor="name">
-                  {t('subject.form.name')} <span className="text-destructive">*</span>
+                  {t('subject.form.name')}
+                  {' '}
+                  <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="name"
@@ -150,28 +158,76 @@ export function SubjectForm({ subjectSlug }: SubjectFormProps) {
                   <p className="text-sm text-destructive">{errors.name.message}</p>
                 )}
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="tag_en">{t('subject.form.tagEn')}</Label>
+                <Input
+                  id="tag_en"
+                  {...register('tag_en')}
+                  placeholder={t('subject.form.enterTagEn')}
+                  disabled={isSubmitting}
+                />
+                {errors.tag_en && (
+                  <p className="text-sm text-destructive">{errors.tag_en.message}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="tag_mm">{t('subject.form.tagMm')}</Label>
+                <Input
+                  id="tag_mm"
+                  {...register('tag_mm')}
+                  placeholder={t('subject.form.enterTagMm')}
+                  disabled={isSubmitting}
+                />
+                {errors.tag_mm && (
+                  <p className="text-sm text-destructive">{errors.tag_mm.message}</p>
+                )}
+              </div>
             </div>
-
-            {/* Right Column */}
             <div className="space-y-4">
-              {/* Description */}
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="description">{t('subject.form.description')}</Label>
+              <div className="space-y-2">
+                <Label htmlFor="short_description">{t('subject.form.shortDescription')}</Label>
                 <Textarea
-                  id="description"
-                  {...register('description')}
-                  placeholder={t('subject.form.enterDescription')}
+                  id="short_description"
+                  {...register('short_description')}
+                  placeholder={t('subject.form.enterShortDescription')}
                   disabled={isSubmitting}
                   rows={4}
                 />
-                {errors.description && (
-                  <p className="text-sm text-destructive">{errors.description.message}</p>
+                {errors.short_description && (
+                  <p className="text-sm text-destructive">{errors.short_description.message}</p>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Form Actions */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 pt-2 border-t">
+            <div className="md:col-span-3 space-y-2">
+              <Label>{t('subject.form.image')}</Label>
+              <ImageUpload
+                value={watch('image_url') || null}
+                onChange={(url) => setValue('image_url', url, { shouldValidate: true })}
+                disabled={isSubmitting}
+                label=""
+              />
+              {errors.image_url && (
+                <p className="text-sm text-destructive">{errors.image_url.message}</p>
+              )}
+            </div>
+            <div className="md:col-span-9 space-y-2">
+              <Label>{t('subject.form.description')}</Label>
+              <SummernoteEditor
+                value={watch('description') || ''}
+                onChange={(content) => setValue('description', content, { shouldValidate: true })}
+                placeholder={t('subject.form.enterDescription')}
+                height={250}
+                disabled={isSubmitting}
+              />
+              {errors.description && (
+                <p className="text-sm text-destructive">{errors.description.message}</p>
+              )}
+            </div>
+          </div>
+
           <div className="flex justify-end gap-4 pt-4 border-t">
             <Button
               type="button"
@@ -182,9 +238,9 @@ export function SubjectForm({ subjectSlug }: SubjectFormProps) {
               <ArrowLeft className="h-4 w-4 mr-2" />
               {t('subject.actions.cancel')}
             </Button>
-            <Button 
-              type="submit" 
-              variant="default" 
+            <Button
+              type="submit"
+              variant="default"
               disabled={isSubmitting || createSubject.isPending || updateSubject.isPending}
             >
               {(isSubmitting || createSubject.isPending || updateSubject.isPending) ? (
@@ -209,6 +265,3 @@ export function SubjectForm({ subjectSlug }: SubjectFormProps) {
     </Card>
   )
 }
-
-
-

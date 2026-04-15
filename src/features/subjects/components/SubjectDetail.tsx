@@ -69,6 +69,10 @@ export function SubjectDetail({ subjectSlug }: SubjectDetailProps) {
                     {subject.slug}
                   </code>
                 </div>
+                <div className="min-w-0 space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">{t('subject.detail.orderNo')}</p>
+                  <p className="text-base font-semibold break-words">{subject.order_no ?? '-'}</p>
+                </div>
                 {subject.short_description && (
                   <div className="min-w-0 space-y-1 md:col-span-2">
                     <p className="text-sm font-medium text-muted-foreground">

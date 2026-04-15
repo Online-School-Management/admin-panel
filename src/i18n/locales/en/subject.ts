@@ -22,12 +22,14 @@ export const subject = {
   // Form labels
   form: {
     name: 'Name',
+    orderNo: 'Order No',
     image: 'Subject image',
     shortDescription: 'Short description',
     tagEn: 'Tag (English)',
     tagMm: 'Tag (Myanmar)',
     description: 'Description',
     enterName: 'Enter subject name',
+    enterOrderNo: 'Enter order number (e.g. 1, 2, 3)',
     enterShortDescription: 'Enter short description shown on subject list',
     enterTagEn: 'Enter English tag (e.g. Best for beginners)',
     enterTagMm: 'Enter Myanmar tag',
@@ -38,6 +40,7 @@ export const subject = {
   table: {
     no: 'No',
     image: 'Image',
+    orderNo: 'Order No',
     name: 'Name',
     slug: 'Slug',
     shortDescription: 'Short description',
@@ -66,6 +69,7 @@ export const subject = {
   detail: {
     basicInformation: 'Basic Information',
     name: 'Name',
+    orderNo: 'Order No',
     slug: 'Slug',
     image: 'Image',
     shortDescription: 'Short description',

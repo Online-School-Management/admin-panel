@@ -11,6 +11,7 @@ export interface Subject {
   short_description?: string | null
   tag_en?: string | null
   tag_mm?: string | null
+  order_no?: number | null
   created_at?: string
   updated_at?: string
 }
@@ -25,6 +26,7 @@ export interface SubjectCollectionItem {
   short_description?: string | null
   tag_en?: string | null
   tag_mm?: string | null
+  order_no?: number | null
   created_at: string
 }
 
@@ -36,6 +38,7 @@ export interface CreateSubjectInput {
   short_description?: string | null
   tag_en?: string | null
   tag_mm?: string | null
+  order_no?: number | null
 }
 
 export interface UpdateSubjectInput {
@@ -46,6 +49,7 @@ export interface UpdateSubjectInput {
   short_description?: string | null
   tag_en?: string | null
   tag_mm?: string | null
+  order_no?: number | null
 }
 
 export interface SubjectsResponse {

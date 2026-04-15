@@ -55,6 +55,7 @@ export function SubjectForm({ subjectSlug }: SubjectFormProps) {
     resolver: zodResolver(subjectFormSchema),
     defaultValues: {
       name: '',
+      order_no: undefined,
       image_url: undefined,
       short_description: undefined,
       tag_en: undefined,
@@ -84,6 +85,7 @@ export function SubjectForm({ subjectSlug }: SubjectFormProps) {
 
     reset({
       name: subject.name || '',
+      order_no: subject.order_no ?? undefined,
       image_url: subject.image_url || undefined,
       short_description: subject.short_description || undefined,
       tag_en: subject.tag_en || undefined,
@@ -104,6 +106,7 @@ export function SubjectForm({ subjectSlug }: SubjectFormProps) {
       const updateFormData = data as UpdateSubjectFormData
       const updateData: UpdateSubjectInput = {
         name: updateFormData.name || undefined,
+        order_no: updateFormData.order_no ?? null,
         image_url: updateFormData.image_url ?? null,
         short_description: updateFormData.short_description ?? null,
         tag_en: updateFormData.tag_en ?? null,
@@ -115,6 +118,7 @@ export function SubjectForm({ subjectSlug }: SubjectFormProps) {
       const createFormData = data as CreateSubjectFormData
       const createData: CreateSubjectInput = {
         name: createFormData.name,
+        order_no: createFormData.order_no ?? undefined,
         image_url: createFormData.image_url ?? undefined,
         short_description: createFormData.short_description ?? undefined,
         tag_en: createFormData.tag_en ?? undefined,
@@ -156,6 +160,20 @@ export function SubjectForm({ subjectSlug }: SubjectFormProps) {
                 />
                 {errors.name && (
                   <p className="text-sm text-destructive">{errors.name.message}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="order_no">{t('subject.form.orderNo')}</Label>
+                <Input
+                  id="order_no"
+                  type="number"
+                  min={1}
+                  {...register('order_no', { valueAsNumber: true, setValueAs: (v) => (v === '' || Number.isNaN(v) ? undefined : v) })}
+                  placeholder={t('subject.form.enterOrderNo')}
+                  disabled={isSubmitting}
+                />
+                {errors.order_no && (
+                  <p className="text-sm text-destructive">{errors.order_no.message}</p>
                 )}
               </div>
               <div className="space-y-2">

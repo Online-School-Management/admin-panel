@@ -22,12 +22,14 @@ export const subject = {
   // Form labels
   form: {
     name: 'အမည်',
+    orderNo: 'အစဉ် (Order No)',
     image: 'ဘာသာရပ် ပုံ',
     shortDescription: 'အတိုချုံး ဖော်ပြချက်',
     tagEn: 'Tag (English)',
     tagMm: 'Tag (Myanmar)',
     description: 'ဖော်ပြချက်',
     enterName: 'ဘာသာရပ် အမည် ထည့်ရန်',
+    enterOrderNo: 'အစဉ်နံပါတ် ထည့်ရန် (ဥပမာ: 1, 2, 3)',
     enterShortDescription: 'ဘာသာရပ်စာရင်းတွင် ပြမည့် အတိုချုံးဖော်ပြချက် ထည့်ရန်',
     enterTagEn: 'English tag ထည့်ရန် (ဥပမာ: Best for beginners)',
     enterTagMm: 'Myanmar tag ထည့်ရန်',
@@ -38,6 +40,7 @@ export const subject = {
   table: {
     no: 'နံပါတ်',
     image: 'ပုံ',
+    orderNo: 'အစဉ်',
     name: 'အမည်',
     slug: 'Slug',
     shortDescription: 'အတိုချုံး ဖော်ပြချက်',
@@ -66,6 +69,7 @@ export const subject = {
   detail: {
     basicInformation: 'အခြေခံ အချက်အလက်များ',
     name: 'အမည်',
+    orderNo: 'အစဉ်',
     slug: 'Slug',
     image: 'ပုံ',
     shortDescription: 'အတိုချုံး ဖော်ပြချက်',

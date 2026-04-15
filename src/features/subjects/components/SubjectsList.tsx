@@ -23,7 +23,6 @@ import { DeleteSubjectDialog } from './DeleteSubjectDialog'
 import { Pagination } from '@/components/common/Pagination'
 import { TableSkeleton } from '@/components/common/skeletons/TableSkeleton'
 import { PAGINATION } from '@/constants'
-import format from 'date-fns/format'
 import type { SubjectCollectionItem } from '../types/subject.types'
 import { useTranslation } from '@/i18n/context'
 
@@ -118,10 +117,8 @@ export function SubjectsList() {
                     { width: 'w-8', className: 'w-16' },
                     { width: 'w-12' },
                     { width: 'w-40' },
-                    { width: 'w-40' },
                     { width: 'w-64', className: 'hidden md:table-cell' },
                     { width: 'w-40', className: 'hidden lg:table-cell' },
-                    { width: 'w-24', className: 'hidden lg:table-cell' },
                     { width: 'w-8', className: 'text-right' },
                   ]}
                   rows={5}
@@ -141,12 +138,10 @@ export function SubjectsList() {
                     <TableHeader>
                       <TableRow>
                         <TableHead className="w-16">{t('subject.table.no')}</TableHead>
-                        <TableHead className="w-14">{t('subject.table.image')}</TableHead>
+                        <TableHead className="w-20">{t('subject.table.orderNo')}</TableHead>
                         <TableHead>{t('subject.table.name')}</TableHead>
-                        <TableHead>{t('subject.table.slug')}</TableHead>
                         <TableHead className="hidden md:table-cell">{t('subject.table.shortDescription')}</TableHead>
                         <TableHead className="hidden lg:table-cell">{t('subject.table.tag')}</TableHead>
-                        <TableHead className="hidden lg:table-cell">{t('subject.table.created')}</TableHead>
                         <TableHead className="text-right">{t('subject.table.actions')}</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -162,24 +157,11 @@ export function SubjectsList() {
                             <TableCell className="text-muted-foreground text-center">
                               {rowNumber}
                             </TableCell>
-                            <TableCell className="w-14 p-2">
-                              {subject.image_url ? (
-                                <img
-                                  src={subject.image_url}
-                                  alt=""
-                                  className="h-10 w-10 rounded object-cover border"
-                                />
-                              ) : (
-                                <span className="text-muted-foreground text-xs">—</span>
-                              )}
+                            <TableCell>
+                              {subject.order_no ?? '-'}
                             </TableCell>
                             <TableCell className="font-medium">
                               {subject.name}
-                            </TableCell>
-                            <TableCell>
-                              <code className="text-sm bg-muted px-2 py-1 rounded">
-                                {subject.slug}
-                              </code>
                             </TableCell>
                             <TableCell className="hidden md:table-cell">
                               {subject.short_description ? (
@@ -207,11 +189,6 @@ export function SubjectsList() {
                               ) : (
                                 <span className="text-muted-foreground">-</span>
                               )}
-                            </TableCell>
-                            <TableCell className="text-sm text-muted-foreground hidden lg:table-cell">
-                              {subject.created_at
-                                ? format(new Date(subject.created_at), 'MMM dd, yyyy')
-                                : '-'}
                             </TableCell>
                             <TableCell className="text-right">
                               <DropdownMenu>

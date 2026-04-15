@@ -16,6 +16,7 @@ const subjectFormBaseSchema = z.object({
   short_description: z.string().optional().nullable(),
   tag_en: z.string().max(100).optional().nullable(),
   tag_mm: z.string().max(100).optional().nullable(),
+  order_no: z.number().int().min(1).optional().nullable(),
 })
 
 /**

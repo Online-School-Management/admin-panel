@@ -16,13 +16,14 @@ export interface ScheduleCourse {
 export interface ScheduleTeacher {
   id: number
   name: string
-  email: string
+  email?: string
 }
 
 export interface Schedule {
   id: number
   course: ScheduleCourse
-  teacher: ScheduleTeacher
+  teacher?: ScheduleTeacher | null
+  teacher_id?: number | null
   day_of_week: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday'
   start_time: string
   end_time: string
@@ -36,7 +37,8 @@ export interface Schedule {
 export interface ScheduleCollectionItem {
   id: number
   course: ScheduleCourse
-  teacher: ScheduleTeacher
+  teacher?: ScheduleTeacher | null
+  teacher_id?: number | null
   day_of_week: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday'
   start_time: string
   end_time: string
@@ -47,7 +49,7 @@ export interface ScheduleCollectionItem {
 
 export interface CreateScheduleInput {
   course_id: number
-  teacher_id: number
+  teacher_id: number | null
   day_of_week: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday'
   start_time: string
   end_time: string
@@ -57,12 +59,29 @@ export interface CreateScheduleInput {
 
 export interface UpdateScheduleInput {
   course_id?: number
-  teacher_id?: number
+  teacher_id?: number | null
   day_of_week?: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday'
   start_time?: string
   end_time?: string
   room_or_link?: string | null
   topic_covered?: string | null
+}
+
+export interface CourseTeacherForSchedule {
+  id: number
+  name: string | null
+  email: string | null
+  commission_type: string | null
+  commission_rate?: number | null
+  monthly_salary_amount?: number | null
+  per_session_amount?: number | null
+  fixed_amount?: number | null
+}
+
+export interface CourseTeachersForScheduleResponse {
+  success: boolean
+  message?: string
+  data: CourseTeacherForSchedule[]
 }
 
 export interface SchedulesResponse {

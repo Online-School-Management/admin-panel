@@ -68,6 +68,14 @@ export interface CalculatePayoutInput {
   payout_month?: string | null
 }
 
+export interface PayoutSessionWarning {
+  course_id: number
+  course_title: string
+  teacher_id: number | null
+  session_count: number
+  reason: 'unassigned' | 'no_course_teacher'
+}
+
 export interface CalculatePayoutResult {
   period_start: string
   period_end: string
@@ -75,6 +83,7 @@ export interface CalculatePayoutResult {
   deleted_previous: number
   created_count: number
   total_amount: number
+  warnings?: PayoutSessionWarning[]
 }
 
 export interface MarkAsPaidBulkInput {

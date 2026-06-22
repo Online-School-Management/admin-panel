@@ -435,7 +435,6 @@ export function CoursesList() {
           }}
           courseId={selectedCourseForSchedule.id}
           courseTitle={selectedCourseForSchedule.title}
-          assignedTeacher={selectedCourseForSchedule.assigned_teacher}
         />
       )}
     </>

@@ -94,6 +94,7 @@ export const course = {
   // Detail page sections
   detail: {
     basicInformation: 'အခြေခံ အချက်အလက်များ',
+    studentList: 'ကျောင်းသား စာရင်း',
     assignedTeacher: 'ခန့်အပ်ထားသော ဆရာ',
     teacherName: 'ဆရာ အမည်',
     teacherEmail: 'အီးမေးလ်',
@@ -126,6 +127,7 @@ export const course = {
     courseStatus: 'သင်တန်း အခြေအနေ',
     schedules: 'သင်တန်းချိန်ဇယားများ',
     noSchedules: 'ဤသင်တန်းအတွက် သင်တန်းချိန်ဇယား မသတ်မှတ်ရသေးပါ',
+    noStudents: 'ဤသင်တန်းတွင် စာရင်းသွင်းထားသော ကျောင်းသား မရှိသေးပါ',
     noClassSessions: 'အတန်းချိန် မရှိသေးပါ။',
     classSessions: 'သင်တန်းခန်းများ',
     moreSessions: '+{{count}} ခန်း ပိုရှိပါသည်',
@@ -158,6 +160,7 @@ export const course = {
     assignTeacher: 'ဆရာ ခန့်အပ်ရန်',
     manageSchedule: 'သင်တန်းချိန်ဇယား စီမံခန့်ခွဲရန်',
     addSession: 'အတန်းချိန် ထည့်ရန်',
+    viewStudents: 'ကျောင်းသားများ ကြည့်ရန်',
   },
 }
 

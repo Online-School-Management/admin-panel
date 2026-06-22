@@ -39,6 +39,8 @@ export const courseTeacher = {
     existingAssignments: 'Assigned Teachers',
     changeTeacher: 'Change Teacher',
     confirmDelete: 'Are you sure you want to remove this teacher assignment?',
+    confirmReplaceTeacher:
+      'Replacing {{oldName}} with {{newName}} will update all future schedule slots and sessions for this course that currently belong to {{oldName}}. Past sessions will remain as {{oldName}}. Continue?',
   },
 }
 

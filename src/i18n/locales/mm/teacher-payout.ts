@@ -132,5 +132,11 @@ export const teacherPayout = {
     clickCalculate: '"ပေးချေမှုတွက်ချက်ရန်" ကိုနှိပ်ပြီး ပေးချေမှုမှတ်တမ်းများ ဖန်တီးပါ။',
     staleCalculationWarning:
       'သတိ! ကျောင်းသားပေးချေမှု သို့ ကော်မရှင်များ ပြောင်းလဲထားပါသည် — ပြန်တွက်ချက်ပါ။',
+    sessionWarningsTitle: 'ဆရာနှင့် မကိုက်ညီသော သင်တန်းခန်းများ ရှိပါသည်',
+    sessionWarningsDescription:
+      'ဤသင်တန်းခန်းများကို ပေးချေမှုတွင် မတွက်ပါ။ ဆရာ ခန့်အပ်မှု သို့မဟုတ် သင်တန်းချိန်ဇယား ပြင်ဆင်ပါ။',
+    warningUnassigned: 'ဆရာမပါသော သင်တန်းခန်းများ',
+    warningNoCourseTeacher: 'သင်တန်းတွင် ဆရာမရှိ',
+    warningSessions: 'သင်တန်းခန်း {{count}} ခု',
   },
 }

@@ -39,6 +39,8 @@ export const courseTeacher = {
     existingAssignments: 'ခန့်အပ်ထားသော ဆရာများ',
     changeTeacher: 'ဆရာ ပြောင်းလဲရန်',
     confirmDelete: 'ဤဆရာ ခန့်အပ်မှုကို ဖယ်ရှားလိုပါသလား။',
+    confirmReplaceTeacher:
+      '{{oldName}} ကို {{newName}} ဖြင့် အစားထိုးပါက လက်ရှိ {{oldName}} ၏ အနာဂတ် သင်တန်းချိန်ဇယားနှင့် သင်တန်းခန်းများ အပ်ဒိတ်လုပ်ပါမည်။ အတိတ်သင်တန်းခန်းများသည် {{oldName}} အဖြစ် ရှိနေပါမည်။ ဆက်လုပ်မလား?',
   },
 }
 

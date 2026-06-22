@@ -4,6 +4,7 @@ import type {
   ScheduleResponse,
   CreateScheduleInput,
   UpdateScheduleInput,
+  CourseTeachersForScheduleResponse,
 } from '../types/schedule.types'
 
 /**
@@ -39,6 +40,18 @@ export async function getScheduleById(id: number): Promise<ScheduleResponse> {
  */
 export async function getSchedulesByCourse(courseId: number): Promise<SchedulesResponse> {
   const response = await apiClient.get<SchedulesResponse>(`/schedules/course/${courseId}`)
+  return response.data
+}
+
+/**
+ * Get teachers assigned to a course (for schedule form dropdown)
+ */
+export async function getCourseTeachersForSchedule(
+  courseId: number
+): Promise<CourseTeachersForScheduleResponse> {
+  const response = await apiClient.get<CourseTeachersForScheduleResponse>(
+    `/schedules/course/${courseId}/teachers`
+  )
   return response.data
 }
 

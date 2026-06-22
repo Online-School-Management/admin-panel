@@ -94,6 +94,7 @@ export const course = {
   // Detail page sections
   detail: {
     basicInformation: 'Basic Information',
+    studentList: 'Student List',
     assignedTeacher: 'Assigned Teacher',
     teacherName: 'Teacher Name',
     teacherEmail: 'Email',
@@ -126,6 +127,7 @@ export const course = {
     courseStatus: 'Course Status',
     schedules: 'Schedules',
     noSchedules: 'No schedules defined for this course',
+    noStudents: 'No students enrolled in this course',
     noClassSessions: 'No class sessions yet.',
     classSessions: 'Class Sessions',
     moreSessions: '+{{count}} more sessions',
@@ -158,6 +160,7 @@ export const course = {
     assignTeacher: 'Assign Teacher',
     manageSchedule: 'Manage Schedule',
     addSession: 'Add Session',
+    viewStudents: 'View Students',
   },
 }
 

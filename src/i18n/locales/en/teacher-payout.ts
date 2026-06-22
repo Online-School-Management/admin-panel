@@ -138,5 +138,11 @@ export const teacherPayout = {
     clickCalculate: 'Click "Calculate Payouts" to generate payout records.',
     staleCalculationWarning:
       'Warning! Student payments or commissions changed — please run Re-calculate.',
+    sessionWarningsTitle: 'Some sessions could not be attributed to a teacher',
+    sessionWarningsDescription:
+      'These sessions were excluded from payout. Assign teachers or fix course-teacher assignments.',
+    warningUnassigned: 'Unassigned sessions',
+    warningNoCourseTeacher: 'Teacher not on course',
+    warningSessions: '{{count}} session(s)',
   },
 }

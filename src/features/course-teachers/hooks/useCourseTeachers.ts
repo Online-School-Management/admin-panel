@@ -15,6 +15,7 @@ import {
   showDeleteErrorToast,
 } from '@/utils/toast'
 import { courseKeys } from '@/features/courses/hooks/useCourses'
+import { scheduleKeys } from '@/features/schedules/hooks/useSchedules'
 import type {
   CreateCourseTeacherInput,
   UpdateCourseTeacherInput,
@@ -91,6 +92,8 @@ export function useCreateCourseTeacher() {
       // Invalidate course-specific queries
       if (response.data.course?.id) {
         queryClient.invalidateQueries({ queryKey: courseTeacherKeys.byCourse(response.data.course.id) })
+        queryClient.invalidateQueries({ queryKey: scheduleKeys.teachersByCourse(response.data.course.id) })
+        queryClient.invalidateQueries({ queryKey: scheduleKeys.byCourse(response.data.course.id) })
       }
       // Also refetch to ensure the list is updated immediately
       queryClient.refetchQueries({ queryKey: courseTeacherKeys.lists() })
@@ -135,6 +138,8 @@ export function useUpdateCourseTeacher() {
       // Invalidate course-specific queries
       if (response.data.course?.id) {
         queryClient.invalidateQueries({ queryKey: courseTeacherKeys.byCourse(response.data.course.id) })
+        queryClient.invalidateQueries({ queryKey: scheduleKeys.teachersByCourse(response.data.course.id) })
+        queryClient.invalidateQueries({ queryKey: scheduleKeys.byCourse(response.data.course.id) })
       }
       
       // Invalidate course queries to update assigned_teacher data
@@ -175,6 +180,7 @@ export function useDeleteCourseTeacher() {
       // This ensures that any course-teacher queries by course are refreshed
       queryClient.invalidateQueries({ queryKey: courseTeacherKeys.all })
       queryClient.refetchQueries({ queryKey: courseTeacherKeys.all })
+      queryClient.invalidateQueries({ queryKey: scheduleKeys.all })
       
       // Invalidate course queries to update assigned_teacher data
       queryClient.invalidateQueries({ queryKey: courseKeys.lists() })

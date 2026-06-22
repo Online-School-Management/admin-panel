@@ -4,6 +4,7 @@ import {
   getScheduleById,
   getSchedulesByCourse,
   getSchedulesByTeacher,
+  getCourseTeachersForSchedule,
   createSchedule,
   updateSchedule,
   deleteSchedule,
@@ -33,6 +34,7 @@ export const scheduleKeys = {
   details: () => [...scheduleKeys.all, 'detail'] as const,
   detail: (id: number) => [...scheduleKeys.details(), id] as const,
   byCourse: (courseId: number) => [...scheduleKeys.all, 'course', courseId] as const,
+  teachersByCourse: (courseId: number) => [...scheduleKeys.all, 'course', courseId, 'teachers'] as const,
   byTeacher: (teacherId: number) => [...scheduleKeys.all, 'teacher', teacherId] as const,
 }
 
@@ -64,6 +66,18 @@ export function useSchedulesByCourse(courseId: number) {
     queryFn: () => getSchedulesByCourse(courseId),
     enabled: !!courseId,
     staleTime: 1000 * 60 * 2, // 2 minutes
+  })
+}
+
+/**
+ * Hook to fetch teachers assigned to a course (for schedule form)
+ */
+export function useCourseTeachersForSchedule(courseId: number, enabled = true) {
+  return useQuery({
+    queryKey: scheduleKeys.teachersByCourse(courseId),
+    queryFn: () => getCourseTeachersForSchedule(courseId),
+    enabled: !!courseId && enabled,
+    staleTime: 1000 * 60 * 2,
   })
 }
 
@@ -107,6 +121,7 @@ export function useCreateSchedule() {
       // Invalidate course-specific queries
       if (response.data.course?.id) {
         queryClient.invalidateQueries({ queryKey: scheduleKeys.byCourse(response.data.course.id) })
+        queryClient.invalidateQueries({ queryKey: scheduleKeys.teachersByCourse(response.data.course.id) })
         queryClient.refetchQueries({ queryKey: scheduleKeys.byCourse(response.data.course.id) })
       }
       
@@ -152,6 +167,7 @@ export function useUpdateSchedule() {
       // Invalidate course-specific queries
       if (response.data.course?.id) {
         queryClient.invalidateQueries({ queryKey: scheduleKeys.byCourse(response.data.course.id) })
+        queryClient.invalidateQueries({ queryKey: scheduleKeys.teachersByCourse(response.data.course.id) })
         queryClient.refetchQueries({ queryKey: scheduleKeys.byCourse(response.data.course.id) })
       }
       

@@ -1,9 +1,23 @@
 import { useState } from 'react'
-import { Calendar, DollarSign, Clock, BookOpen, UserPlus, User, Mail, Percent, CalendarDays, CalendarIcon, FileText } from 'lucide-react'
+import { Calendar, DollarSign, Clock, BookOpen, UserPlus, User, Users, Mail, Percent, CalendarDays, CalendarIcon, FileText } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Separator } from '@/components/ui/separator'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { RichHtmlContent } from '@/components/common/RichHtmlContent'
 import { DetailSkeleton } from '@/components/common/skeletons/DetailSkeleton'
 import { useCourse } from '../hooks/useCourses'
@@ -12,6 +26,7 @@ import { ScheduleModal } from '@/features/schedules/components/ScheduleModal'
 import { CreateClassSessionModal, EditClassSessionModal, DeleteClassSessionDialog } from '@/features/class-sessions/components'
 import { ClassSessionsCard } from './ClassSessionsCard'
 import { useDeleteClassSession } from '@/features/class-sessions/hooks/useClassSessions'
+import { useEnrollmentsByCourse } from '@/features/enrollments/hooks/useEnrollments'
 import format from 'date-fns/format'
 import type { Course } from '../types/course.types'
 import { useTranslation } from '@/i18n/context'
@@ -28,11 +43,13 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
   const { t } = useTranslation()
   const [assignTeacherModalOpen, setAssignTeacherModalOpen] = useState(false)
   const [scheduleModalOpen, setScheduleModalOpen] = useState(false)
+  const [studentsModalOpen, setStudentsModalOpen] = useState(false)
   const [createSessionModalOpen, setCreateSessionModalOpen] = useState(false)
   const [editSessionId, setEditSessionId] = useState<number | null>(null)
   const [deleteSessionId, setDeleteSessionId] = useState<number | null>(null)
   const { data: courseData, isLoading, error } = useCourse(courseSlug)
   const deleteSession = useDeleteClassSession(courseData?.data?.slug)
+  const { data: enrollmentsData, isLoading: isLoadingEnrollments } = useEnrollmentsByCourse(courseData?.data?.id ?? 0)
 
   if (isLoading) {
     return <DetailSkeleton />
@@ -86,7 +103,17 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
           {/* Basic Information */}
           <Card>
             <CardHeader>
-              <CardTitle>{t('course.detail.basicInformation')}</CardTitle>
+              <div className="flex items-center justify-between gap-3">
+                <CardTitle>{t('course.detail.basicInformation')}</CardTitle>
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => setStudentsModalOpen(true)}
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  {t('course.actions.viewStudents')}
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -182,22 +209,28 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
                   </div>
                 )}
 
-                {/* Dates Section */}
-                {(course.start_date || course.end_date) && (
-                  <>
-                    {/* <Separator className="my-4" /> */}
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                        <CalendarIcon className="h-4 w-4" />
-                        {t('course.detail.startDate')}
-                      </p>
-                      {course.start_date && (
-                        <p className="text-base">
-                            {format(new Date(course.start_date), 'MMM dd, yyyy')}
-                        </p>
-                      )}
-                    </div>
-                  </>
+                {course.start_date && (
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <CalendarIcon className="h-4 w-4" />
+                      {t('course.detail.startDate')}
+                    </p>
+                    <p className="text-base">
+                      {format(new Date(course.start_date), 'MMM dd, yyyy')}
+                    </p>
+                  </div>
+                )}
+
+                {course.end_date && (
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <CalendarIcon className="h-4 w-4" />
+                      {t('course.detail.endDate')}
+                    </p>
+                    <p className="text-base">
+                      {format(new Date(course.end_date), 'MMM dd, yyyy')}
+                    </p>
+                  </div>
                 )}
 
                 {/* Notes Section */}
@@ -381,7 +414,7 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
                   <CalendarDays className="h-5 w-5" />
                   {t('course.detail.schedules')}
                 </CardTitle>
-                {course.schedules && course.schedules.length > 0 && course.assigned_teacher && (
+                {course.schedules && course.schedules.length > 0 && (
                   <Button
                     onClick={() => setScheduleModalOpen(true)}
                     variant="default"
@@ -439,11 +472,6 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
                       {t('course.actions.manageSchedule')}
                     </Button>
                   </div>
-                  {!course.assigned_teacher && (
-                    <p className="text-xs text-muted-foreground text-center">
-                      {t('schedule.modal.assignTeacherFirst')}
-                    </p>
-                  )}
                 </div>
               )}
             </CardContent>
@@ -523,7 +551,6 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
             onOpenChange={setScheduleModalOpen}
             courseId={courseData.data.id}
             courseTitle={courseData.data.title}
-            assignedTeacher={courseData.data.assigned_teacher}
           />
           {courseData.data.schedules && courseData.data.schedules.length > 0 && (
             <CreateClassSessionModal
@@ -551,6 +578,69 @@ export function CourseDetail({ courseSlug }: CourseDetailProps) {
             }}
             isLoading={deleteSession.isPending}
           />
+          <Dialog open={studentsModalOpen} onOpenChange={setStudentsModalOpen}>
+            <DialogContent className="max-w-3xl">
+              <DialogHeader>
+                <DialogTitle>{t('course.detail.studentList')}</DialogTitle>
+              </DialogHeader>
+
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>{t('course.table.no')}</TableHead>
+                      <TableHead>{t('enrollment.table.student')}</TableHead>
+                      <TableHead>{t('enrollment.table.status')}</TableHead>
+                      <TableHead>{t('enrollment.table.enrolledAt')}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {isLoadingEnrollments ? (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center py-6 text-muted-foreground">
+                          {t('common.messages.loading')}
+                        </TableCell>
+                      </TableRow>
+                    ) : (enrollmentsData?.data?.length ?? 0) === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center py-6 text-muted-foreground">
+                          {t('course.detail.noStudents')}
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      enrollmentsData?.data.map((enrollment, index) => (
+                        <TableRow key={enrollment.id}>
+                          <TableCell>{index + 1}</TableCell>
+                          <TableCell>
+                            {enrollment.student ? (
+                              <div>
+                                <div className="font-medium">{enrollment.student.name}</div>
+                                <div className="text-sm text-muted-foreground">
+                                  {enrollment.student.student_id}
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline">
+                              {t(`common.status.${enrollment.status}`)}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {enrollment.enrolled_at
+                              ? format(new Date(enrollment.enrolled_at), 'MMM dd, yyyy')
+                              : '-'}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </DialogContent>
+          </Dialog>
         </>
       )}
     </div>

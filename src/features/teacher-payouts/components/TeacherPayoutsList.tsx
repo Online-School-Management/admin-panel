@@ -46,6 +46,7 @@ import format from 'date-fns/format'
 import startOfMonth from 'date-fns/startOfMonth'
 import endOfMonth from 'date-fns/endOfMonth'
 import type { PayoutItem } from '@/features/payouts/types/payout.types'
+import type { PayoutSessionWarning } from '../types/teacher-payout.types'
 import { useTranslation } from '@/i18n/context'
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/utils/format'
@@ -83,6 +84,7 @@ export function TeacherPayoutsList() {
   const [bonusModalOpen, setBonusModalOpen] = useState(false)
   const [selectedPayoutForBonus, setSelectedPayoutForBonus] = useState<PayoutItem | null>(null)
   const [calculateConfirmOpen, setCalculateConfirmOpen] = useState(false)
+  const [payoutWarnings, setPayoutWarnings] = useState<PayoutSessionWarning[]>([])
 
   // Compute period dates
   const { periodStart, periodEnd, payoutMonth } = useMemo(() => {
@@ -181,6 +183,9 @@ export function TeacherPayoutsList() {
         payout_month: payoutMonth,
       },
       {
+        onSuccess: (response) => {
+          setPayoutWarnings(response.data.warnings ?? [])
+        },
         onSettled: () => setCalculateConfirmOpen(false),
       }
     )
@@ -410,6 +415,34 @@ export function TeacherPayoutsList() {
             className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-950 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100"
           >
             {t('teacherPayout.messages.staleCalculationWarning')}
+          </div>
+        )}
+
+        {payoutWarnings.length > 0 && (
+          <div
+            role="status"
+            className="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100 space-y-2"
+          >
+            <p className="font-medium">{t('teacherPayout.messages.sessionWarningsTitle')}</p>
+            <p className="text-amber-900/80 dark:text-amber-100/80">
+              {t('teacherPayout.messages.sessionWarningsDescription')}
+            </p>
+            <ul className="list-disc pl-5 space-y-1">
+              {payoutWarnings.map((warning, index) => (
+                <li key={`${warning.course_id}-${warning.teacher_id ?? 'null'}-${index}`}>
+                  <span className="font-medium">{warning.course_title}</span>
+                  {' — '}
+                  {warning.reason === 'unassigned'
+                    ? t('teacherPayout.messages.warningUnassigned')
+                    : t('teacherPayout.messages.warningNoCourseTeacher')}
+                  {warning.teacher_id != null && ` (ID: ${warning.teacher_id})`}
+                  {' — '}
+                  {t('teacherPayout.messages.warningSessions', {
+                    count: String(warning.session_count),
+                  })}
+                </li>
+              ))}
+            </ul>
           </div>
         )}
 

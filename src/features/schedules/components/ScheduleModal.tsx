@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Calendar, Loader2, Trash2, Edit, AlertCircle, Plus } from 'lucide-react'
+import { Calendar, Loader2, Trash2, Edit, Plus, Info } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -22,12 +22,15 @@ import {
 import { Badge } from '@/components/ui/badge'
 import {
   useSchedulesByCourse,
+  useCourseTeachersForSchedule,
   useCreateSchedule,
   useUpdateSchedule,
   useDeleteSchedule,
 } from '../hooks/useSchedules'
 import { createScheduleSchema, type CreateScheduleFormData } from '../schemas/schedule.schemas'
 import { useTranslation } from '@/i18n/context'
+import { formatCurrency } from '@/utils/format'
+import type { CourseTeacherForSchedule } from '../types/schedule.types'
 
 const DAYS_OF_WEEK = [
   { value: 'Monday', label: 'Monday' },
@@ -39,18 +42,43 @@ const DAYS_OF_WEEK = [
   { value: 'Sunday', label: 'Sunday' },
 ] as const
 
-/**
- * Convert 24-hour time format (HH:mm) to 12-hour format with AM/PM
- */
 function formatTimeTo12Hour(time24: string): string {
   if (!time24) return time24
-  
+
   const [hours, minutes] = time24.split(':').map(Number)
   const period = hours >= 12 ? 'PM' : 'AM'
   const hours12 = hours % 12 || 12
   const minutesStr = minutes.toString().padStart(2, '0')
-  
+
   return `${hours12}:${minutesStr} ${period}`
+}
+
+function formatCommission(
+  teacher: CourseTeacherForSchedule | null | undefined,
+  t: (key: string) => string,
+): string | null {
+  if (!teacher?.commission_type) return null
+
+  switch (teacher.commission_type) {
+    case 'monthly_percent':
+      return teacher.commission_rate != null
+        ? `${t('teacher.commissionType.monthly_percent')}: ${Number(teacher.commission_rate).toFixed(2)}%`
+        : t('teacher.commissionType.monthly_percent')
+    case 'monthly_salary':
+      return teacher.monthly_salary_amount != null
+        ? `${t('teacher.commissionType.monthly_salary')}: ${formatCurrency(Number(teacher.monthly_salary_amount))}`
+        : t('teacher.commissionType.monthly_salary')
+    case 'per_session':
+      return teacher.per_session_amount != null
+        ? `${t('teacher.commissionType.per_session')}: ${formatCurrency(Number(teacher.per_session_amount))}`
+        : t('teacher.commissionType.per_session')
+    case 'fixed_amount':
+      return teacher.fixed_amount != null
+        ? `${t('teacher.commissionType.fixed_amount')}: ${formatCurrency(Number(teacher.fixed_amount))}`
+        : t('teacher.commissionType.fixed_amount')
+    default:
+      return null
+  }
 }
 
 interface ScheduleModalProps {
@@ -58,35 +86,30 @@ interface ScheduleModalProps {
   onOpenChange: (open: boolean) => void
   courseId: number
   courseTitle: string
-  assignedTeacher: {
-    id: number
-    name: string
-    email?: string
-    commission_rate: number | null
-  } | null
 }
 
-/**
- * ScheduleModal component - modal for managing schedules for a course
- */
 export function ScheduleModal({
   open,
   onOpenChange,
   courseId,
   courseTitle,
-  assignedTeacher,
 }: ScheduleModalProps) {
   const { t } = useTranslation()
   const [editingId, setEditingId] = useState<number | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
+  const [originalTeacherId, setOriginalTeacherId] = useState<number | null>(null)
 
-  // Fetch existing schedules for this course
   const {
     data: schedulesData,
     isLoading: isLoadingSchedules,
     isFetching: isFetchingSchedules,
     refetch: refetchSchedules,
   } = useSchedulesByCourse(courseId)
+
+  const {
+    data: courseTeachersData,
+    isLoading: isLoadingTeachers,
+  } = useCourseTeachersForSchedule(courseId, open)
 
   const createSchedule = useCreateSchedule()
   const updateSchedule = useUpdateSchedule()
@@ -103,7 +126,7 @@ export function ScheduleModal({
     resolver: zodResolver(createScheduleSchema),
     defaultValues: {
       course_id: courseId,
-      teacher_id: undefined as any,
+      teacher_id: null,
       day_of_week: undefined as any,
       start_time: '',
       end_time: '',
@@ -112,47 +135,63 @@ export function ScheduleModal({
   })
 
   const selectedDayOfWeek = watch('day_of_week')
+  const selectedTeacherId = watch('teacher_id')
   const schedules = schedulesData?.data || []
+  const courseTeachers = courseTeachersData?.data || []
 
-  // Reset form when modal opens/closes or when editing changes
+  const defaultTeacherId = useMemo(() => {
+    if (courseTeachers.length === 1) {
+      return courseTeachers[0].id
+    }
+    return null
+  }, [courseTeachers])
+
+  const assignedCourseTeacher = useMemo(() => {
+    if (originalTeacherId == null) return null
+    return courseTeachers.find((ct) => ct.id === originalTeacherId) ?? null
+  }, [originalTeacherId, courseTeachers])
+
+  const showAssignedTeacher = editingId != null && originalTeacherId != null
+  const showTeacherDropdown = !showAssignedTeacher && courseTeachers.length > 0
+
   useEffect(() => {
     if (!open) {
       reset()
       setEditingId(null)
       setShowAddForm(false)
+      setOriginalTeacherId(null)
     } else {
-      // When modal opens, refetch schedules to ensure fresh data
       refetchSchedules()
       if (editingId) {
         const scheduleToEdit = schedules.find((s) => s.id === editingId)
         if (scheduleToEdit) {
-          // When editing, use the teacher from the schedule (should be the assigned teacher)
-          setValue('teacher_id', scheduleToEdit.teacher.id)
+          const teacherId = scheduleToEdit.teacher_id ?? scheduleToEdit.teacher?.id ?? null
+          setOriginalTeacherId(teacherId)
+          setValue('teacher_id', teacherId)
           setValue('day_of_week', scheduleToEdit.day_of_week)
           setValue('start_time', scheduleToEdit.start_time)
           setValue('end_time', scheduleToEdit.end_time)
           setValue('room_or_link', scheduleToEdit.room_or_link || null)
         }
-      } else {
-        reset()
-        setValue('course_id', courseId)
-        // Automatically set teacher_id from assigned teacher
-        if (assignedTeacher) {
-          setValue('teacher_id', assignedTeacher.id)
-        }
       }
     }
-  }, [open, editingId, schedules, reset, setValue, refetchSchedules, courseId, assignedTeacher])
+  }, [open, editingId, schedules, reset, setValue, refetchSchedules])
 
-  const onSubmit = async (data: CreateScheduleFormData) => {
-    // Ensure teacher_id is set (should always be from assignedTeacher)
-    const teacherId = assignedTeacher?.id
-    if (!teacherId) {
-      return // Should not happen if validation works correctly
-    }
+  const resetAddForm = () => {
+    reset({
+      course_id: courseId,
+      teacher_id: defaultTeacherId,
+      day_of_week: undefined as any,
+      start_time: '',
+      end_time: '',
+      room_or_link: null,
+    })
+  }
+
+  const submitSchedule = (data: CreateScheduleFormData) => {
+    const teacherId = data.teacher_id ?? null
 
     if (editingId) {
-      // Update existing schedule
       updateSchedule.mutate(
         {
           id: editingId,
@@ -166,19 +205,15 @@ export function ScheduleModal({
         },
         {
           onSuccess: async () => {
-            // Refetch schedules to get updated data
             await refetchSchedules()
-            reset()
+            resetAddForm()
             setEditingId(null)
             setShowAddForm(false)
-            if (assignedTeacher) {
-              setValue('teacher_id', assignedTeacher.id)
-            }
+            setOriginalTeacherId(null)
           },
         }
       )
     } else {
-      // Create new schedule
       createSchedule.mutate(
         {
           course_id: courseId,
@@ -190,14 +225,9 @@ export function ScheduleModal({
         },
         {
           onSuccess: async () => {
-            // Refetch schedules to get updated data
             await refetchSchedules()
-            reset()
+            resetAddForm()
             setShowAddForm(false)
-            setValue('course_id', courseId)
-            if (assignedTeacher) {
-              setValue('teacher_id', assignedTeacher.id)
-            }
           },
         }
       )
@@ -205,36 +235,37 @@ export function ScheduleModal({
   }
 
   const handleEdit = (scheduleId: number) => {
+    const scheduleToEdit = schedules.find((s) => s.id === scheduleId)
+    if (!scheduleToEdit) return
+
+    const teacherId = scheduleToEdit.teacher_id ?? scheduleToEdit.teacher?.id ?? null
+    setOriginalTeacherId(teacherId)
     setEditingId(scheduleId)
-    setShowAddForm(false) // Hide add form if editing
+    setShowAddForm(false)
+    setValue('course_id', courseId)
+    setValue('teacher_id', teacherId)
+    setValue('day_of_week', scheduleToEdit.day_of_week)
+    setValue('start_time', scheduleToEdit.start_time)
+    setValue('end_time', scheduleToEdit.end_time)
+    setValue('room_or_link', scheduleToEdit.room_or_link || null)
   }
 
   const handleCancelEdit = () => {
     setEditingId(null)
-    reset()
-    setValue('course_id', courseId)
-    if (assignedTeacher) {
-      setValue('teacher_id', assignedTeacher.id)
-    }
+    setOriginalTeacherId(null)
+    resetAddForm()
   }
 
   const handleAddClick = () => {
     setShowAddForm(true)
     setEditingId(null)
-    reset()
-    setValue('course_id', courseId)
-    if (assignedTeacher) {
-      setValue('teacher_id', assignedTeacher.id)
-    }
+    setOriginalTeacherId(null)
+    resetAddForm()
   }
 
   const handleCancelAdd = () => {
     setShowAddForm(false)
-    reset()
-    setValue('course_id', courseId)
-    if (assignedTeacher) {
-      setValue('teacher_id', assignedTeacher.id)
-    }
+    resetAddForm()
   }
 
   const handleDelete = (scheduleId: number) => {
@@ -247,6 +278,9 @@ export function ScheduleModal({
     }
   }
 
+  const showForm = showAddForm || editingId
+  const assignedCommission = formatCommission(assignedCourseTeacher, t)
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -256,19 +290,15 @@ export function ScheduleModal({
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Alert if no teacher assigned */}
-          {!assignedTeacher && (
-            <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-destructive mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="text-sm font-medium text-destructive">
-                  {t('schedule.modal.noTeacherAssigned')}
-                </p>
-              </div>
+          {courseTeachers.length === 0 && (
+            <div className="p-4 bg-muted border rounded-lg flex items-start gap-3">
+              <Info className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-muted-foreground">
+                {t('schedule.modal.noTeachersOnCourseHint')}
+              </p>
             </div>
           )}
 
-          {/* Existing Schedules */}
           {!editingId && !showAddForm && (
             <>
               {isLoadingSchedules ? (
@@ -277,53 +307,69 @@ export function ScheduleModal({
                 </div>
               ) : schedules.length > 0 ? (
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-base font-semibold">
-                      {t('schedule.modal.existingSchedules')} ({schedules.length})
-                    </Label>
-                  </div>
+                  <Label className="text-base font-semibold">
+                    {t('schedule.modal.existingSchedules')} ({schedules.length})
+                  </Label>
                   <div className="space-y-2">
-                    {schedules.map((schedule) => (
-                      <div
-                        key={schedule.id}
-                        className="flex items-center justify-between p-3 border rounded-lg"
-                      >
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Badge variant="default">{schedule.day_of_week}</Badge>
-                            <span className="font-medium">
-                              {formatTimeTo12Hour(schedule.start_time)} - {formatTimeTo12Hour(schedule.end_time)}
-                            </span>
+                    {schedules.map((schedule) => {
+                      const teacherId = schedule.teacher_id ?? schedule.teacher?.id ?? null
+                      const courseTeacher = teacherId
+                        ? courseTeachers.find((ct) => ct.id === teacherId)
+                        : null
+                      const commission = formatCommission(courseTeacher, t)
+
+                      return (
+                        <div
+                          key={schedule.id}
+                          className="flex items-center justify-between p-3 border rounded-lg"
+                        >
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                              <Badge variant="default">{schedule.day_of_week}</Badge>
+                              <span className="font-medium">
+                                {formatTimeTo12Hour(schedule.start_time)} -{' '}
+                                {formatTimeTo12Hour(schedule.end_time)}
+                              </span>
+                            </div>
+                            {teacherId != null && (
+                              <p className="text-sm text-muted-foreground">
+                                {t('schedule.modal.teacher')}:{' '}
+                                {schedule.teacher?.name ?? courseTeacher?.name}
+                                {commission && (
+                                  <>
+                                    {' · '}
+                                    {t('schedule.modal.commission')}: {commission}
+                                  </>
+                                )}
+                              </p>
+                            )}
+                            {schedule.room_or_link && (
+                              <p className="text-sm text-muted-foreground">
+                                {t('schedule.modal.roomOrLink')}: {schedule.room_or_link}
+                              </p>
+                            )}
                           </div>
-                          <p className="text-sm text-muted-foreground">
-                            {t('schedule.modal.teacher')}: {schedule.teacher.name}
-                          </p>
-                          {schedule.room_or_link && (
-                            <p className="text-sm text-muted-foreground">
-                              {t('schedule.modal.roomOrLink')}: {schedule.room_or_link}
-                            </p>
-                          )}
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEdit(schedule.id)}
+                              disabled={isSubmitting}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => handleDelete(schedule.id)}
+                              disabled={isSubmitting || deleteSchedule.isPending}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEdit(schedule.id)}
-                            disabled={isSubmitting}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleDelete(schedule.id)}
-                            disabled={isSubmitting || deleteSchedule.isPending}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 </div>
               ) : (
@@ -334,24 +380,16 @@ export function ScheduleModal({
                 </div>
               )}
 
-              {/* Add Schedule Button */}
-              {assignedTeacher && (
-                <div className="flex justify-center pt-2">
-                  <Button
-                    onClick={handleAddClick}
-                    variant="default"
-                    disabled={isSubmitting}
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    {t('schedule.modal.addSchedule')}
-                  </Button>
-                </div>
-              )}
+              <div className="flex justify-center pt-2">
+                <Button onClick={handleAddClick} variant="default" disabled={isSubmitting}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t('schedule.modal.addSchedule')}
+                </Button>
+              </div>
             </>
           )}
 
-          {/* Add/Edit Form */}
-          {assignedTeacher && (showAddForm || editingId) && (
+          {showForm && (
             <>
               {(isFetchingSchedules || createSchedule.isPending || updateSchedule.isPending) && (
                 <div className="flex items-center justify-center py-4 border rounded-lg bg-muted/50 mb-4">
@@ -365,22 +403,54 @@ export function ScheduleModal({
                   </p>
                 </div>
               )}
+
               <form
-                onSubmit={handleSubmit(onSubmit)}
+                onSubmit={handleSubmit(submitSchedule)}
                 className={`space-y-4 ${isFetchingSchedules || createSchedule.isPending || updateSchedule.isPending ? 'opacity-50 pointer-events-none' : ''}`}
               >
-                {/* Display assigned teacher info */}
-                <div className="p-3 bg-muted rounded-lg">
-                  <Label className="text-sm font-medium text-muted-foreground">
-                    {t('schedule.modal.assignedTeacher')}
-                  </Label>
-                  <p className="text-base font-semibold mt-1">{assignedTeacher.name}</p>
-                  {assignedTeacher.email && (
-                    <p className="text-sm text-muted-foreground">{assignedTeacher.email}</p>
-                  )}
-                </div>
+                {showAssignedTeacher && (
+                  <div className="space-y-2">
+                    <Label>{t('schedule.modal.assignedTeacher')}</Label>
+                    <div className="p-3 bg-muted border rounded-lg">
+                      <p className="font-medium">
+                        {assignedCourseTeacher?.name ?? schedules.find((s) => s.id === editingId)?.teacher?.name}
+                      </p>
+                      {assignedCommission && (
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {t('schedule.modal.commission')}: {assignedCommission}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
 
-              <div className="space-y-4">
+                {showTeacherDropdown && (
+                  <div className="space-y-2">
+                    <Label htmlFor="teacher_id">{t('schedule.modal.selectTeacher')}</Label>
+                    <Select
+                      value={selectedTeacherId != null ? String(selectedTeacherId) : ''}
+                      onValueChange={(value) => {
+                        setValue('teacher_id', Number(value), { shouldValidate: true })
+                      }}
+                      disabled={isSubmitting || isLoadingTeachers}
+                    >
+                      <SelectTrigger id="teacher_id">
+                        <SelectValue placeholder={t('schedule.modal.chooseTeacher')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {courseTeachers.map((teacher) => (
+                          <SelectItem key={teacher.id} value={String(teacher.id)}>
+                            {teacher.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {errors.teacher_id && (
+                      <p className="text-sm text-destructive">{errors.teacher_id.message}</p>
+                    )}
+                  </div>
+                )}
+
                 <div className="space-y-2">
                   <Label htmlFor="day_of_week">
                     {t('schedule.modal.dayOfWeek')} <span className="text-destructive">*</span>
@@ -410,7 +480,8 @@ export function ScheduleModal({
 
                 <div className="space-y-2">
                   <Label>
-                    {t('schedule.modal.startTime')} / {t('schedule.modal.endTime')} <span className="text-destructive">*</span>
+                    {t('schedule.modal.startTime')} / {t('schedule.modal.endTime')}{' '}
+                    <span className="text-destructive">*</span>
                   </Label>
                   <div className="flex items-center gap-2">
                     <div className="flex-1">
@@ -439,58 +510,50 @@ export function ScheduleModal({
                   </div>
                 </div>
 
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="room_or_link">{t('schedule.modal.roomOrLink')}</Label>
-                <Input
-                  id="room_or_link"
-                  {...register('room_or_link')}
-                  placeholder={t('schedule.modal.enterRoomOrLink')}
-                  disabled={isSubmitting}
-                />
-                {errors.room_or_link && (
-                  <p className="text-sm text-destructive">{errors.room_or_link.message}</p>
-                )}
-              </div>
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="room_or_link">{t('schedule.modal.roomOrLink')}</Label>
+                  <Input
+                    id="room_or_link"
+                    {...register('room_or_link')}
+                    placeholder={t('schedule.modal.enterRoomOrLink')}
+                    disabled={isSubmitting}
+                  />
+                  {errors.room_or_link && (
+                    <p className="text-sm text-destructive">{errors.room_or_link.message}</p>
+                  )}
+                </div>
 
-            <div className="flex justify-end gap-2 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={editingId ? handleCancelEdit : handleCancelAdd}
-                disabled={isSubmitting}
-              >
-                {t('schedule.modal.cancel')}
-              </Button>
-              <Button type="submit" disabled={isSubmitting || createSchedule.isPending || updateSchedule.isPending}>
-                {(isSubmitting || createSchedule.isPending || updateSchedule.isPending) ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    {editingId ? t('schedule.modal.updating') : t('schedule.modal.creating')}
-                  </>
-                ) : (
-                  <>
-                    <Calendar className="h-4 w-4 mr-2" />
-                    {editingId ? t('schedule.modal.update') : t('schedule.modal.create')}
-                  </>
-                )}
-              </Button>
-            </div>
-          </form>
+                <div className="flex justify-end gap-2 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={editingId ? handleCancelEdit : handleCancelAdd}
+                    disabled={isSubmitting}
+                  >
+                    {t('schedule.modal.cancel')}
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting || createSchedule.isPending || updateSchedule.isPending}
+                  >
+                    {(isSubmitting || createSchedule.isPending || updateSchedule.isPending) ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        {editingId ? t('schedule.modal.updating') : t('schedule.modal.creating')}
+                      </>
+                    ) : (
+                      <>
+                        <Calendar className="h-4 w-4 mr-2" />
+                        {editingId ? t('schedule.modal.update') : t('schedule.modal.create')}
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </form>
             </>
-          )}
-
-          {/* No Teacher Assigned Message */}
-          {!assignedTeacher && !showAddForm && !editingId && (
-            <div className="text-center py-4">
-              <p className="text-sm text-muted-foreground">
-                {t('schedule.modal.assignTeacherFirst')}
-              </p>
-            </div>
           )}
         </div>
       </DialogContent>
     </Dialog>
   )
 }
-

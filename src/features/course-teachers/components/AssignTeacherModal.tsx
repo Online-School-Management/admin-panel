@@ -251,6 +251,20 @@ export function AssignTeacherModal({
     }
 
     if (editingId) {
+      const oldTeacherId = existingAssignment?.teacher.id
+      const newTeacherId = data.teacher_id
+      if (oldTeacherId && newTeacherId !== oldTeacherId) {
+        const oldName = existingAssignment?.teacher.user.name ?? ''
+        const newName = teachers.find((teacher) => teacher.id === newTeacherId)?.user.name ?? ''
+        if (
+          !window.confirm(
+            t('courseTeacher.modal.confirmReplaceTeacher', { oldName, newName })
+          )
+        ) {
+          return
+        }
+      }
+
       updateAssignment.mutate(
         {
           id: editingId,

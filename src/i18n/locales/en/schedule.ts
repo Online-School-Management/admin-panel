@@ -28,9 +28,19 @@ export const schedule = {
     noSchedules: 'No schedules found for this course',
     addSchedule: 'Add Schedule',
     assignedTeacher: 'Assigned Teacher',
-    noTeacherAssigned: 'No teacher is assigned to this course. Please assign a teacher first before creating schedules.',
-    assignTeacherFirst: 'Please assign a teacher to this course first before creating schedules.',
-    confirmDelete: 'Are you sure you want to delete this schedule? This will also delete all future class sessions.',
+    commission: 'Commission',
+    noTeacherAssigned: 'No teacher is assigned to this course yet. You can still create schedule slots and assign a teacher later.',
+    assignTeacherFirst: 'You can create schedule slots now and assign teachers when ready.',
+    unassigned: 'Unassigned',
+    unassignedWarning:
+      'Sessions will be created without a teacher until one is assigned. They will not count toward payout.',
+    noTeachersOnCourseHint:
+      'No teachers are assigned to this course yet. You can create unassigned schedule slots, or assign teachers from the course page first.',
+    confirmTeacherChangeTitle: 'Change schedule teacher?',
+    confirmTeacherChangeDescription:
+      'Future sessions (from today) for this schedule will be updated to {{newTeacher}}. Past sessions will remain attributed to {{oldTeacher}}.',
+    confirmTeacherChangeConfirm: 'Yes, update future sessions',
+    confirmDelete: 'Are you sure you want to delete this schedule? All class sessions for this slot will also be deleted.',
     loadingSchedules: 'Loading schedules...',
     creatingSchedule: 'Creating schedule and generating class sessions...',
     updatingSchedule: 'Updating schedule and regenerating class sessions...',

@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { CheckCircle2, Pencil } from 'lucide-react'
+import { CheckCircle2, Download, Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Table,
   TableBody,
@@ -18,16 +19,11 @@ import { useTranslation } from '@/i18n/context'
 import { usePayout, useMarkPayoutAsPaid } from '@/features/payouts/hooks/usePayouts'
 import { MarkPayoutAsPaidDialog } from '@/features/teacher-payouts/components/MarkPayoutAsPaidDialog'
 import { EditPayoutBonusModal } from '@/features/teacher-payouts/components/EditPayoutBonusModal'
+import { exportPayoutSummaryToExcel } from '@/features/teacher-payouts/utils/exportPayoutSummaryExcel'
 import { formatCurrency, safeText } from '@/utils/format'
+import { cn } from '@/lib/utils'
 import format from 'date-fns/format'
-import type { PayoutSession, TeacherPayoutDetail } from '@/features/payouts/types/payout.types'
-
-/** Flat session row for the sessions table (session + course name + subject + teacher name) */
-interface FlatSession extends PayoutSession {
-  course_name: string
-  course_subject: string | null
-  teacher_name: string
-}
+import type { TeacherPayoutDetail } from '@/features/payouts/types/payout.types'
 
 /** e.g. "March 2026" from payout_month (YYYY-MM) or period_start */
 function formatPayoutMonthYear(payout: {
@@ -99,30 +95,54 @@ function SectionSummaryTitle({
   monthYear,
   locale,
   t,
+  trailingAction,
 }: {
   teacherName: string
   monthYear: string
   locale: string
   t: (key: string, params?: Record<string, string | number>) => string
+  trailingAction?: ReactNode
 }) {
   if (locale === 'mm') {
     return (
       <>
-        <span className="text-primary">{monthYear}</span>
-        <span className="text-foreground">{t('teacherPayout.detailPage.sectionSummaryMmBetweenMonthAndTeacher')}</span>
-        <span className="text-primary">{teacherName}</span>
-        <span className="text-foreground">{t('teacherPayout.detailPage.sectionSummaryMmSuffix')}</span>
+        <span className="inline-flex flex-wrap items-baseline gap-x-1">
+          <span className="text-primary">{monthYear}</span>
+          <span className="text-foreground">{t('teacherPayout.detailPage.sectionSummaryMmBetweenMonthAndTeacher')}</span>
+          <span className="text-primary">{teacherName}</span>
+          <span className="text-foreground">{t('teacherPayout.detailPage.sectionSummaryMmSuffix')}</span>
+        </span>
+        {trailingAction && (
+          <span className="ml-4 inline-flex shrink-0">{trailingAction}</span>
+        )}
       </>
     )
   }
   return (
     <>
-      <span className="text-foreground">{t('teacherPayout.detailPage.sectionSummaryLead')}</span>
-      <span className="text-primary">{teacherName}</span>
-      <span className="text-muted-foreground">{t('teacherPayout.detailPage.sectionSummaryBetween')}</span>
-      <span className="text-primary">{monthYear}</span>
+      <span className="inline-flex flex-wrap items-baseline gap-x-1">
+        <span className="text-foreground">{t('teacherPayout.detailPage.sectionSummaryLead')}</span>
+        <span className="text-primary">{teacherName}</span>
+        <span className="text-muted-foreground">{t('teacherPayout.detailPage.sectionSummaryBetween')}</span>
+        <span className="text-primary">{monthYear}</span>
+      </span>
+      {trailingAction && (
+        <span className="ml-4 inline-flex shrink-0">{trailingAction}</span>
+      )}
     </>
   )
+}
+
+function getSummaryTitleText(
+  teacherName: string,
+  monthYear: string,
+  locale: string,
+  t: (key: string, params?: Record<string, string | number>) => string
+): string {
+  if (locale === 'mm') {
+    return `${monthYear}${t('teacherPayout.detailPage.sectionSummaryMmBetweenMonthAndTeacher')}${teacherName}${t('teacherPayout.detailPage.sectionSummaryMmSuffix')}`
+  }
+  return `${t('teacherPayout.detailPage.sectionSummaryLead')}${teacherName}${t('teacherPayout.detailPage.sectionSummaryBetween')}${monthYear}`
 }
 
 export default function TeacherPayoutDetailPage() {
@@ -131,12 +151,33 @@ export default function TeacherPayoutDetailPage() {
   const payoutId = id ? parseInt(id, 10) : 0
   const [markPaidDialogOpen, setMarkPaidDialogOpen] = useState(false)
   const [bonusModalOpen, setBonusModalOpen] = useState(false)
+  const [activeCourseId, setActiveCourseId] = useState<string | null>(null)
 
   const { data: payoutResponse, isLoading, error } = usePayout(payoutId)
   const markAsPaid = useMarkPayoutAsPaid()
 
   const payout = payoutResponse?.data
   const isPending = payout?.status === 'pending'
+
+  const courseSessionTabs = useMemo(
+    () =>
+      (payout?.teacher_payouts ?? [])
+        .filter((tp) => tp.course)
+        .map((tp) => ({
+          ...tp,
+          sessions: [...(tp.sessions ?? [])].sort((a, b) =>
+            a.session_date && b.session_date
+              ? new Date(a.session_date).getTime() - new Date(b.session_date).getTime()
+              : 0
+          ),
+        })),
+    [payout?.teacher_payouts]
+  )
+
+  useEffect(() => {
+    const firstId = courseSessionTabs[0]?.course?.id
+    setActiveCourseId(firstId ? String(firstId) : null)
+  }, [payoutId, courseSessionTabs])
 
   const handleMarkPaidConfirm = () => {
     if (payout) {
@@ -187,20 +228,66 @@ export default function TeacherPayoutDetailPage() {
     0
   )
 
-  // Flat list of all sessions in the period (from all courses), sorted by date
-  const flatSessions: FlatSession[] = summaryLines
-    .flatMap((tp) =>
-      (tp.sessions ?? []).map((s) => ({
-        ...s,
-        course_name: safeText(tp.course?.title),
-        course_subject:
+  const defaultCourseTab = courseSessionTabs[0]?.course?.id
+    ? String(courseSessionTabs[0].course.id)
+    : undefined
+
+  const selectedCourseId = activeCourseId ?? defaultCourseTab ?? null
+
+  const handleExportSummary = () => {
+    if (summaryLines.length === 0) return
+
+    const fileMonth = payout.payout_month ?? monthYear.replace(/\s+/g, '-')
+
+    exportPayoutSummaryToExcel({
+      title: getSummaryTitleText(teacherName, monthYear, locale, t),
+      paymentStatusLabel: t('teacherPayout.detailPage.paymentStatusTitle'),
+      paymentStatus: t(`teacherPayout.status.${payout.status}`),
+      headers: [
+        t('teacherPayout.table.no'),
+        t('teacherPayout.detailPage.summaryTeacher'),
+        t('teacherPayout.detailPage.summaryPeriod'),
+        t('teacherPayout.detailPage.summaryCourseName'),
+        t('teacherPayout.detailPage.summaryCoursePrice'),
+        t('teacherPayout.detailPage.summaryCollected'),
+        t('teacherPayout.detailPage.commission'),
+        t('teacherPayout.detailPage.summaryToTeacher'),
+        t('teacherPayout.detailPage.totalSessionClass'),
+      ],
+      rows: summaryLines.map((tp, index) => ({
+        no: index + 1,
+        teacher: teacherName,
+        period: periodLabel,
+        course: tp.course
+          ? safeText(tp.course.title)
+          : t('teacherPayout.detailPage.salaryAllCourses'),
+        subject:
           tp.course?.subject && typeof tp.course.subject.name === 'string'
             ? tp.course.subject.name
             : null,
-        teacher_name: teacherName,
-      }))
-    )
-    .sort((a, b) => (a.session_date && b.session_date ? new Date(a.session_date).getTime() - new Date(b.session_date).getTime() : 0))
+        coursePrice:
+          tp.course?.monthly_fee != null
+            ? Number(tp.course.monthly_fee)
+            : tp.course?.total_fee != null
+              ? Number(tp.course.total_fee)
+              : null,
+        collected: Number(tp.total_collected ?? 0),
+        commission: getCommissionLabel(tp, t),
+        toTeacher: Number(tp.payout_amount ?? 0),
+        sessions: tp.sessions?.length ?? tp.sessions_count ?? 0,
+      })),
+      footerLabel: t('teacherPayout.detailPage.summaryFooterTotal'),
+      footerTotals: {
+        collected: footerTotalCollected,
+        toTeacher: footerTotalPayoutToTeacher,
+        sessions: footerTotalSessions,
+      },
+      fileName: t('teacherPayout.detailPage.exportSummaryFileName', {
+        teacher: teacherName.replace(/\s+/g, '_'),
+        month: fileMonth,
+      }),
+    })
+  }
 
   return (
     <div className="space-y-6">
@@ -285,15 +372,28 @@ export default function TeacherPayoutDetailPage() {
       {/* Section 1: Summary table (one row per course) */}
       <Card>
         <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3 space-y-0">
-          <CardTitle className="font-normal">
+          <CardTitle className="font-normal flex flex-wrap items-center gap-4">
             <SectionSummaryTitle
               teacherName={teacherName}
               monthYear={monthYear}
               locale={locale}
               t={t}
+              trailingAction={
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="border-black/80 text-black shadow-md hover:border-black hover:bg-black/5 hover:text-black hover:shadow-md"
+                  onClick={handleExportSummary}
+                  disabled={summaryLines.length === 0}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  {t('teacherPayout.detailPage.exportSummary')}
+                </Button>
+              }
             />
           </CardTitle>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm text-muted-foreground">{t('teacherPayout.detailPage.paymentStatusTitle')}:</span>
             <Badge variant={payout.status === 'paid' ? 'default' : 'warning'} className="text-sm">
               {t(`teacherPayout.status.${payout.status}`)}
@@ -403,50 +503,119 @@ export default function TeacherPayoutDetailPage() {
         </CardContent>
       </Card>
 
-      {/* Section 2: Sessions in period (one flat table) */}
+      {/* Section 2: Sessions in period (tabs per course) */}
       <Card>
         <CardHeader>
           <CardTitle>{t('teacherPayout.detailPage.sectionSessions', { period: periodLabel })}</CardTitle>
         </CardHeader>
-        <CardContent>
-          {flatSessions.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-12 text-center">{t('teacherPayout.detailPage.sessionNo')}</TableHead>
-                  <TableHead className="w-28">{t('teacherPayout.detailPage.sessionDate')}</TableHead>
-                  <TableHead className="w-[180px]">{t('teacherPayout.detailPage.sessionCourseName')}</TableHead>
-                  <TableHead className="w-[140px]">{t('teacherPayout.detailPage.sessionTeacherName')}</TableHead>
-                  <TableHead>{t('teacherPayout.detailPage.sessionTopic')}</TableHead>
-                  <TableHead>{t('teacherPayout.detailPage.sessionStatus')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {flatSessions.map((s, index) => (
-                  <TableRow key={typeof s.id === 'number' || typeof s.id === 'string' ? s.id : index}>
-                    <TableCell className="text-center">{index + 1}</TableCell>
-                    <TableCell>{s.session_date ? format(new Date(s.session_date), 'dd MMM yyyy') : '—'}</TableCell>
-                    <TableCell>
-                      <div>
-                        <span>{s.course_name}</span>
-                        {s.course_subject && (
-                          <div className="text-sm font-medium text-muted-foreground">
-                            {s.course_subject}
-                          </div>
+        <CardContent className="space-y-4">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+            <span className="text-muted-foreground">{t('teacherPayout.detailPage.sessionTeacherName')}:</span>
+            {payout.teacher?.slug ? (
+              <Link
+                to={`/teachers/${payout.teacher.slug}`}
+                className="font-medium text-primary hover:underline"
+              >
+                {teacherName}
+              </Link>
+            ) : (
+              <span className="font-medium">{teacherName}</span>
+            )}
+            {payout.teacher?.email && (
+              <span className="text-muted-foreground">({payout.teacher.email})</span>
+            )}
+          </div>
+
+          {courseSessionTabs.length > 0 && selectedCourseId ? (
+            <Tabs
+              value={selectedCourseId}
+              onValueChange={setActiveCourseId}
+              className="space-y-4"
+            >
+              <div className="overflow-x-auto pb-1 -mx-1 px-1">
+                <TabsList className="inline-flex h-auto w-max min-w-full justify-start gap-2 rounded-none border-0 bg-transparent p-0">
+                  {courseSessionTabs.map((tp) => {
+                    const courseId = String(tp.course!.id)
+                    const courseTitle = safeText(tp.course!.title)
+                    const subjectName =
+                      tp.course?.subject && typeof tp.course.subject.name === 'string'
+                        ? tp.course.subject.name
+                        : null
+                    const sessionCount = tp.sessions.length || tp.sessions_count || 0
+
+                    return (
+                      <TabsTrigger
+                        key={courseId}
+                        value={courseId}
+                        className={cn(
+                          'h-auto min-w-[200px] max-w-[280px] shrink-0 flex-col items-start rounded-lg border px-3 py-2.5 text-left shadow-none',
+                          'data-[state=active]:border-primary data-[state=active]:bg-primary/5 data-[state=active]:text-foreground data-[state=active]:shadow-sm',
+                          'data-[state=inactive]:border-border data-[state=inactive]:bg-background hover:bg-muted/40'
                         )}
-                      </div>
-                    </TableCell>
-                    <TableCell>{s.teacher_name}</TableCell>
-                    <TableCell className="text-muted-foreground">{s.topic_covered ?? '—'}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="capitalize">
-                        {safeText(s.status, '')}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                      >
+                        <div className="flex w-full items-start justify-between gap-2">
+                          <div className="min-w-0 text-left">
+                            <span className="block text-sm font-medium leading-snug line-clamp-2">
+                              {courseTitle}
+                            </span>
+                            {subjectName && (
+                              <span className="mt-0.5 block text-xs font-medium text-muted-foreground line-clamp-1">
+                                {subjectName}
+                              </span>
+                            )}
+                          </div>
+                          <Badge variant="secondary" className="shrink-0 tabular-nums">
+                            {sessionCount}
+                          </Badge>
+                        </div>
+                      </TabsTrigger>
+                    )
+                  })}
+                </TabsList>
+              </div>
+
+              {courseSessionTabs.map((tp) => {
+                const courseId = String(tp.course!.id)
+                const sessions = tp.sessions
+
+                return (
+                  <TabsContent key={courseId} value={courseId} className="mt-0 focus-visible:outline-none">
+                    {sessions.length > 0 ? (
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="w-12 text-center">{t('teacherPayout.detailPage.sessionNo')}</TableHead>
+                            <TableHead className="w-28">{t('teacherPayout.detailPage.sessionDate')}</TableHead>
+                            <TableHead className="w-[140px]">{t('teacherPayout.detailPage.sessionTeacherName')}</TableHead>
+                            <TableHead>{t('teacherPayout.detailPage.sessionTopic')}</TableHead>
+                            <TableHead>{t('teacherPayout.detailPage.sessionStatus')}</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {sessions.map((s, index) => (
+                            <TableRow key={typeof s.id === 'number' || typeof s.id === 'string' ? s.id : index}>
+                              <TableCell className="text-center">{index + 1}</TableCell>
+                              <TableCell>
+                                {s.session_date ? format(new Date(s.session_date), 'dd MMM yyyy') : '—'}
+                              </TableCell>
+                              <TableCell>{teacherName}</TableCell>
+                              <TableCell className="text-muted-foreground">{s.topic_covered ?? '—'}</TableCell>
+                              <TableCell>
+                                <Badge variant="outline" className="capitalize">
+                                  {safeText(s.status, '')}
+                                </Badge>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    ) : (
+                      <p className="text-muted-foreground">{t('teacherPayout.detailPage.noSessions')}</p>
+                    )}
+                  </TabsContent>
+                )
+              })}
+            </Tabs>
           ) : (
             <p className="text-muted-foreground">{t('teacherPayout.detailPage.noSessions')}</p>
           )}

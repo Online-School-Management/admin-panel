@@ -132,6 +132,8 @@ export const teacherPayout = {
     saveBonus: 'Save bonus',
     editBonus: 'Edit bonus',
     saving: 'Saving…',
+    exportSummary: 'Excel',
+    exportSummaryFileName: 'Summary_{{teacher}}_{{month}}',
   },
   messages: {
     noPayouts: 'No payouts found for this period',

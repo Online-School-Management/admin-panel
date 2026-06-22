@@ -126,6 +126,8 @@ export const teacherPayout = {
     saveBonus: 'အပိုဆုငွေ သိမ်းမည်',
     editBonus: 'အပိုဆုငွေ ပြင်မည်',
     saving: 'သိမ်းဆည်းနေသည်…',
+    exportSummary: 'Excel',
+    exportSummaryFileName: 'အကျဉ်းချုပ်_{{teacher}}_{{month}}',
   },
   messages: {
     noPayouts: 'ဤကာလအတွက် ပေးချေမှုမရှိပါ',

@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { Calculator, CheckCircle2, Gift, Loader2, Search, RefreshCw, CalendarRange } from 'lucide-react'
+import { Calculator, CheckCircle2, Download, Gift, Loader2, Search, RefreshCw, CalendarRange } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -37,8 +37,11 @@ import {
   useMarkPayoutAsPaid,
   useMarkPayoutsAsPaidBulk,
 } from '@/features/payouts/hooks/usePayouts'
+import { downloadPayoutSummaryExport } from '../utils/payoutSummaryExportHelpers'
+import type { PayoutSummaryColumnId } from '../utils/payoutSummaryExportColumns'
 import { MarkPayoutAsPaidDialog } from './MarkPayoutAsPaidDialog'
 import { EditPayoutBonusModal } from './EditPayoutBonusModal'
+import { ExportExcelColumnsModal } from './ExportExcelColumnsModal'
 import { Pagination } from '@/components/common/Pagination'
 import { TableSkeleton } from '@/components/common/skeletons/TableSkeleton'
 import { PAGINATION } from '@/constants'
@@ -50,6 +53,7 @@ import type { PayoutSessionWarning } from '../types/teacher-payout.types'
 import { useTranslation } from '@/i18n/context'
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/utils/format'
+import { showErrorToast } from '@/utils/toast'
 
 /**
  * TeacherPayoutsList - main component for teacher payout management
@@ -85,6 +89,8 @@ export function TeacherPayoutsList() {
   const [selectedPayoutForBonus, setSelectedPayoutForBonus] = useState<PayoutItem | null>(null)
   const [calculateConfirmOpen, setCalculateConfirmOpen] = useState(false)
   const [payoutWarnings, setPayoutWarnings] = useState<PayoutSessionWarning[]>([])
+  const [isExporting, setIsExporting] = useState(false)
+  const [exportModalOpen, setExportModalOpen] = useState(false)
 
   // Compute period dates
   const { periodStart, periodEnd, payoutMonth } = useMemo(() => {
@@ -260,6 +266,39 @@ export function TeacherPayoutsList() {
     setSelectedIds([])
   }
 
+  const exportFileMonth =
+    payoutMonth ??
+    (periodStart ? periodStart.slice(0, 7) : calculateDialogPeriodLabel.replace(/\s+/g, '-'))
+
+  const handleExportAllSummaries = async (columnIds: PayoutSummaryColumnId[]) => {
+    if (periodMode === 'custom' && (!customStart || !customEnd)) return
+
+    setIsExporting(true)
+    try {
+      const exportedCount = await downloadPayoutSummaryExport({
+        periodStart,
+        periodEnd,
+        columnIds,
+        locale,
+        t,
+        fileName: t('teacherPayout.detailPage.exportAllSummaryFileName', {
+          month: exportFileMonth,
+        }),
+      })
+
+      if (exportedCount === 0) {
+        showErrorToast(t('teacherPayout.messages.exportAllSummaryEmpty'))
+        return
+      }
+
+      setExportModalOpen(false)
+    } catch (error) {
+      showErrorToast(error, { title: t('teacherPayout.actions.exportAllSummary') })
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
   const hasActiveFilters = search !== '' || statusFilter !== 'all'
 
   const getStatusBadge = (status: string) => {
@@ -363,6 +402,28 @@ export function TeacherPayoutsList() {
               : hasTeacherPayoutsForPeriod
                 ? t('teacherPayout.actions.reCalculate')
                 : t('teacherPayout.actions.calculate')}
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="border-black/80 text-black shadow-md hover:border-black hover:bg-black/5 hover:text-black hover:shadow-md"
+            onClick={() => setExportModalOpen(true)}
+            disabled={
+              isExporting ||
+              !hasTeacherPayoutsForPeriod ||
+              (periodMode === 'custom' && (!customStart || !customEnd))
+            }
+          >
+            {isExporting ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4 mr-2" />
+            )}
+            {isExporting
+              ? t('teacherPayout.actions.exportAllSummaryExporting')
+              : t('teacherPayout.actions.exportAllSummary')}
           </Button>
 
           {/* Period totals inline */}
@@ -729,6 +790,13 @@ export function TeacherPayoutsList() {
           if (!open) setSelectedPayoutForBonus(null)
         }}
         payout={selectedPayoutForBonus}
+      />
+
+      <ExportExcelColumnsModal
+        open={exportModalOpen}
+        onOpenChange={setExportModalOpen}
+        onConfirm={handleExportAllSummaries}
+        isExporting={isExporting}
       />
 
       <AlertDialog open={calculateConfirmOpen} onOpenChange={setCalculateConfirmOpen}>

@@ -31,21 +31,23 @@ export interface PayoutSession {
 
 export interface TeacherPayoutDetail {
   id: number
-  teacher_id: number
-  course_id: number | null
+  teacher_id?: number
+  course_id?: number | null
   commission_type: string
-  period_start: string
-  period_end: string
-  payout_month: string | null
+  period_start?: string
+  period_end?: string
+  payout_month?: string | null
   total_collected: number
   commission_rate: number | null
   sessions_count: number
   per_session_rate: number | null
   salary_amount: number | null
   payout_amount: number
-  status: string
+  status?: string
   course?: PayoutCourse | null
   sessions?: PayoutSession[]
+  students_count?: number
+  student_names?: string[]
 }
 
 export interface PayoutItem {
@@ -122,6 +124,12 @@ export interface PayoutResponse {
   success: boolean
   message?: string
   data: PayoutItem
+}
+
+export interface PayoutExportResponse {
+  success: boolean
+  message?: string
+  data: PayoutItem[]
 }
 
 export interface MarkPayoutsPaidBulkResponse {

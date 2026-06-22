@@ -2,6 +2,7 @@ import apiClient from '@/services/api-client'
 import type {
   PayoutsResponse,
   PayoutResponse,
+  PayoutExportResponse,
   MarkPayoutsPaidBulkInput,
   MarkPayoutsPaidBulkResponse,
   MonthlyClosingSummary,
@@ -30,6 +31,15 @@ export async function getPayouts(params?: {
   order_dir?: string
 }): Promise<PayoutsResponse> {
   const response = await apiClient.get<PayoutsResponse>('/payouts', { params })
+  return response.data
+}
+
+export async function getPayoutExportSummary(params: {
+  period_start: string
+  period_end: string
+  payout_id?: number
+}): Promise<PayoutExportResponse> {
+  const response = await apiClient.get<PayoutExportResponse>('/payouts/export-summary', { params })
   return response.data
 }
 

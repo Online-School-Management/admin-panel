@@ -61,6 +61,17 @@ export const teacherPayout = {
     cancel: 'Cancel',
     confirmPaid: 'Confirm Paid',
     processing: 'Processing...',
+    exportAllSummary: 'Excel',
+    exportAllSummaryExporting: 'Exporting...',
+  },
+  exportColumns: {
+    title: 'Export Excel',
+    description: 'Choose which columns to include in the downloaded Excel file.',
+    selectAll: 'Select all columns',
+    download: 'Download',
+    subject: 'Subject',
+    studentsCount: 'Student count',
+    studentNames: 'Student names',
   },
   dialog: {
     markPaidTitle: 'Mark as Paid',
@@ -134,6 +145,7 @@ export const teacherPayout = {
     saving: 'Saving…',
     exportSummary: 'Excel',
     exportSummaryFileName: 'Summary_{{teacher}}_{{month}}',
+    exportAllSummaryFileName: 'Teacher_Payouts_{{month}}',
   },
   messages: {
     noPayouts: 'No payouts found for this period',
@@ -146,5 +158,6 @@ export const teacherPayout = {
     warningUnassigned: 'Unassigned sessions',
     warningNoCourseTeacher: 'Teacher not on course',
     warningSessions: '{{count}} session(s)',
+    exportAllSummaryEmpty: 'No payout summaries to export for this period.',
   },
 }

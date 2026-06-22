@@ -61,6 +61,17 @@ export const teacherPayout = {
     cancel: 'မလုပ်တော့ပါ',
     confirmPaid: 'ပေးပြီးအတည်ပြုရန်',
     processing: 'လုပ်ဆောင်နေသည်...',
+    exportAllSummary: 'Excel',
+    exportAllSummaryExporting: 'ထုတ်ယူနေသည်...',
+  },
+  exportColumns: {
+    title: 'Excel ထုတ်ယူရန်',
+    description: 'ထုတ်ယူမည့် Excel ဖိုင်တွင် ထည့်သွင်းမည့် ကော်လံများကို ရွေးချယ်ပါ။',
+    selectAll: 'ကော်လံအားလုံး ရွေးမည်',
+    download: 'ထုတ်ယူရန်',
+    subject: 'ဘာသာရပ်',
+    studentsCount: 'ကျောင်းသား အရေအတွက်',
+    studentNames: 'ကျောင်းသား အမည်များ',
   },
   dialog: {
     markPaidTitle: 'ပေးပြီးအဖြစ်မှတ်ရန်',
@@ -128,6 +139,7 @@ export const teacherPayout = {
     saving: 'သိမ်းဆည်းနေသည်…',
     exportSummary: 'Excel',
     exportSummaryFileName: 'အကျဉ်းချုပ်_{{teacher}}_{{month}}',
+    exportAllSummaryFileName: 'ဆရာပေးချေမှု_{{month}}',
   },
   messages: {
     noPayouts: 'ဤကာလအတွက် ပေးချေမှုမရှိပါ',
@@ -140,5 +152,6 @@ export const teacherPayout = {
     warningUnassigned: 'ဆရာမပါသော သင်တန်းခန်းများ',
     warningNoCourseTeacher: 'သင်တန်းတွင် ဆရာမရှိ',
     warningSessions: 'သင်တန်းခန်း {{count}} ခု',
+    exportAllSummaryEmpty: 'ဤကာလအတွက် ထုတ်ယူရန် ပေးချေမှု အကျဉ်းချုပ် မရှိပါ။',
   },
 }

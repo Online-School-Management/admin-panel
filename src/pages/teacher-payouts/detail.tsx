@@ -19,44 +19,17 @@ import { useTranslation } from '@/i18n/context'
 import { usePayout, useMarkPayoutAsPaid } from '@/features/payouts/hooks/usePayouts'
 import { MarkPayoutAsPaidDialog } from '@/features/teacher-payouts/components/MarkPayoutAsPaidDialog'
 import { EditPayoutBonusModal } from '@/features/teacher-payouts/components/EditPayoutBonusModal'
-import { exportPayoutSummaryToExcel } from '@/features/teacher-payouts/utils/exportPayoutSummaryExcel'
+import { ExportExcelColumnsModal } from '@/features/teacher-payouts/components/ExportExcelColumnsModal'
+import {
+  downloadPayoutSummaryExport,
+  formatPayoutMonthYear,
+  getCommissionLabel,
+} from '@/features/teacher-payouts/utils/payoutSummaryExportHelpers'
+import type { PayoutSummaryColumnId } from '@/features/teacher-payouts/utils/payoutSummaryExportColumns'
 import { formatCurrency, safeText } from '@/utils/format'
+import { showErrorToast } from '@/utils/toast'
 import { cn } from '@/lib/utils'
 import format from 'date-fns/format'
-import type { TeacherPayoutDetail } from '@/features/payouts/types/payout.types'
-
-/** e.g. "March 2026" from payout_month (YYYY-MM) or period_start */
-function formatPayoutMonthYear(payout: {
-  payout_month?: string | null
-  period_start?: string
-}): string {
-  if (payout.payout_month && /^\d{4}-\d{2}$/.test(payout.payout_month)) {
-    const [y, m] = payout.payout_month.split('-').map(Number)
-    return format(new Date(y, m - 1, 1), 'MMMM yyyy')
-  }
-  if (payout.period_start) {
-    return format(new Date(payout.period_start), 'MMMM yyyy')
-  }
-  return '—'
-}
-
-function getCommissionLabel(
-  tp: TeacherPayoutDetail,
-  t: (key: string, params?: Record<string, string | number>) => string
-): string {
-  switch (tp.commission_type) {
-    case 'monthly_percent':
-      return `${Number(tp.commission_rate) || 0}%`
-    case 'per_session':
-      return `${Number(tp.sessions_count) || 0} × ${formatCurrency(tp.per_session_rate)}`
-    case 'monthly_salary':
-      return t('teacherPayout.detailPage.salaryAllCourses')
-    case 'fixed_amount':
-      return `${t('teacherPayout.detailPage.commissionFixedAmount')}: ${formatCurrency(tp.payout_amount)}`
-    default:
-      return '—'
-  }
-}
 
 function PayoutDetailTitle({
   teacherName,
@@ -133,18 +106,6 @@ function SectionSummaryTitle({
   )
 }
 
-function getSummaryTitleText(
-  teacherName: string,
-  monthYear: string,
-  locale: string,
-  t: (key: string, params?: Record<string, string | number>) => string
-): string {
-  if (locale === 'mm') {
-    return `${monthYear}${t('teacherPayout.detailPage.sectionSummaryMmBetweenMonthAndTeacher')}${teacherName}${t('teacherPayout.detailPage.sectionSummaryMmSuffix')}`
-  }
-  return `${t('teacherPayout.detailPage.sectionSummaryLead')}${teacherName}${t('teacherPayout.detailPage.sectionSummaryBetween')}${monthYear}`
-}
-
 export default function TeacherPayoutDetailPage() {
   const { t, locale } = useTranslation()
   const { id } = useParams<{ id: string }>()
@@ -152,6 +113,8 @@ export default function TeacherPayoutDetailPage() {
   const [markPaidDialogOpen, setMarkPaidDialogOpen] = useState(false)
   const [bonusModalOpen, setBonusModalOpen] = useState(false)
   const [activeCourseId, setActiveCourseId] = useState<string | null>(null)
+  const [exportModalOpen, setExportModalOpen] = useState(false)
+  const [isExporting, setIsExporting] = useState(false)
 
   const { data: payoutResponse, isLoading, error } = usePayout(payoutId)
   const markAsPaid = useMarkPayoutAsPaid()
@@ -234,59 +197,36 @@ export default function TeacherPayoutDetailPage() {
 
   const selectedCourseId = activeCourseId ?? defaultCourseTab ?? null
 
-  const handleExportSummary = () => {
+  const handleExportSummary = async (columnIds: PayoutSummaryColumnId[]) => {
     if (summaryLines.length === 0) return
 
-    const fileMonth = payout.payout_month ?? monthYear.replace(/\s+/g, '-')
+    setIsExporting(true)
+    try {
+      const fileMonth = payout.payout_month ?? monthYear.replace(/\s+/g, '-')
+      const exportedCount = await downloadPayoutSummaryExport({
+        periodStart: payout.period_start,
+        periodEnd: payout.period_end,
+        payoutId: payout.id,
+        columnIds,
+        locale,
+        t,
+        fileName: t('teacherPayout.detailPage.exportSummaryFileName', {
+          teacher: teacherName.replace(/\s+/g, '_'),
+          month: fileMonth,
+        }),
+      })
 
-    exportPayoutSummaryToExcel({
-      title: getSummaryTitleText(teacherName, monthYear, locale, t),
-      paymentStatusLabel: t('teacherPayout.detailPage.paymentStatusTitle'),
-      paymentStatus: t(`teacherPayout.status.${payout.status}`),
-      headers: [
-        t('teacherPayout.table.no'),
-        t('teacherPayout.detailPage.summaryTeacher'),
-        t('teacherPayout.detailPage.summaryPeriod'),
-        t('teacherPayout.detailPage.summaryCourseName'),
-        t('teacherPayout.detailPage.summaryCoursePrice'),
-        t('teacherPayout.detailPage.summaryCollected'),
-        t('teacherPayout.detailPage.commission'),
-        t('teacherPayout.detailPage.summaryToTeacher'),
-        t('teacherPayout.detailPage.totalSessionClass'),
-      ],
-      rows: summaryLines.map((tp, index) => ({
-        no: index + 1,
-        teacher: teacherName,
-        period: periodLabel,
-        course: tp.course
-          ? safeText(tp.course.title)
-          : t('teacherPayout.detailPage.salaryAllCourses'),
-        subject:
-          tp.course?.subject && typeof tp.course.subject.name === 'string'
-            ? tp.course.subject.name
-            : null,
-        coursePrice:
-          tp.course?.monthly_fee != null
-            ? Number(tp.course.monthly_fee)
-            : tp.course?.total_fee != null
-              ? Number(tp.course.total_fee)
-              : null,
-        collected: Number(tp.total_collected ?? 0),
-        commission: getCommissionLabel(tp, t),
-        toTeacher: Number(tp.payout_amount ?? 0),
-        sessions: tp.sessions?.length ?? tp.sessions_count ?? 0,
-      })),
-      footerLabel: t('teacherPayout.detailPage.summaryFooterTotal'),
-      footerTotals: {
-        collected: footerTotalCollected,
-        toTeacher: footerTotalPayoutToTeacher,
-        sessions: footerTotalSessions,
-      },
-      fileName: t('teacherPayout.detailPage.exportSummaryFileName', {
-        teacher: teacherName.replace(/\s+/g, '_'),
-        month: fileMonth,
-      }),
-    })
+      if (exportedCount === 0) {
+        showErrorToast(t('teacherPayout.messages.exportAllSummaryEmpty'))
+        return
+      }
+
+      setExportModalOpen(false)
+    } catch (error) {
+      showErrorToast(error, { title: t('teacherPayout.detailPage.exportSummary') })
+    } finally {
+      setIsExporting(false)
+    }
   }
 
   return (
@@ -384,8 +324,8 @@ export default function TeacherPayoutDetailPage() {
                   variant="outline"
                   size="sm"
                   className="border-black/80 text-black shadow-md hover:border-black hover:bg-black/5 hover:text-black hover:shadow-md"
-                  onClick={handleExportSummary}
-                  disabled={summaryLines.length === 0}
+                  onClick={() => setExportModalOpen(true)}
+                  disabled={summaryLines.length === 0 || isExporting}
                 >
                   <Download className="h-4 w-4 mr-2" />
                   {t('teacherPayout.detailPage.exportSummary')}
@@ -635,6 +575,13 @@ export default function TeacherPayoutDetailPage() {
         open={bonusModalOpen}
         onOpenChange={setBonusModalOpen}
         payout={payout}
+      />
+
+      <ExportExcelColumnsModal
+        open={exportModalOpen}
+        onOpenChange={setExportModalOpen}
+        onConfirm={handleExportSummary}
+        isExporting={isExporting}
       />
     </div>
   )
